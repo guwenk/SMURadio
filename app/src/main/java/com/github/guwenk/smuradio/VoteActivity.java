@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,8 @@ public class VoteActivity extends AppCompatActivity {
     ArrayList<String> names = new ArrayList<>();
     String filename;
     String choose;
+    String downloadedXml;
+    boolean downloadIsDone = false;
 
     //String urlXML = "http://192.168.1.69:9001/?pass=yHZDVtGwCC&action=getplaylist";
 
@@ -58,10 +61,6 @@ public class VoteActivity extends AppCompatActivity {
         new ParseXML().execute(); //для сети нужно добавить в execute параметр urlXML
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, names);
         listView.setAdapter(adapter);
-
-        FileWorker fw = new FileWorker();
-        fw.writeFile();
-        System.out.println(fw.readFile());
 
 
 
@@ -139,43 +138,7 @@ public class VoteActivity extends AppCompatActivity {
     }
 
 
-    protected class FileWorker{
-        String FILENAME = "Base.xml";
-        String LOG_TAG = "FileWorker";
-        void writeFile(){
-            try {
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(FILENAME, MODE_PRIVATE)));
-                DownloadXML dlXML = new DownloadXML();
-                dlXML.start();
-                bw.write(dlXML.getDownloadedXml());
-                bw.close();
-                Log.d(LOG_TAG, "Файл записан");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        String readFile(){
-            StringBuilder sb = new StringBuilder();
-            try{
-                BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput(FILENAME)));
-                String str;
-                while ((str = br.readLine()) != null){
-                    sb.append(str);
-                    sb.append("\n");
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return sb.toString();
-        }
-    }
-
-
-    //Парсинг XML из Assets
+    //Парсинг XML из сети
     protected class ParseXML extends AsyncTask<String, Void, Void>{
         @Override
         protected void onPreExecute() {
@@ -190,13 +153,11 @@ public class VoteActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(String... strings) { //это для сети - protected Void doInBackground(String... Url)
             try {
-                //URL url = new URL(Url[0]); //Из сети почему-то плохо работает
-                InputStream stream = getAssets().open("base.xml");
+                InputStream stream = new URL("http://192.168.1.69:9001/?pass=yHZDVtGwCC&action=library&filename=Base").openConnection().getInputStream();
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-                //Document doc = documentBuilder.parse(new InputSource(url.openStream()));
                 Document doc = documentBuilder.parse(new InputSource(stream));
-                trackNodeList = doc.getElementsByTagName("TRACK");
+                trackNodeList = doc.getElementsByTagName("Track");
             } catch (SAXException e) {
                 System.out.println("Wrong IP:PORT or PASS");
             } catch (ParserConfigurationException | IOException e) {
@@ -212,11 +173,11 @@ public class VoteActivity extends AppCompatActivity {
                 Element trackElement = (Element) trackNodeList.item(i);
                 Tracks tracks = new Tracks();
                 tracks.setNum(i+1);
-                tracks.setArtist(trackElement.getAttribute("ARTIST"));
-                tracks.setTitle(trackElement.getAttribute("TITLE"));
-                tracks.setDuration(trackElement.getAttribute("DURATION"));
-                tracks.setFilename(trackElement.getAttribute("FILENAME"));
-                names.add((i+1)+ ". " + trackElement.getAttribute("ARTIST") + " - " + trackElement.getAttribute("TITLE"));
+                tracks.setArtist(trackElement.getAttribute("artist"));
+                tracks.setTitle(trackElement.getAttribute("title"));
+                tracks.setDuration(trackElement.getAttribute("duration"));
+                tracks.setFilename(trackElement.getAttribute("filename"));
+                names.add((i+1)+ ". " + trackElement.getAttribute("artist") + " - " + trackElement.getAttribute("title"));
                 trackList.add(tracks);
             }
             pDialog.dismiss();
