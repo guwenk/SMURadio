@@ -6,7 +6,6 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,14 +19,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +31,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 
+
 public class VoteActivity extends AppCompatActivity {
 
     NodeList trackNodeList;
@@ -46,10 +40,6 @@ public class VoteActivity extends AppCompatActivity {
     ArrayList<String> names = new ArrayList<>();
     String filename;
     String choose;
-    String downloadedXml;
-    boolean downloadIsDone = false;
-
-    //String urlXML = "http://192.168.1.69:9001/?pass=yHZDVtGwCC&action=getplaylist";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +48,13 @@ public class VoteActivity extends AppCompatActivity {
 
         final ListView listView = (ListView) findViewById(R.id.listView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        if (!new InternetChecker().hasConnection(getApplicationContext())){
+            Toast.makeText(getApplicationContext(), "Проверьте подключение к интернету", Toast.LENGTH_LONG).show();
+            finish();
+        }
         new ParseXML().execute(); //для сети нужно добавить в execute параметр urlXML
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, names);
         listView.setAdapter(adapter);
-
-
 
         //<Поисковик>
         final EditText etFilter = (EditText)findViewById(R.id.filter);
@@ -122,7 +114,6 @@ public class VoteActivity extends AppCompatActivity {
     }
 
 
-
     //<Запрос на добавление трека>
     protected class VoteRequest extends AsyncTask<String, Void, Void>{
         @Override
@@ -158,17 +149,10 @@ public class VoteActivity extends AppCompatActivity {
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                 Document doc = documentBuilder.parse(new InputSource(stream));
                 trackNodeList = doc.getElementsByTagName("Track");
-            } catch (SAXException e) {
-                System.out.println("Wrong IP:PORT or PASS");
-            } catch (ParserConfigurationException | IOException e) {
+            } catch (SAXException | IOException | ParserConfigurationException e) {
                 e.printStackTrace();
             }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
+            if (trackNodeList != null)
             for (int i = 0; i < trackNodeList.getLength(); i++){
                 Element trackElement = (Element) trackNodeList.item(i);
                 Tracks tracks = new Tracks();
@@ -180,6 +164,12 @@ public class VoteActivity extends AppCompatActivity {
                 names.add((i+1)+ ". " + trackElement.getAttribute("artist") + " - " + trackElement.getAttribute("title"));
                 trackList.add(tracks);
             }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
             pDialog.dismiss();
         }
     }

@@ -35,8 +35,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (toggleButton.isChecked()){
-                    mediaPlayer = new MediaPlayer();
-                    new RadioPlayer().execute();
+                    if (new InternetChecker().hasConnection(getApplicationContext())){
+                        mediaPlayer = new MediaPlayer();
+                        new RadioPlayer().execute();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Проверьте подключение к интернету", Toast.LENGTH_LONG).show();
+                        toggleButton.setChecked(false);
+                    }
                 }else{
                     mediaPlayer.release();
                     mediaPlayer = null;
