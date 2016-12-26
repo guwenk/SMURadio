@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
                         mediaPlayer = new MediaPlayer();
                         new RadioPlayer().execute();
                     } else {
-                        Toast.makeText(getApplicationContext(), "Проверьте подключение к интернету", Toast.LENGTH_LONG).show();
                         toggleButton.setChecked(false);
                     }
                 }else{
@@ -53,8 +52,10 @@ public class MainActivity extends AppCompatActivity {
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, VoteActivity.class);
-                startActivity(intent);
+                if (new InternetChecker().hasConnection(getApplicationContext())){
+                    Intent intent = new Intent(MainActivity.this, VoteActivity.class);
+                    startActivity(intent);
+                }
             }
         });
 

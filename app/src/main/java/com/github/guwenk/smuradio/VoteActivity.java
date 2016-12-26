@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -48,13 +49,10 @@ public class VoteActivity extends AppCompatActivity {
 
         final ListView listView = (ListView) findViewById(R.id.listView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        if (!new InternetChecker().hasConnection(getApplicationContext())){
-            Toast.makeText(getApplicationContext(), "Проверьте подключение к интернету", Toast.LENGTH_LONG).show();
-            finish();
-        }
-        new ParseXML().execute(); //для сети нужно добавить в execute параметр urlXML
+        new ParseXML().execute();
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, names);
         listView.setAdapter(adapter);
+
 
         //<Поисковик>
         final EditText etFilter = (EditText)findViewById(R.id.filter);
@@ -100,7 +98,7 @@ public class VoteActivity extends AppCompatActivity {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     if (!Objects.equals(filename, "") && filename != null) {
-                        new VoteRequest().execute();
+                        new VoteRequest().execute(filename);
                         Toast.makeText(getApplicationContext(), "Выполнено: " + choose, Toast.LENGTH_SHORT).show();
                         finish();
                     } else{
@@ -111,21 +109,6 @@ public class VoteActivity extends AppCompatActivity {
             }
         });
         //<Кнопка голосования/>
-    }
-
-
-    //<Запрос на добавление трека>
-    protected class VoteRequest extends AsyncTask<String, Void, Void>{
-        @Override
-        protected Void doInBackground(String... strings) {
-            try {
-                //Log.d("FilePath", filename);
-                new URL("http://192.168.1.69:9001/?pass=yHZDVtGwCC&action=songrequest&filename=" + filename).openConnection().getInputStream(); // Отправка запроса
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
     }
 
 

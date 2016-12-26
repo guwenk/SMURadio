@@ -3,6 +3,7 @@ package com.github.guwenk.smuradio;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
 
 
 class InternetChecker {
@@ -24,6 +25,7 @@ class InternetChecker {
         {
             return true;
         }
+        Toast.makeText(context, "Проверьте подключение к интернету", Toast.LENGTH_LONG).show();
         return false;
     }
 }
