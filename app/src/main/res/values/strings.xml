@@ -8,4 +8,8 @@
     <string name="stop">Выкл. радио</string>
     <string name="radio_on">Радио включено</string>
     <string name="radio_off">Радио выключено</string>
+    <string name="password">Password</string>
+    <string name="admin_menu">Admin Menu</string>
+    <string name="next_track">Следующий трек</string>
+    <string name="prev_track">Предыдущий трек</string>
 </resources>

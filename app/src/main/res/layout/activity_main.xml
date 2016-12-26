@@ -5,41 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.github.guwenk.smuradio.MainActivity">
-
-    <Button
-        android:text="Предыдущий трек"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnPrev"
-        android:layout_below="@+id/btnNext"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:text="Следующий трек"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnNext"
-        android:layout_below="@+id/etPass"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:hint="Password"
-        android:ems="10"
-        android:id="@+id/etPass"
-        android:layout_below="@+id/btnToTrackOrder"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="35dp" />
-
     <ToggleButton
-        android:text="Radio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:id="@+id/toggleButton"
         android:textOn="@string/radio_on"
         android:textOff="@string/radio_off"
@@ -50,8 +18,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btnToTrackOrder"
-        android:layout_below="@+id/toggleButton"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_below="@+id/toggleButton" />
+
+    <Button
+        android:text="@string/admin_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnToAdminMenu"
+        android:layout_below="@+id/btnToTrackOrder" />
 
 </RelativeLayout>
