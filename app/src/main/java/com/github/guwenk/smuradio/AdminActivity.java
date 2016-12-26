@@ -18,6 +18,7 @@ public class AdminActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
+
         final EditText etPass = (EditText)findViewById(R.id.etPass);
 
         final Button btnNext = (Button)findViewById(R.id.btnNext);
