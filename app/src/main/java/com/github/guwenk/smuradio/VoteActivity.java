@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -86,8 +87,17 @@ public class VoteActivity extends AppCompatActivity {
                         if (names.get(listView.getCheckedItemPosition()).toUpperCase().contains(trackList.get(i).getArtist().toUpperCase())&& names.get(listView.getCheckedItemPosition()).toUpperCase().contains(trackList.get(i).getTitle().toUpperCase())) {
                             filename = trackList.get(i).getFilename();
                             choose = trackList.get(i).getTitle();
-                            //Log.d("***************************", listView.getCheckedItemPosition()+"; "+ names.get(listView.getCheckedItemPosition())+ "; "+ trackList.get(i).getArtist()+ " - "+ trackList.get(i).getTitle() + "; "+ trackList.get(i).getFilename());
-                            break;
+                            //Log.d("OrderB", listView.getCheckedItemPosition()+"; "+ names.get(listView.getCheckedItemPosition())+ "; "+ trackList.get(i).getArtist()+ " - "+ trackList.get(i).getTitle() + "; "+ trackList.get(i).getFilename());
+                            //break;
+                            // При составлении плйлиста лучше избегать имён составляющих другие имена
+                            // Например: "Moby - Extreme Ways" и "Extreme Ways (Bourne's Legacy)"
+                            // Однако можно использоавть к примеру так: "Moby - Extreme Ways (Original)" и "Extreme Ways (Bourne's Legacy)"
+                            // Так же допустимо составление такого плейлиста:
+                            // 1. Автор1 - Трек1
+                            // 2. Автор1 - Трек1 и аргумент1
+                            // 3. Автор1 - Трек1 и аргумент1 и аргумент1
+                            // 4. Автор1 - Трек1 и аргумент2
+                            // и т. д. , главное избегать содержаний друг друга в обратном порядке
                         }
                     }
                 } catch (ArrayIndexOutOfBoundsException e){
