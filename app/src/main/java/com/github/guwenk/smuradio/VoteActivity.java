@@ -89,6 +89,7 @@ public class VoteActivity extends AppCompatActivity {
                             choose = trackList.get(i).getTitle();
                             //Log.d("OrderB", listView.getCheckedItemPosition()+"; "+ names.get(listView.getCheckedItemPosition())+ "; "+ trackList.get(i).getArtist()+ " - "+ trackList.get(i).getTitle() + "; "+ trackList.get(i).getFilename());
                             //break;
+
                             // При составлении плйлиста лучше избегать имён составляющих другие имена
                             // Например: "Moby - Extreme Ways" и "Extreme Ways (Bourne's Legacy)"
                             // Однако можно использоавть к примеру так: "Moby - Extreme Ways (Original)" и "Extreme Ways (Bourne's Legacy)"
