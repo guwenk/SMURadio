@@ -13,4 +13,16 @@
     <string name="wrong_password">Wrong password</string>
     <string name="loading_playlist">Loading playlist</string>
     <string name="loading">Loading…</string>
+    <string name="_48_kbps" translatable="false">48 kbps</string>
+    <string name="_96_kbps" translatable="false">96 kbps</string>
+    <string name="_128_kbps" translatable="false">128 kbps</string>
+    <string name="_256_kbps" translatable="false">256 kbps</string>
+    <string name="choose_bitrate">Choose bitrate</string>
+    <string name="unknown_error">Unknown Error</string>
+    <string name="bitrate">Bitrate:</string>
+    <string name="copy_link_to_clipboard">Copy link to clipboard</string>
+    <string name="link_was_copied256">Stream link was copied (256kbps)</string>
+    <string name="link_was_copied128">Stream link was copied (128kbps)</string>
+    <string name="link_was_copied96">Stream link was copied (96kbps)</string>
+    <string name="link_was_copied48">Stream link was copied (48kbps)</string>
 </resources>

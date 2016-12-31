@@ -13,4 +13,12 @@
     <string name="search">Искать</string>
     <string name="track_order">Заказ музыки</string>
     <string name="wrong_password">Неверный пароль</string>
+    <string name="choose_bitrate">Выберете битрейт</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="bitrate">Битрейт:</string>
+    <string name="copy_link_to_clipboard">Копировать ссылку на поток</string>
+    <string name="link_was_copied128">Ссылка на поток скопирована (128kbps)</string>
+    <string name="link_was_copied256">Ссылка на поток скопирована (256kbps)</string>
+    <string name="link_was_copied48">Ссылка на поток скопирована (48kbps)</string>
+    <string name="link_was_copied96">Ссылка на поток скопирована (96kbps)</string>
 </resources>
