@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Какое-то радио</string>
+    <string name="filter">Фильтр</string>
+    <string name="loading">Загрузка…</string>
+    <string name="loading_playlist">Загрузка плейлиста</string>
+    <string name="next_track">Следующий трек</string>
+    <string name="order">Заказать!</string>
+    <string name="password">Пароль</string>
+    <string name="prev_track">Предыдущий трек</string>
+    <string name="radio_off">Радио - выкл.</string>
+    <string name="radio_on">Радио - вкл.</string>
+    <string name="search">Искать</string>
+    <string name="track_order">Заказ музыки</string>
+    <string name="wrong_password">Неверный пароль</string>
+</resources>

@@ -32,7 +32,7 @@
         android:layout_above="@+id/buttonVote" />
 
     <Button
-        android:text="@string/apply"
+        android:text="@string/search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"

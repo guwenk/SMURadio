@@ -1,15 +1,16 @@
 <resources>
-    <string name="app_name">Какое-то радио</string>
-    <string name="order">Заказать!</string>
-    <string name="track_order">Заказать музыку</string>
-    <string name="filter">Поиск</string>
-    <string name="apply">Искать</string>
-    <string name="play">Вкл. радио</string>
-    <string name="stop">Выкл. радио</string>
-    <string name="radio_on">Радио включено</string>
-    <string name="radio_off">Радио выключено</string>
+    <string name="app_name">Some Radio</string>
+    <string name="order">Order!</string>
+    <string name="track_order">Music order</string>
+    <string name="filter">Filter</string>
+    <string name="search">Search</string>
+    <string name="radio_on">Radio - ON</string>
+    <string name="radio_off">Radio - OFF</string>
     <string name="password">Password</string>
-    <string name="admin_menu">Admin Menu</string>
-    <string name="next_track">Следующий трек</string>
-    <string name="prev_track">Предыдущий трек</string>
+    <string name="admin_menu" translatable="false">Admin Menu</string>
+    <string name="next_track">Next track</string>
+    <string name="prev_track">Previous track</string>
+    <string name="wrong_password">Wrong password</string>
+    <string name="loading_playlist">Loading playlist</string>
+    <string name="loading">Loading…</string>
 </resources>

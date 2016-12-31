@@ -35,7 +35,7 @@ public class AdminActivity extends AppCompatActivity {
                     if (Objects.equals(inputPass, pass)){
                         new UrlRequest("next").start();
                     } else {
-                        Toast.makeText(getApplicationContext(), "Wrong password", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.wrong_password, Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -56,7 +56,7 @@ public class AdminActivity extends AppCompatActivity {
                     if (Objects.equals(inputPass, pass)){
                         new UrlRequest("prev").start();
                     } else {
-                        Toast.makeText(getApplicationContext(), "Wrong password", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.wrong_password, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
