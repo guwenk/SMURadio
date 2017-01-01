@@ -11,7 +11,7 @@ import android.widget.Toast;
 import java.util.Objects;
 
 public class AdminActivity extends AppCompatActivity {
-    private String pass = "8887f6929b1af320d05e4aaac0c79f24121f91c5058bac47bc53bdf4b3bd2c8f";
+    private String pass = "6f9ed6e8c912cd72694616d106316d3c70d8411a5f80e7808fdd3ca00ea34e06";
     private String inputPass;
     @Override
     protected void onCreate(Bundle savedInstanceState) {

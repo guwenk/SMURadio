@@ -25,4 +25,5 @@
     <string name="link_was_copied128">Stream link was copied (128kbps)</string>
     <string name="link_was_copied96">Stream link was copied (96kbps)</string>
     <string name="link_was_copied48">Stream link was copied (48kbps)</string>
+    <string name="unable_to_connect_to_server">Unable to connect to server</string>
 </resources>

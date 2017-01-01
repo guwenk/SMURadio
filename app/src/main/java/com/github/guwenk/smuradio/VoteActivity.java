@@ -22,7 +22,10 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +34,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 
 public class VoteActivity extends AppCompatActivity {
@@ -124,6 +128,7 @@ public class VoteActivity extends AppCompatActivity {
 
     //Парсинг XML из сети
     protected class ParseXML extends AsyncTask<String, Void, Void>{
+        boolean caughtException = false;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -137,25 +142,32 @@ public class VoteActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(String... strings) { //это для сети - protected Void doInBackground(String... Url)
             try {
-                InputStream stream = new URL("http://192.168.1.69:9001/?pass=yHZDVtGwCC&action=library&filename=Base").openConnection().getInputStream();
+                URL url = new URL("http://192.168.1.69:9001/?pass=yHZDVtGwCC&action=library&filename=Base");
+                URLConnection connection = url.openConnection();
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(5000);
+                InputStream stream = connection.getInputStream();
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                 Document doc = documentBuilder.parse(new InputSource(stream));
                 trackNodeList = doc.getElementsByTagName("Track");
-            } catch (SAXException | IOException | ParserConfigurationException e) {
+            } catch (SocketTimeoutException e){
+                caughtException = true;
+            } catch (SAXException | ParserConfigurationException | IOException e) {
                 e.printStackTrace();
             }
-            if (trackNodeList != null)
-            for (int i = 0; i < trackNodeList.getLength(); i++){
-                Element trackElement = (Element) trackNodeList.item(i);
-                Tracks tracks = new Tracks();
-                tracks.setNum(i+1);
-                tracks.setArtist(trackElement.getAttribute("artist"));
-                tracks.setTitle(trackElement.getAttribute("title"));
-                tracks.setDuration(trackElement.getAttribute("duration"));
-                tracks.setFilename(trackElement.getAttribute("filename"));
-                names.add((i+1)+ ". " + trackElement.getAttribute("artist") + " - " + trackElement.getAttribute("title"));
-                trackList.add(tracks);
+            if (trackNodeList != null) {
+                for (int i = 0; i < trackNodeList.getLength(); i++) {
+                    Element trackElement = (Element) trackNodeList.item(i);
+                    Tracks tracks = new Tracks();
+                    tracks.setNum(i + 1);
+                    tracks.setArtist(trackElement.getAttribute("artist"));
+                    tracks.setTitle(trackElement.getAttribute("title"));
+                    tracks.setDuration(trackElement.getAttribute("duration"));
+                    tracks.setFilename(trackElement.getAttribute("filename"));
+                    names.add((i + 1) + ". " + trackElement.getAttribute("artist") + " - " + trackElement.getAttribute("title"));
+                    trackList.add(tracks);
+                }
             }
             return null;
         }
@@ -164,6 +176,10 @@ public class VoteActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             pDialog.dismiss();
+            if (caughtException) {
+                Toast.makeText(getApplicationContext(), R.string.unable_to_connect_to_server, Toast.LENGTH_LONG).show();
+                finish();
+            }
         }
     }
 }
