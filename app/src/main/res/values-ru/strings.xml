@@ -22,4 +22,6 @@
     <string name="link_was_copied48">Ссылка на поток скопирована (48kbps)</string>
     <string name="link_was_copied96">Ссылка на поток скопирована (96kbps)</string>
     <string name="unable_to_connect_to_server">Не удалось подключиться к серверу</string>
+    <string name="action_settings">Настройки</string>
+    <string name="coming_soon">Скоро будет…</string>
 </resources>

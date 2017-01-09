@@ -9,9 +9,12 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -75,17 +78,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (new InternetChecker().hasConnection(getApplicationContext())){
                     Intent intent = new Intent(MainActivity.this, VoteActivity.class);
-                    startActivity(intent);
-                }
-            }
-        });
-
-        final Button btnToAdminMenu = (Button)findViewById(R.id.btnToAdminMenu);
-        btnToAdminMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (new InternetChecker().hasConnection(getApplicationContext())){
-                    Intent intent = new Intent(MainActivity.this, AdminActivity.class);
                     startActivity(intent);
                 }
             }
@@ -174,4 +166,28 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_settings:
+                Toast.makeText(getApplicationContext(), "Coming soon...", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.action_toAdminActivity:
+                if (new InternetChecker().hasConnection(getApplicationContext())){
+                    Intent intent = new Intent(MainActivity.this, AdminActivity.class);
+                    startActivity(intent);
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }
