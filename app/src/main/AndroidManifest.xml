@@ -22,6 +22,8 @@
         </activity>
         <activity android:name=".VoteActivity" />
         <activity android:name=".AdminActivity"></activity>
+        <activity android:name=".SettingsActivity"
+            android:label="@string/action_settings"></activity>
     </application>
 
 </manifest>

@@ -25,57 +25,14 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <TextView
-        android:text="@string/bitrate"
+    <Button
+        android:text="@string/copy_link_to_clipboard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView"
+        android:id="@+id/btnCopyToClipBoard"
         android:layout_below="@+id/btnToTrackOrder"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
-
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/bitrate_group"
-        android:layout_below="@+id/textView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
-
-        <RadioButton
-            android:text="@string/_256_kbps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/radioBtn256"
-            android:layout_weight="1" />
-
-        <RadioButton
-            android:text="@string/_128_kbps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/radioBtn128"
-            android:layout_weight="1" />
-
-        <RadioButton
-            android:text="@string/_96_kbps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/radioBtn96"
-            android:layout_weight="1" />
-
-        <RadioButton
-            android:text="@string/_48_kbps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/radioBtn48"
-            android:layout_weight="1" />
-        <Button
-            android:text="@string/copy_link_to_clipboard"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnCopyToClipBoard"/>
-    </RadioGroup>
-
 
 
 </RelativeLayout>

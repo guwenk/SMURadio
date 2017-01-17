@@ -1,14 +1,18 @@
 package com.github.guwenk.smuradio;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
     MediaPlayer mediaPlayer;
     AudioManager am;
     boolean bRadioCreate = false;
-    String radioUrl;
-    int bitrate;
+    String radioUrl = "http://free.radioheart.ru:8000/guwenk";
+    String bitrate;
 
 
     @Override
@@ -35,19 +39,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         am = (AudioManager) getSystemService(AUDIO_SERVICE);
-
-        final RadioButton radioBitrate256 = (RadioButton)findViewById(R.id.radioBtn256);
-        radioBitrate256.setOnClickListener(radioBitrateClickListener);
-
-        final RadioButton radioBitrate128 = (RadioButton)findViewById(R.id.radioBtn128);
-        radioBitrate128.setOnClickListener(radioBitrateClickListener);
-
-        final RadioButton radioBitrate96 = (RadioButton)findViewById(R.id.radioBtn96);
-        radioBitrate96.setOnClickListener(radioBitrateClickListener);
-
-        final RadioButton radioBitrate48 = (RadioButton)findViewById(R.id.radioBtn48);
-        radioBitrate48.setOnClickListener(radioBitrateClickListener);
-
 
         final ToggleButton toggleButton = (ToggleButton)findViewById(R.id.toggleButton);
         toggleButton.setOnClickListener(new View.OnClickListener() {
@@ -89,27 +80,26 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (radioUrl != null) {
                     ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData clipData = ClipData.newPlainText("", radioUrl);
+                    ClipData clipData = ClipData.newPlainText("", radioUrl+bitrate);
                     clipboard.setPrimaryClip(clipData);
-                    switch (bitrate){
-                        case 256:
-                            Toast.makeText(getApplicationContext(), R.string.link_was_copied256, Toast.LENGTH_SHORT).show();
-                            break;
-                        case 128:
-                            Toast.makeText(getApplicationContext(), R.string.link_was_copied128, Toast.LENGTH_SHORT).show();
-                            break;
-                        case 96:
-                            Toast.makeText(getApplicationContext(), R.string.link_was_copied96, Toast.LENGTH_SHORT).show();
-                            break;
-                        case 48:
-                            Toast.makeText(getApplicationContext(), R.string.link_was_copied48, Toast.LENGTH_SHORT).show();
-                            break;
-                        default: Toast.makeText(getApplicationContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
-                    }
-
+                    Toast.makeText(getApplicationContext(), getString(R.string.link_was_copied) + " (" + bitrate + "kbps)", Toast.LENGTH_SHORT).show();
                 }else Toast.makeText(getApplicationContext(), R.string.choose_bitrate, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        bitrate = sp.getString("bitrate", "128");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        bitrate = sp.getString("bitrate", "128");
     }
 
     protected class RadioPlayer extends AsyncTask<String, Void, Void>{
@@ -122,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(String... strings) {
             try {
-                mediaPlayer.setDataSource(radioUrl);
+                mediaPlayer.setDataSource(radioUrl+bitrate);
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                     @Override
@@ -140,33 +130,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    View.OnClickListener radioBitrateClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            RadioButton rb = (RadioButton)view;
-            switch (rb.getId()){
-                case R.id.radioBtn256:
-                    radioUrl = "http://free.radioheart.ru:8000/guwenk256";
-                    bitrate = 256;
-                    break;
-                case R.id.radioBtn128:
-                    radioUrl = "http://free.radioheart.ru:8000/guwenk128";
-                    bitrate = 128;
-                    break;
-                case R.id.radioBtn96:
-                    radioUrl = "http://free.radioheart.ru:8000/guwenk96";
-                    bitrate = 96;
-                    break;
-                case R.id.radioBtn48:
-                    radioUrl = "http://free.radioheart.ru:8000/guwenk48";
-                    bitrate = 48;
-                    break;
-                default:
-                    Toast.makeText(getApplicationContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -175,14 +138,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         int id = item.getItemId();
         switch (id) {
             case R.id.action_settings:
-                Toast.makeText(getApplicationContext(), "Coming soon...", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "Coming soon...", Toast.LENGTH_SHORT).show();
+                intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             case R.id.action_toAdminActivity:
                 if (new InternetChecker().hasConnection(getApplicationContext())){
-                    Intent intent = new Intent(MainActivity.this, AdminActivity.class);
+                    intent = new Intent(MainActivity.this, AdminActivity.class);
                     startActivity(intent);
                 }
                 return true;
