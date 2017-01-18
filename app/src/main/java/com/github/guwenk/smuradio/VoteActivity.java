@@ -6,7 +6,8 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -22,7 +23,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -33,8 +33,6 @@ import java.util.Objects;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 
 public class VoteActivity extends AppCompatActivity {
@@ -60,26 +58,34 @@ public class VoteActivity extends AppCompatActivity {
 
         //<Поисковик>
         final EditText etFilter = (EditText)findViewById(R.id.filter);
-        final Button btnFind = (Button)findViewById(R.id.btnApply);
-        btnFind.setOnClickListener(new View.OnClickListener() {
+        //<Поисковик/>
+
+        etFilter.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View view) {
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 names.clear();
                 String filter = etFilter.getText().toString();
                 String trackName1, trackName2;
-                for (int i = 0; i < trackList.size(); i++){
-                    trackName1 = trackList.get(i).getArtist() + " " + trackList.get(i).getTitle();
-                    trackName2 = trackList.get(i).getArtist() + " - " + trackList.get(i).getTitle();
+                for (int j = 0; j < trackList.size(); j++){
+                    trackName1 = trackList.get(j).getArtist() + " " + trackList.get(j).getTitle();
+                    trackName2 = trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle();
                     if (trackName1.toUpperCase().contains(filter.toUpperCase()) || trackName2.toUpperCase().contains(filter.toUpperCase())){
-                        names.add((i+1)+ ". " + trackList.get(i).getArtist() + " - " + trackList.get(i).getTitle());
+                        names.add((j+1)+ ". " + trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle());
                     }
                 }
                 adapter.notifyDataSetChanged();
             }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
         });
-        //<Поисковик/>
-
-
 
         //<Кнопка голосования>
         Button btnVote = (Button)findViewById(R.id.buttonVote);

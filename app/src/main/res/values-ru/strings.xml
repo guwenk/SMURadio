@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Какое-то радио</string>
+    <string name="action_settings">Настройки</string>
+    <string name="bitrate">Битрейт</string>
+    <string name="bitrate_choose">Выберете битрейт</string>
+    <string name="coming_soon">Скоро…</string>
+    <string name="copy_link_to_clipboard">Скопировать ссылку на поток</string>
     <string name="filter">Фильтр</string>
+    <string name="link_was_copied">Ссылка на поток скопирована</string>
     <string name="loading">Загрузка…</string>
     <string name="loading_playlist">Загрузка плейлиста</string>
     <string name="next_track">Следующий трек</string>
@@ -10,16 +16,9 @@
     <string name="prev_track">Предыдущий трек</string>
     <string name="radio_off">Радио - выкл.</string>
     <string name="radio_on">Радио - вкл.</string>
-    <string name="search">Искать</string>
-    <string name="track_order">Заказ музыки</string>
+    <string name="search">Поиск</string>
+    <string name="track_order">Заказать музыку</string>
+    <string name="unable_to_connect_to_server">Не удалось связаться с сервером</string>
+    <string name="error">Ошибка:</string>
     <string name="wrong_password">Неверный пароль</string>
-    <string name="choose_bitrate">Выберете битрейт</string>
-    <string name="unknown_error">Неизвестная ошибка</string>
-    <string name="bitrate">Битрейт</string>
-    <string name="copy_link_to_clipboard">Копировать ссылку на поток</string>
-    <string name="unable_to_connect_to_server">Не удалось подключиться к серверу</string>
-    <string name="action_settings">Настройки</string>
-    <string name="coming_soon">Скоро будет…</string>
-    <string name="bitrate_choose">Выберете битрейт</string>
-    <string name="link_was_copied">Ссылка на поток скопирована</string>
 </resources>

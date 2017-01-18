@@ -10,18 +10,12 @@
     <string name="admin_menu" translatable="false">Admin Menu</string>
     <string name="next_track">Next track</string>
     <string name="prev_track">Previous track</string>
-    <string name="wrong_password">Wrong password</string>
     <string name="loading_playlist">Loading playlist</string>
     <string name="loading">Loading…</string>
-    <string name="_48_kbps" translatable="false">48 kbps</string>
-    <string name="_96_kbps" translatable="false">96 kbps</string>
-    <string name="_128_kbps" translatable="false">128 kbps</string>
-    <string name="_256_kbps" translatable="false">256 kbps</string>
-    <string name="choose_bitrate">Choose bitrate</string>
-    <string name="unknown_error">Unknown Error</string>
+    <string name="error">Error:</string>
     <string name="bitrate">Bitrate</string>
     <string name="bitrate_choose">Choose bitrate</string>
-    <string name="copy_link_to_clipboard">Copy link to clipboard</string>
+    <string name="copy_link_to_clipboard">Copy stream link</string>
     <string name="link_was_copied">Stream link was copied</string>
     <string name="unable_to_connect_to_server">Unable to connect to server</string>
     <string name="action_settings">Settings</string>
@@ -29,10 +23,10 @@
 
 
     <string-array name="bitrate_names">
-        <item>@string/_48_kbps</item>
-        <item>@string/_96_kbps</item>
-        <item>@string/_128_kbps</item>
-        <item>@string/_256_kbps</item>
+        <item>48 kbps</item>
+        <item>96 kbps</item>
+        <item>128 kbps</item>
+        <item>256 kbps</item>
     </string-array>
     <string-array name="bitrate_values">
         <item>48</item>
@@ -40,4 +34,5 @@
         <item>128</item>
         <item>256</item>
     </string-array>
+    <string name="wrong_password">Wrong password</string>
 </resources>

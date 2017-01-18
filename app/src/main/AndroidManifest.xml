@@ -21,9 +21,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".VoteActivity" />
-        <activity android:name=".AdminActivity"></activity>
-        <activity android:name=".SettingsActivity"
-            android:label="@string/action_settings"></activity>
+        <activity android:name=".AdminActivity" />
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/action_settings" />
     </application>
 
 </manifest>
