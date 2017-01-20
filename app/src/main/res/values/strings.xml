@@ -35,4 +35,7 @@
         <item>256</item>
     </string-array>
     <string name="wrong_password">Wrong password</string>
+    <string name="nothing_selected">Nothing selected</string>
+    <string name="done">"Done: "</string>
+    <string name="dwnld_music_db">Download music database</string>
 </resources>

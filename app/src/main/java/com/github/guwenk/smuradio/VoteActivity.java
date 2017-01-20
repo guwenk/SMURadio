@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -58,13 +59,9 @@ public class VoteActivity extends AppCompatActivity {
 
         //<Поисковик>
         final EditText etFilter = (EditText)findViewById(R.id.filter);
-        //<Поисковик/>
-
         etFilter.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -82,10 +79,9 @@ public class VoteActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
+            public void afterTextChanged(Editable editable) {}
         });
+        //<Поисковик/>
 
         //<Кнопка голосования>
         Button btnVote = (Button)findViewById(R.id.buttonVote);
@@ -93,6 +89,17 @@ public class VoteActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
+                    StringBuilder sb = new StringBuilder(names.get(listView.getCheckedItemPosition()));
+                    while (true){
+                        if (sb.charAt(0) != '.'){
+                            sb.deleteCharAt(0);
+                        } else {
+                            sb.deleteCharAt(0);
+                            Log.d("MusicName", sb.toString());
+                            break;
+                        }
+                    }
+
                     for (int i = 0; i < trackList.size(); i++) {
                         if (names.get(listView.getCheckedItemPosition()).toUpperCase().contains(trackList.get(i).getArtist().toUpperCase())&& names.get(listView.getCheckedItemPosition()).toUpperCase().contains(trackList.get(i).getTitle().toUpperCase())) {
                             filename = trackList.get(i).getFilename();
@@ -119,10 +126,10 @@ public class VoteActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     if (!Objects.equals(filename, "") && filename != null) {
                         new VoteRequest().execute(filename);
-                        Toast.makeText(getApplicationContext(), "Выполнено: " + choose, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.done) + choose, Toast.LENGTH_SHORT).show();
                         finish();
                     } else{
-                        Toast.makeText(getApplicationContext(), "Ничего не выбрано", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.nothing_selected, Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -139,8 +146,8 @@ public class VoteActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(VoteActivity.this);
-            pDialog.setTitle("Загрузка плейлиста");
-            pDialog.setMessage("Загрузка....");
+            pDialog.setTitle(getString(R.string.dwnld_music_db));
+            pDialog.setMessage(getString(R.string.loading));
             pDialog.setIndeterminate(false);
             pDialog.show();
         }

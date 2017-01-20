@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                     // play it!
                     BASS.BASS_ChannelPlay(chan, false);
                 } else {
-                    pDialog.setMessage("Buffering... (" + progress +")");
+                    pDialog.setMessage("Buffering... (" + progress +"%)");
                     //((TextView) findViewById(R.id.status1)).setText(String.format("buffering... %d%%", progress));
                     handler.postDelayed(this, 50);
                 }
@@ -157,6 +157,11 @@ public class MainActivity extends AppCompatActivity {
                         .setMessage((String)param)
                         .setPositiveButton("OK", null)
                         .show();
+                try {
+                    ToggleButton tb = (ToggleButton) findViewById(R.id.toggleButton);
+                    tb.setActivated(false);
+                    pDialog.dismiss();
+                } catch (NullPointerException ignored){}
             }
         });
     }

@@ -21,4 +21,7 @@
     <string name="unable_to_connect_to_server">Не удалось связаться с сервером</string>
     <string name="error">Ошибка:</string>
     <string name="wrong_password">Неверный пароль</string>
+    <string name="done">"Выполнено: "</string>
+    <string name="nothing_selected">Ничего не выбрано</string>
+    <string name="dwnld_music_db">Загрузка мызукальной базы</string>
 </resources>
