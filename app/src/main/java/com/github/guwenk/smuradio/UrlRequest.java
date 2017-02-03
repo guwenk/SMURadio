@@ -1,6 +1,8 @@
 package com.github.guwenk.smuradio;
 
 
+import android.content.res.Resources;
+
 import java.io.IOException;
 import java.net.URL;
 
@@ -13,7 +15,9 @@ class UrlRequest extends Thread{
     @Override
     public void run() {
         try {
-            new URL("http://192.168.1.69:9001/?pass=yHZDVtGwCC&cmd="+command).openConnection().getInputStream();
+            new URL("http://" + Resources.getSystem().getString(R.string.request_address)
+                    + "/?pass=" + Resources.getSystem().getString(R.string.request_pass)
+                    + "&cmd="+command).openConnection().getInputStream();
         } catch (IOException e) {
             e.printStackTrace();
         }

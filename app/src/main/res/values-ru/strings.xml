@@ -24,4 +24,5 @@
     <string name="done">"Выполнено: "</string>
     <string name="nothing_selected">Ничего не выбрано</string>
     <string name="dwnld_music_db">Загрузка мызукальной базы</string>
+    <string name="buffering_display">Дисплей буферизации</string>
 </resources>

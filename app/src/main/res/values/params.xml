@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="request_address" translatable="false">192.168.1.69:9001</string>
+    <string name="request_pass" translatable="false">yHZDVtGwCC</string>
+    <string name="stream_host" translatable="false">http://free.radioheart.ru:8000/guwenk</string>
+    <string-array name="bitrate_values">
+        <item>48</item>
+        <item>96</item>
+        <item>128</item>
+        <item>256</item>
+    </string-array>
+</resources>

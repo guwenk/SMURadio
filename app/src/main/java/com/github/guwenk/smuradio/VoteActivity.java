@@ -3,12 +3,12 @@ package com.github.guwenk.smuradio;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -28,6 +28,8 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -86,6 +88,7 @@ public class VoteActivity extends AppCompatActivity {
         //<Кнопка голосования>
         Button btnVote = (Button)findViewById(R.id.buttonVote);
         btnVote.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View view) {
                 try {
@@ -93,29 +96,17 @@ public class VoteActivity extends AppCompatActivity {
                     while (true){
                         if (sb.charAt(0) != '.'){
                             sb.deleteCharAt(0);
-                        } else {
+                        }else {
                             sb.deleteCharAt(0);
-                            Log.d("MusicName", sb.toString());
+                            sb.deleteCharAt(0);
+                            //Log.d("MusicName", sb.toString());
                             break;
                         }
                     }
-
                     for (int i = 0; i < trackList.size(); i++) {
-                        if (names.get(listView.getCheckedItemPosition()).toUpperCase().contains(trackList.get(i).getArtist().toUpperCase())&& names.get(listView.getCheckedItemPosition()).toUpperCase().contains(trackList.get(i).getTitle().toUpperCase())) {
+                        if (Objects.equals(sb.toString(), trackList.get(i).getArtist() + " - " + trackList.get(i).getTitle())) {
                             filename = trackList.get(i).getFilename();
                             choose = trackList.get(i).getTitle();
-                            //Log.d("OrderB", listView.getCheckedItemPosition()+"; "+ names.get(listView.getCheckedItemPosition())+ "; "+ trackList.get(i).getArtist()+ " - "+ trackList.get(i).getTitle() + "; "+ trackList.get(i).getFilename());
-                            //break;
-
-                            // При составлении плйлиста лучше избегать имён составляющих другие имена
-                            // Например: "Moby - Extreme Ways" и "Extreme Ways (Bourne's Legacy)"
-                            // Однако можно использоавть к примеру так: "Moby - Extreme Ways (Original)" и "Extreme Ways (Bourne's Legacy)"
-                            // Так же допустимо составление такого плейлиста:
-                            // 1. Автор1 - Трек1
-                            // 2. Автор1 - Трек1 и аргумент1
-                            // 3. Автор1 - Трек1 и аргумент1 и аргумент1
-                            // 4. Автор1 - Трек1 и аргумент2
-                            // и т. д. , главное избегать содержаний друг друга в обратном порядке
                         }
                     }
                 } catch (ArrayIndexOutOfBoundsException e){
@@ -123,16 +114,13 @@ public class VoteActivity extends AppCompatActivity {
                     choose = "";
                 }
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    if (!Objects.equals(filename, "") && filename != null) {
-                        new VoteRequest().execute(filename);
-                        Toast.makeText(getApplicationContext(), getString(R.string.done) + choose, Toast.LENGTH_SHORT).show();
-                        finish();
-                    } else{
-                        Toast.makeText(getApplicationContext(), R.string.nothing_selected, Toast.LENGTH_SHORT).show();
-                    }
+                if (!Objects.equals(filename, "") && filename != null) {
+                    new VoteRequest().execute(filename);
+                    Toast.makeText(getApplicationContext(), getString(R.string.done) + choose, Toast.LENGTH_SHORT).show();
+                    finish();
+                } else{
+                    Toast.makeText(getApplicationContext(), R.string.nothing_selected, Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
         //<Кнопка голосования/>
@@ -153,7 +141,7 @@ public class VoteActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Void doInBackground(String... strings) { //это для сети - protected Void doInBackground(String... Url)
+        protected Void doInBackground(String... strings) {
             try {
                 URL url = new URL("http://192.168.1.69:9001/?pass=yHZDVtGwCC&action=library&filename=Base");
                 URLConnection connection = url.openConnection();
@@ -170,16 +158,24 @@ public class VoteActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             if (trackNodeList != null) {
+                ArrayList<String> names_mem = new ArrayList<>();
                 for (int i = 0; i < trackNodeList.getLength(); i++) {
                     Element trackElement = (Element) trackNodeList.item(i);
                     Tracks tracks = new Tracks();
-                    tracks.setNum(i + 1);
                     tracks.setArtist(trackElement.getAttribute("artist"));
                     tracks.setTitle(trackElement.getAttribute("title"));
-                    tracks.setDuration(trackElement.getAttribute("duration"));
                     tracks.setFilename(trackElement.getAttribute("filename"));
-                    names.add((i + 1) + ". " + trackElement.getAttribute("artist") + " - " + trackElement.getAttribute("title"));
+                    names_mem.add(trackElement.getAttribute("artist") + " - " + trackElement.getAttribute("title"));
                     trackList.add(tracks);
+                }
+                Collections.sort(names_mem, new Comparator<String>() {
+                    @Override
+                    public int compare(String s1, String s2) {
+                        return s1.compareToIgnoreCase(s2);
+                    }
+                });
+                for (int i = 0; i < names_mem.size(); i++){
+                    names.add((i + 1) + ". " + names_mem.get(i));
                 }
             }
             return null;

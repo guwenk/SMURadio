@@ -1,10 +1,8 @@
 package com.github.guwenk.smuradio;
 
 class Tracks {
-    private int num;
     private String artist;
     private String title;
-    private String duration;
     private String filename;
 
     String getFilename() {
@@ -29,21 +27,5 @@ class Tracks {
 
     void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getDuration() {
-        return duration;
-    }
-
-    void setDuration(String duration) {
-        this.duration = duration;
-    }
-
-    public int getNum() {
-        return num;
-    }
-
-    void setNum(int num) {
-        this.num = num;
     }
 }

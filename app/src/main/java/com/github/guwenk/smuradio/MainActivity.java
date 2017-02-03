@@ -20,7 +20,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.un4seen.bass.BASS;
 
@@ -28,14 +27,18 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
+import be.rijckaert.tim.animatedvector.FloatingMusicActionButton;
+
 
 public class MainActivity extends AppCompatActivity {
 
     ProgressDialog pDialog;
 
     AudioManager am;
-    String radioUrl = "http://free.radioheart.ru:8000/guwenk";
+    String radioUrl = getString(R.string.stream_host);
     String bitrate;
+    boolean buffering_display;
+    boolean radioStatus = false;
 
     int req; // request number/counter
     int chan; // stream handle
@@ -54,40 +57,45 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         am = (AudioManager) getSystemService(AUDIO_SERVICE);
 
-        final ToggleButton toggleButton = (ToggleButton) findViewById(R.id.toggleButton);
-        toggleButton.setOnClickListener(new View.OnClickListener() {
+        final FloatingMusicActionButton musicFab = (FloatingMusicActionButton)findViewById(R.id.fab);
+        musicFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (toggleButton.isChecked()) {
+                if (!radioStatus){
                     if (new InternetChecker().hasConnection(getApplicationContext())) {
                         if (radioUrl != null) {
                             if (!BASS.BASS_Init(-1, 44100, 0)) {
                                 Error("Can't initialize device");
                                 return;
                             }
+                            changeRadioStatus(musicFab);
+
                             BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
                             BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
 
                             // load AAC and HLS add-ons (if present)
                             BASS.BASS_PluginLoad("libbass_aac.so", 0);
                             BASS.BASS_PluginLoad("libbasshls.so", 0);
-                            pDialog = new ProgressDialog(MainActivity.this);
-                            pDialog.setTitle("Loading");
-                            pDialog.setMessage("");
-                            pDialog.setIndeterminate(false);
-                            pDialog.show();
+                            if (buffering_display) {
+                                pDialog = new ProgressDialog(MainActivity.this);
+                                pDialog.setTitle("Loading");
+                                pDialog.setMessage("");
+                                pDialog.setIndeterminate(false);
+                                pDialog.show();
+                            }
                             new Thread(new MainActivity.OpenURL(radioUrl + bitrate)).start();
                         } else {
                             Toast.makeText(getApplicationContext(), getString(R.string.error) + " ToggleButton, MediaPlayer, Bitrate", Toast.LENGTH_SHORT).show();
-                            toggleButton.setChecked(false);
+                            radioStatus = false;
                         }
                     } else {
-                        toggleButton.setChecked(false);
+                        radioStatus = false;
                     }
                 } else {
                     BASS.BASS_Free();
                     ((TextView) findViewById(R.id.status1)).setText("");
                     findViewById(R.id.status1).setVisibility(View.INVISIBLE);
+                    changeRadioStatus(musicFab);
                 }
             }
         });
@@ -110,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 if (progress < 0) return; // failed, eg. stream freed
                 progress = progress * 100 / (int) BASS.BASS_StreamGetFilePosition(chan, BASS.BASS_FILEPOS_END); // percentage of buffer filled
                 if (progress > 75 || BASS.BASS_StreamGetFilePosition(chan, BASS.BASS_FILEPOS_CONNECTED) == 0) { // over 75% full (or end of download)
-                    pDialog.dismiss();
+                    if (buffering_display) pDialog.dismiss();
                     findViewById(R.id.status1).setVisibility(View.VISIBLE);
                     DoMeta();
                     BASS.BASS_ChannelSetSync(chan, BASS.BASS_SYNC_META, 0, MetaSync, 0); // Shoutcast
@@ -121,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                     // play it!
                     BASS.BASS_ChannelPlay(chan, false);
                 } else {
-                    pDialog.setMessage("Buffering... (" + progress +"%)");
+                    if (buffering_display) pDialog.setMessage("Buffering... (" + progress +"%)");
                     //((TextView) findViewById(R.id.status1)).setText(String.format("buffering... %d%%", progress));
                     handler.postDelayed(this, 50);
                 }
@@ -134,12 +142,14 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         bitrate = sp.getString("bitrate", "128");
+        buffering_display = sp.getBoolean("buffering_display", true);
     }
     @Override
     protected void onResume() {
         super.onResume();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         bitrate = sp.getString("bitrate", "128");
+        buffering_display = sp.getBoolean("buffering_display", true);
     }
 
     class RunnableParam implements Runnable {
@@ -158,9 +168,7 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("OK", null)
                         .show();
                 try {
-                    ToggleButton tb = (ToggleButton) findViewById(R.id.toggleButton);
-                    tb.setActivated(false);
-                    pDialog.dismiss();
+                    if (buffering_display) pDialog.dismiss();
                 } catch (NullPointerException ignored){}
             }
         });
@@ -258,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
             BASS.BASS_StreamFree(chan); // close old stream
             runOnUiThread(new Runnable() {
                 public void run() {
-                    pDialog.setMessage("Connecting...");
+                    if (buffering_display) pDialog.setMessage("Connecting...");
                     //((TextView)findViewById(R.id.status1)).setText("connecting...");
                 }
             });
@@ -284,6 +292,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    void changeRadioStatus(FloatingMusicActionButton musicFab){
+        if (radioStatus){
+            radioStatus = false;
+            musicFab.playAnimation();
+            musicFab.changeMode(FloatingMusicActionButton.Mode.STOP_TO_PLAY);
+        }else{
+            radioStatus = true;
+            musicFab.playAnimation();
+            musicFab.changeMode(FloatingMusicActionButton.Mode.PLAY_TO_STOP);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

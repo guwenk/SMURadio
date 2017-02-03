@@ -20,22 +20,15 @@
     <string name="unable_to_connect_to_server">Unable to connect to server</string>
     <string name="action_settings">Settings</string>
     <string name="coming_soon">Coming Soon…</string>
-
-
     <string-array name="bitrate_names">
         <item>48 kbps</item>
         <item>96 kbps</item>
         <item>128 kbps</item>
         <item>256 kbps</item>
     </string-array>
-    <string-array name="bitrate_values">
-        <item>48</item>
-        <item>96</item>
-        <item>128</item>
-        <item>256</item>
-    </string-array>
     <string name="wrong_password">Wrong password</string>
     <string name="nothing_selected">Nothing selected</string>
     <string name="done">"Done: "</string>
     <string name="dwnld_music_db">Download music database</string>
+    <string name="buffering_display">Buffering display</string>
 </resources>
