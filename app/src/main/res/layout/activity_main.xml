@@ -38,15 +38,23 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <be.rijckaert.tim.animatedvector.FloatingMusicActionButton
-        android:id="@+id/fab"
-        android:layout_width="400dp"
-        android:layout_height="400dp"
-        app:backgroundTint="#ee3322"
-        app:mode="playToStop"
-        android:layout_below="@+id/status1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="35dp" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:padding="100dp"
+        android:layout_above="@+id/btnToTrackOrder"
+        android:layout_below="@+id/status1">
+
+        <be.rijckaert.tim.animatedvector.FloatingMusicActionButton
+            android:id="@+id/fab"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:backgroundTint="#ff0000"
+            app:mode="playToStop"/>
+    </LinearLayout>
 
 
 </RelativeLayout>

@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressDialog pDialog;
 
     AudioManager am;
-    String radioUrl = getString(R.string.stream_host);
+    String radioUrl;
     String bitrate;
     boolean buffering_display;
     boolean radioStatus = false;
@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        radioUrl = getString(R.string.stream_host);
+
         am = (AudioManager) getSystemService(AUDIO_SERVICE);
 
         final FloatingMusicActionButton musicFab = (FloatingMusicActionButton)findViewById(R.id.fab);

@@ -1,6 +1,5 @@
 package com.github.guwenk.smuradio;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -14,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.w3c.dom.Document;
@@ -41,7 +41,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class VoteActivity extends AppCompatActivity {
 
     NodeList trackNodeList;
-    ProgressDialog pDialog;
+    //ProgressDialog pDialog;
     List<Tracks> trackList = new ArrayList<>();
     ArrayList<String> names = new ArrayList<>();
     String filename;
@@ -133,11 +133,11 @@ public class VoteActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(VoteActivity.this);
-            pDialog.setTitle(getString(R.string.dwnld_music_db));
-            pDialog.setMessage(getString(R.string.loading));
-            pDialog.setIndeterminate(false);
-            pDialog.show();
+            //pDialog = new ProgressDialog(VoteActivity.this);
+            //pDialog.setTitle(getString(R.string.dwnld_music_db));
+            //pDialog.setMessage(getString(R.string.loading));
+            //pDialog.setIndeterminate(false);
+            //pDialog.show();
         }
 
         @Override
@@ -184,8 +184,15 @@ public class VoteActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            pDialog.dismiss();
-            if (caughtException) {
+            //pDialog.dismiss();
+            if (!caughtException) {
+                ProgressBar pb = (ProgressBar)findViewById(R.id.progressBar_orderMenu);
+                pb.setVisibility(View.INVISIBLE);
+                EditText et = (EditText)findViewById(R.id.filter);
+                et.setVisibility(View.VISIBLE);
+                ListView lv = (ListView)findViewById(R.id.listView);
+                lv.setVisibility(View.VISIBLE);
+            } else {
                 Toast.makeText(getApplicationContext(), R.string.unable_to_connect_to_server, Toast.LENGTH_LONG).show();
                 finish();
             }

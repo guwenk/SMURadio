@@ -17,17 +17,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/filter"
+        android:visibility="invisible"
         android:hint="@string/filter"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <ListView
         android:layout_width="match_parent"
+        android:visibility="invisible"
         android:layout_height="match_parent"
-        android:layout_below="@+id/filter"
         android:id="@+id/listView"
+        android:layout_below="@+id/filter"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_above="@+id/buttonVote" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar_orderMenu"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
