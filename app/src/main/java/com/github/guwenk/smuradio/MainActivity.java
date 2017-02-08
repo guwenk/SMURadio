@@ -1,7 +1,6 @@
 package com.github.guwenk.smuradio;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -24,7 +23,6 @@ import com.un4seen.bass.BASS;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 
 import be.rijckaert.tim.animatedvector.FloatingMusicActionButton;
 
@@ -280,17 +278,20 @@ public class MainActivity extends AppCompatActivity {
     void changeRadioStatus(FloatingMusicActionButton musicFab){
         if (!radioStatus){
             radioStatus = true;
-            musicFab.changeMode(FloatingMusicActionButton.Mode.STOP_TO_PLAY);
+            musicFab.changeMode(FloatingMusicActionButton.Mode.PLAY_TO_STOP);
             musicFab.playAnimation();
             findViewById(R.id.status1).setVisibility(View.VISIBLE);
+            new ButtonTimeout(musicFab, 300).start();
         }else{
             radioStatus = false;
-            musicFab.changeMode(FloatingMusicActionButton.Mode.PLAY_TO_STOP);
+            musicFab.changeMode(FloatingMusicActionButton.Mode.STOP_TO_PLAY);
             musicFab.playAnimation();
             ((TextView) findViewById(R.id.status1)).setText("");
             findViewById(R.id.status1).setVisibility(View.INVISIBLE);
+            new ButtonTimeout(musicFab, 300).start();
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

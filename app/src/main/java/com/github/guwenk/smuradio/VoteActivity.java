@@ -142,8 +142,8 @@ public class VoteActivity extends AppCompatActivity {
                         + "/?pass=" + getString(R.string.request_pass)
                         + "&action=library&filename=Base");
                 URLConnection connection = url.openConnection();
-                connection.setConnectTimeout(5000);
-                connection.setReadTimeout(5000);
+                connection.setConnectTimeout(10000);
+                connection.setReadTimeout(10000);
                 InputStream stream = connection.getInputStream();
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
