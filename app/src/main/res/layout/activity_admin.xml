@@ -4,20 +4,24 @@
     android:id="@+id/activity_admin"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_main"
     tools:context="com.github.guwenk.smuradio.AdminActivity">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/spectrum_bg"
+        android:scaleType="centerCrop"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="numberPassword"
-        android:textColor="#9c9c9c"
-        android:textColorHint="#9c9c9c"
+        android:background="@drawable/back"
         android:hint="@string/password"
         android:ems="10"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:id="@+id/etPass" />
 
     <Button

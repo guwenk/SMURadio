@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     int req; // request number/counter
     int chan; // stream handle
+    FloatingMusicActionButton musicFab;
 
     static final int BASS_SYNC_HLS_SEGMENT = 0x10300;
     static final int BASS_TAG_HLS_EXTINF = 0x14000;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
         am = (AudioManager) getSystemService(AUDIO_SERVICE);
 
-        final FloatingMusicActionButton musicFab = (FloatingMusicActionButton)findViewById(R.id.fab);
+        musicFab = (FloatingMusicActionButton)findViewById(R.id.fab);
         musicFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                                 Error("Can't initialize device");
                                 return;
                             }
-                            changeRadioStatus(musicFab);
+                            changeRadioStatus();
 
                             BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
                             BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     BASS.BASS_Free();
-                    changeRadioStatus(musicFab);
+                    changeRadioStatus();
                 }
             }
         });
@@ -134,6 +135,14 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         bitrate = sp.getString("bitrate", "128");
+        if (radioStatus) musicFab.changeMode(FloatingMusicActionButton.Mode.STOP_TO_PLAY);
+        else musicFab.changeMode(FloatingMusicActionButton.Mode.PLAY_TO_STOP);
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        //Отключение кнопки "назад"
     }
 
     class RunnableParam implements Runnable {
@@ -151,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
                         .setMessage((String)param)
                         .setPositiveButton("OK", null)
                         .show();
-                changeRadioStatus((FloatingMusicActionButton)findViewById(R.id.fab));
+                changeRadioStatus();
             }
         });
     }
@@ -252,7 +261,6 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 public void run() {
                     ((TextView)findViewById(R.id.status1)).setText(R.string.connecting);
-                    //changeRadioStatus((FloatingMusicActionButton)findViewById(R.id.fab));
                 }
             });
             int c=BASS.BASS_StreamCreateURL(url, 0, BASS.BASS_STREAM_BLOCK|BASS.BASS_STREAM_STATUS|BASS.BASS_STREAM_AUTOFREE, StatusProc, r); // open URL
@@ -277,17 +285,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    void changeRadioStatus(FloatingMusicActionButton musicFab){
+    void changeRadioStatus(){
         if (!radioStatus){
             radioStatus = true;
-            musicFab.changeMode(FloatingMusicActionButton.Mode.PLAY_TO_STOP);
             musicFab.playAnimation();
+            musicFab.changeMode(FloatingMusicActionButton.Mode.PLAY_TO_STOP);
             findViewById(R.id.status1).setVisibility(View.VISIBLE);
             new ButtonTimeout(musicFab, 300).start();
         }else{
             radioStatus = false;
-            musicFab.changeMode(FloatingMusicActionButton.Mode.STOP_TO_PLAY);
             musicFab.playAnimation();
+            musicFab.changeMode(FloatingMusicActionButton.Mode.STOP_TO_PLAY);
             ((TextView) findViewById(R.id.status1)).setText("");
             findViewById(R.id.status1).setVisibility(View.INVISIBLE);
             new ButtonTimeout(musicFab, 300).start();

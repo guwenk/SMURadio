@@ -55,7 +55,7 @@ public class VoteActivity extends AppCompatActivity {
         final ListView listView = (ListView) findViewById(R.id.listView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         new ParseXML().execute();
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, names);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.simple_list_item_single_choice, names);
         listView.setAdapter(adapter);
 
 

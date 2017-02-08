@@ -5,8 +5,15 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_main"
     tools:context="com.github.guwenk.smuradio.MainActivity">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/spectrum_bg"
+        android:scaleType="centerCrop"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:text="@string/track_order"
@@ -44,7 +51,7 @@
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:padding="100dp"
+        android:padding="120dp"
         android:layout_above="@+id/btnToTrackOrder"
         android:layout_below="@+id/status1">
 
@@ -55,6 +62,8 @@
             app:backgroundTint="#ff0000"
             app:mode="playToStop"/>
     </LinearLayout>
+
+
 
 
 </RelativeLayout>
