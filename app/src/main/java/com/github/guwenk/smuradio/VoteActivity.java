@@ -133,17 +133,14 @@ public class VoteActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            //pDialog = new ProgressDialog(VoteActivity.this);
-            //pDialog.setTitle(getString(R.string.dwnld_music_db));
-            //pDialog.setMessage(getString(R.string.loading));
-            //pDialog.setIndeterminate(false);
-            //pDialog.show();
         }
 
         @Override
         protected Void doInBackground(String... strings) {
             try {
-                URL url = new URL("http://192.168.1.69:9001/?pass=yHZDVtGwCC&action=library&filename=Base");
+                URL url = new URL("http://" + getString(R.string.request_address)
+                        + "/?pass=" + getString(R.string.request_pass)
+                        + "&action=library&filename=Base");
                 URLConnection connection = url.openConnection();
                 connection.setConnectTimeout(5000);
                 connection.setReadTimeout(5000);

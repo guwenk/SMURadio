@@ -7,8 +7,4 @@
         android:entries="@array/bitrate_names"
         android:entryValues="@array/bitrate_values"
         android:dialogTitle="@string/bitrate_choose"/>
-    <SwitchPreference
-        android:key="buffering_display"
-        android:title="@string/buffering_display"
-        android:defaultValue="true"/>
 </PreferenceScreen>

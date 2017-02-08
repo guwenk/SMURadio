@@ -29,6 +29,6 @@
     <string name="wrong_password">Wrong password</string>
     <string name="nothing_selected">Nothing selected</string>
     <string name="done">"Done: "</string>
-    <string name="dwnld_music_db">Download music database</string>
-    <string name="buffering_display">Buffering display</string>
+    <string name="connecting">Connecting…</string>
+    <string name="buffering">Buffering…</string>
 </resources>

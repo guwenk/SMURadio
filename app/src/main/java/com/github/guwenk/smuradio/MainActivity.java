@@ -13,7 +13,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,12 +31,9 @@ import be.rijckaert.tim.animatedvector.FloatingMusicActionButton;
 
 public class MainActivity extends AppCompatActivity {
 
-    ProgressDialog pDialog;
-
     AudioManager am;
     String radioUrl;
     String bitrate;
-    boolean buffering_display;
     boolean radioStatus = false;
 
     int req; // request number/counter
@@ -78,13 +74,6 @@ public class MainActivity extends AppCompatActivity {
                             // load AAC and HLS add-ons (if present)
                             BASS.BASS_PluginLoad("libbass_aac.so", 0);
                             BASS.BASS_PluginLoad("libbasshls.so", 0);
-                            if (buffering_display) {
-                                pDialog = new ProgressDialog(MainActivity.this);
-                                pDialog.setTitle("Loading");
-                                pDialog.setMessage("");
-                                pDialog.setIndeterminate(false);
-                                pDialog.show();
-                            }
                             new Thread(new MainActivity.OpenURL(radioUrl + bitrate)).start();
                         } else {
                             Toast.makeText(getApplicationContext(), getString(R.string.error) + " ToggleButton, MediaPlayer, Bitrate", Toast.LENGTH_SHORT).show();
@@ -95,8 +84,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     BASS.BASS_Free();
-                    ((TextView) findViewById(R.id.status1)).setText("");
-                    findViewById(R.id.status1).setVisibility(View.INVISIBLE);
                     changeRadioStatus(musicFab);
                 }
             }
@@ -120,8 +107,6 @@ public class MainActivity extends AppCompatActivity {
                 if (progress < 0) return; // failed, eg. stream freed
                 progress = progress * 100 / (int) BASS.BASS_StreamGetFilePosition(chan, BASS.BASS_FILEPOS_END); // percentage of buffer filled
                 if (progress > 75 || BASS.BASS_StreamGetFilePosition(chan, BASS.BASS_FILEPOS_CONNECTED) == 0) { // over 75% full (or end of download)
-                    if (buffering_display) pDialog.dismiss();
-                    findViewById(R.id.status1).setVisibility(View.VISIBLE);
                     DoMeta();
                     BASS.BASS_ChannelSetSync(chan, BASS.BASS_SYNC_META, 0, MetaSync, 0); // Shoutcast
                     BASS.BASS_ChannelSetSync(chan, BASS.BASS_SYNC_OGG_CHANGE, 0, MetaSync, 0); // Icecast/OGG
@@ -131,8 +116,7 @@ public class MainActivity extends AppCompatActivity {
                     // play it!
                     BASS.BASS_ChannelPlay(chan, false);
                 } else {
-                    if (buffering_display) pDialog.setMessage("Buffering... (" + progress +"%)");
-                    //((TextView) findViewById(R.id.status1)).setText(String.format("buffering... %d%%", progress));
+                    ((TextView) findViewById(R.id.status1)).setText(getString(R.string.buffering)+" (" + progress +"%)");
                     handler.postDelayed(this, 50);
                 }
             }
@@ -144,14 +128,12 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         bitrate = sp.getString("bitrate", "128");
-        buffering_display = sp.getBoolean("buffering_display", true);
     }
     @Override
     protected void onResume() {
         super.onResume();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         bitrate = sp.getString("bitrate", "128");
-        buffering_display = sp.getBoolean("buffering_display", true);
     }
 
     class RunnableParam implements Runnable {
@@ -169,9 +151,7 @@ public class MainActivity extends AppCompatActivity {
                         .setMessage((String)param)
                         .setPositiveButton("OK", null)
                         .show();
-                try {
-                    if (buffering_display) pDialog.dismiss();
-                } catch (NullPointerException ignored){}
+                changeRadioStatus((FloatingMusicActionButton)findViewById(R.id.fab));
             }
         });
     }
@@ -235,22 +215,25 @@ public class MainActivity extends AppCompatActivity {
         public void DOWNLOADPROC(ByteBuffer buffer, int length, Object user) {
             if ((Integer)user!=req) return; // make sure this is still the current request
             if (buffer!=null && length==0) { // got HTTP/ICY tags
-                String[] s;
+                //String[] s;
                 try {
-                    CharsetDecoder dec= Charset.forName("ISO-8859-1").newDecoder();
+                    //CharsetDecoder dec=
+                            Charset.forName("ISO-8859-1").newDecoder();
                     ByteBuffer temp=ByteBuffer.allocate(buffer.limit()); // CharsetDecoder doesn't like a direct buffer?
                     temp.put(buffer);
                     temp.position(0);
-                    s=dec.decode(temp).toString().split("\0"); // convert buffer to string array
+                    //s=dec.decode(temp).toString().split("\0"); // convert buffer to string array
                 } catch (Exception e) {
-                    return;
+                    //return;
                 }
+                /*
                 runOnUiThread(new MainActivity.RunnableParam(s[0]) { // 1st string = status
                     public void run() {
                         //((TextView)findViewById(R.id.status1)).setText((String)param);
                         Log.i("Connection",(String)param);
                     }
                 });
+                */
             }
         }
     };
@@ -268,8 +251,8 @@ public class MainActivity extends AppCompatActivity {
             BASS.BASS_StreamFree(chan); // close old stream
             runOnUiThread(new Runnable() {
                 public void run() {
-                    if (buffering_display) pDialog.setMessage("Connecting...");
-                    //((TextView)findViewById(R.id.status1)).setText("connecting...");
+                    ((TextView)findViewById(R.id.status1)).setText(R.string.connecting);
+                    //changeRadioStatus((FloatingMusicActionButton)findViewById(R.id.fab));
                 }
             });
             int c=BASS.BASS_StreamCreateURL(url, 0, BASS.BASS_STREAM_BLOCK|BASS.BASS_STREAM_STATUS|BASS.BASS_STREAM_AUTOFREE, StatusProc, r); // open URL
@@ -295,14 +278,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     void changeRadioStatus(FloatingMusicActionButton musicFab){
-        if (radioStatus){
-            radioStatus = false;
-            musicFab.playAnimation();
-            musicFab.changeMode(FloatingMusicActionButton.Mode.STOP_TO_PLAY);
-        }else{
+        if (!radioStatus){
             radioStatus = true;
+            musicFab.changeMode(FloatingMusicActionButton.Mode.STOP_TO_PLAY);
             musicFab.playAnimation();
+            findViewById(R.id.status1).setVisibility(View.VISIBLE);
+        }else{
+            radioStatus = false;
             musicFab.changeMode(FloatingMusicActionButton.Mode.PLAY_TO_STOP);
+            musicFab.playAnimation();
+            ((TextView) findViewById(R.id.status1)).setText("");
+            findViewById(R.id.status1).setVisibility(View.INVISIBLE);
         }
     }
 
