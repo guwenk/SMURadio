@@ -25,10 +25,6 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/action_settings" />
-
-        <service
-            android:name=".MusicPlayer"
-            android:enabled="true" />
     </application>
 
 </manifest>
