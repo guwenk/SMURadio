@@ -33,7 +33,7 @@ public class AdminActivity extends AppCompatActivity {
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     if (Objects.equals(inputPass, pass)){
-                        new UrlRequest("next").start();
+                        new UrlRequest("next", getString(R.string.request_address), getString(R.string.request_pass)).start();
                     } else {
                         Toast.makeText(getApplicationContext(), R.string.wrong_password, Toast.LENGTH_SHORT).show();
                     }
@@ -54,7 +54,7 @@ public class AdminActivity extends AppCompatActivity {
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     if (Objects.equals(inputPass, pass)){
-                        new UrlRequest("prev").start();
+                        new UrlRequest("prev", getString(R.string.request_address), getString(R.string.request_pass)).start();
                     } else {
                         Toast.makeText(getApplicationContext(), R.string.wrong_password, Toast.LENGTH_SHORT).show();
                     }

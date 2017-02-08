@@ -115,7 +115,7 @@ public class VoteActivity extends AppCompatActivity {
                 }
 
                 if (!Objects.equals(filename, "") && filename != null) {
-                    new VoteRequest().execute(filename);
+                    new VoteRequest().execute(filename, getString(R.string.request_address), getString(R.string.request_pass));
                     Toast.makeText(getApplicationContext(), getString(R.string.done) + choose, Toast.LENGTH_SHORT).show();
                     finish();
                 } else{

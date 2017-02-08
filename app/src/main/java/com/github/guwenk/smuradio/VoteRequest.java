@@ -1,6 +1,5 @@
 package com.github.guwenk.smuradio;
 
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -10,12 +9,10 @@ import java.net.URL;
 
 class VoteRequest extends AsyncTask<String, Void, Void> {
     @Override
-    protected Void doInBackground(String... filename) {
+    protected Void doInBackground(String... strings) {
         try {
-            Log.d("FilePath", filename[0]);
-            new URL("http://" + Resources.getSystem().getString(R.string.request_address)
-                    + "/?pass=" + Resources.getSystem().getString(R.string.request_pass)
-                    + "&action=songrequest&filename=" + filename[0]).openConnection().getInputStream(); // Отправка запроса
+            Log.d("FilePath", strings[0]);
+            new URL("http://" + strings[1] + "/?pass=" + strings[2] + "&action=songrequest&filename=" + strings[0]).openConnection().getInputStream(); // Отправка запроса
         } catch (IOException e) {
             e.printStackTrace();
         }
