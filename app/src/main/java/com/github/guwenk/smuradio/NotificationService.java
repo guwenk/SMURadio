@@ -1,6 +1,5 @@
 package com.github.guwenk.smuradio;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -9,7 +8,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -27,7 +25,6 @@ public class NotificationService extends Service{
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.getAction().equals(Constants.ACTION.STARTFOREGROUND_ACTION)) {
             showNotification();
-            Toast.makeText(this, "Service Started", Toast.LENGTH_SHORT).show();
         } else if (intent.getAction().equals(Constants.ACTION.PLAY_ACTION)) {
             Log.i(LOG_TAG, "Clicked Play");
             activity.doPlayPause();
@@ -35,7 +32,8 @@ public class NotificationService extends Service{
         } else if (intent.getAction().equals(
                 Constants.ACTION.STOPFOREGROUND_ACTION)) {
             Log.i(LOG_TAG, "Received Stop Foreground Intent");
-            activity.changeRadioStatus();
+            if(activity.radioStatus)
+                activity.changeRadioStatus();
             activity.stopBASS();
             stopForeground(true);
             stopSelf();
