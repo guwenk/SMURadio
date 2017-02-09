@@ -4,6 +4,6 @@
         android:viewportWidth="24.0"
         android:viewportHeight="24.0">
     <path
-        android:fillColor="#000000"
+        android:fillColor="@color/notification_button"
         android:pathData="M6,6h12v12H6z"/>
 </vector>

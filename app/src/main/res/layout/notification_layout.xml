@@ -8,16 +8,20 @@
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
+        android:background="@drawable/back3"
+        android:layout_margin="1dp"
         android:layout_weight="1"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:paddingLeft="11dp" >
 
         <TextView
             android:id="@+id/status_bar_track_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingRight="2dp"
+            android:layout_gravity="center_vertical"
             android:textColor="#ffffff"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -29,14 +33,16 @@
         android:src="@drawable/ic_play_arrow_24dp"
         android:scaleType="centerCrop"
         android:layout_height="64dp"
-        android:background="?android:selectableItemBackground"
+        android:layout_margin="1dp"
+        android:background="@drawable/back3"
         android:contentDescription="@string/play_and_stop" />
 
     <ImageButton
         android:id="@+id/status_bar_collapse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?android:selectableItemBackground"
+        android:background="@drawable/back3"
+        android:layout_margin="1dp"
         android:src="@drawable/ic_close_24dp"
         android:contentDescription="@string/close_notification" />
 

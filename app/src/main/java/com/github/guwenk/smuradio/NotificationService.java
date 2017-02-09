@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 
 public class NotificationService extends Service{
@@ -28,7 +27,7 @@ public class NotificationService extends Service{
         } else if (intent.getAction().equals(Constants.ACTION.PLAY_ACTION)) {
             Log.i(LOG_TAG, "Clicked Play");
             activity.doPlayPause();
-            new ButtonTimeout((ImageButton)activity.findViewById(R.id.status_bar_play), 300);
+            new ButtonTimeout((ImageButton)activity.findViewById(R.id.status_bar_play), 300); //Doesn't work!!!
         } else if (intent.getAction().equals(
                 Constants.ACTION.STOPFOREGROUND_ACTION)) {
             Log.i(LOG_TAG, "Received Stop Foreground Intent");
@@ -72,7 +71,7 @@ public class NotificationService extends Service{
         views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_stop_24dp);
         views.setInt(R.id.small_notification_bg, "setBackgroundResource", R.color.notificationOrange);
 
-        views.setTextViewText(R.id.status_bar_track_name, "Song Title");
+        views.setTextViewText(R.id.status_bar_track_name, "SomeRadio");
         ready = true;
 
         status = new Notification.Builder(this).build();

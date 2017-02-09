@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     Intent intentNotification;
     NotificationService notifService;
     boolean notifActiv = false;
+    int connection;
 
     static final int BASS_SYNC_HLS_SEGMENT = 0x10300;
     static final int BASS_TAG_HLS_EXTINF = 0x14000;
@@ -191,7 +192,8 @@ public class MainActivity extends AppCompatActivity {
                         .setMessage((String)param)
                         .setPositiveButton("OK", null)
                         .show();
-                changeRadioStatus();
+                if (radioStatus)
+                    changeRadioStatus();
                 notifService.views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_arrow_24dp);
             }
         });
@@ -306,13 +308,13 @@ public class MainActivity extends AppCompatActivity {
                         notifService.refreshTitle(getString(R.string.connecting));
                 }
             });
-            int c=BASS.BASS_StreamCreateURL(url, 0, BASS.BASS_STREAM_BLOCK|BASS.BASS_STREAM_STATUS|BASS.BASS_STREAM_AUTOFREE, StatusProc, r); // open URL
+            connection = BASS.BASS_StreamCreateURL(url, 0, BASS.BASS_STREAM_BLOCK|BASS.BASS_STREAM_STATUS|BASS.BASS_STREAM_AUTOFREE, StatusProc, r); // open URL
             synchronized(lock) {
                 if (r!=req) { // there is a newer request, discard this stream
-                    if (c!=0) BASS.BASS_StreamFree(c);
+                    if (connection!=0) BASS.BASS_StreamFree(connection);
                     return;
                 }
-                chan=c; // this is now the current stream
+                chan=connection; // this is now the current stream
             }
             if (chan==0) { // failed to open
                 runOnUiThread(new Runnable() {
@@ -344,6 +346,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void stopBASS(){
+        BASS.BASS_StreamFree(connection);
         BASS.BASS_Free();
     }
 
