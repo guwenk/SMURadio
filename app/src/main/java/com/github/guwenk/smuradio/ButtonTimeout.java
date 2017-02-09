@@ -1,6 +1,6 @@
 package com.github.guwenk.smuradio;
 
-import android.widget.Button;
+import android.widget.ImageButton;
 
 import be.rijckaert.tim.animatedvector.FloatingMusicActionButton;
 
@@ -8,7 +8,7 @@ import be.rijckaert.tim.animatedvector.FloatingMusicActionButton;
 class ButtonTimeout extends Thread{
     private FloatingMusicActionButton musicFab;
     private int millis;
-    private Button button;
+    private ImageButton imageButton;
     private boolean isMFab;
 
     ButtonTimeout(FloatingMusicActionButton musicFab, int millis){
@@ -16,8 +16,8 @@ class ButtonTimeout extends Thread{
         this.millis = millis;
         isMFab = true;
     }
-    ButtonTimeout(Button button, int millis){
-        this.button = button;
+    ButtonTimeout(ImageButton button, int millis){
+        this.imageButton = button;
         this.millis = millis;
         isMFab = false;
     }
@@ -25,13 +25,13 @@ class ButtonTimeout extends Thread{
     @Override
     public void run() {
         if (isMFab) musicFab.setClickable(false);
-        else button.setClickable(false);
+        else imageButton.setClickable(false);
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         if (isMFab) musicFab.setClickable(true);
-        else button.setClickable(true);
+        else imageButton.setClickable(true);
     }
 }

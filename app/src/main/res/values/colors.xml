@@ -2,5 +2,7 @@
 <resources>
     <color name="colorPrimary">#cf4c01</color>
     <color name="colorPrimaryDark">#a63c11</color>
-    <color name="colorAccent">#ffffff</color>
+    <color name="colorAccent">#4d4d4d</color>
+
+    <color name="notificationOrange">#c15808</color>
 </resources>

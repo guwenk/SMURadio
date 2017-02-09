@@ -1,19 +1,21 @@
 package com.github.guwenk.smuradio;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Handler;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
     int req; // request number/counter
     int chan; // stream handle
     FloatingMusicActionButton musicFab;
+    ServiceConnection serviceConnection;
+    Intent intentNotification;
+    NotificationService notifService;
+    boolean notifActiv = false;
 
     static final int BASS_SYNC_HLS_SEGMENT = 0x10300;
     static final int BASS_TAG_HLS_EXTINF = 0x14000;
@@ -60,33 +66,7 @@ public class MainActivity extends AppCompatActivity {
         musicFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!radioStatus){
-                    if (new InternetChecker().hasConnection(getApplicationContext())) {
-                        if (radioUrl != null) {
-                            if (!BASS.BASS_Init(-1, 44100, 0)) {
-                                Error("Can't initialize device");
-                                return;
-                            }
-                            changeRadioStatus();
-
-                            BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
-                            BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
-
-                            // load AAC and HLS add-ons (if present)
-                            BASS.BASS_PluginLoad("libbass_aac.so", 0);
-                            BASS.BASS_PluginLoad("libbasshls.so", 0);
-                            new Thread(new MainActivity.OpenURL(radioUrl + bitrate)).start();
-                        } else {
-                            Toast.makeText(getApplicationContext(), getString(R.string.error) + " ToggleButton, MediaPlayer, Bitrate", Toast.LENGTH_SHORT).show();
-                            radioStatus = false;
-                        }
-                    } else {
-                        radioStatus = false;
-                    }
-                } else {
-                    BASS.BASS_Free();
-                    changeRadioStatus();
-                }
+                doPlayPause();
             }
         });
 
@@ -118,10 +98,63 @@ public class MainActivity extends AppCompatActivity {
                     BASS.BASS_ChannelPlay(chan, false);
                 } else {
                     ((TextView) findViewById(R.id.status1)).setText(getString(R.string.buffering)+" (" + progress +"%)");
+                    notifService.refreshTitle(getString(R.string.buffering)+" (" + progress +"%)");
                     handler.postDelayed(this, 50);
                 }
             }
         };
+    }
+
+    void doPlayPause(){
+        if (!radioStatus){
+            if (new InternetChecker().hasConnection(getApplicationContext())) {
+                if (radioUrl != null) {
+                    if (!BASS.BASS_Init(-1, 44100, 0)) {
+                        Error("Can't initialize device");
+                        return;
+                    }
+                    if (!notifActiv){
+                        intentNotification = new Intent(MainActivity.this, NotificationService.class);
+                        intentNotification.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
+                        startService(intentNotification);
+                        serviceConnection = new ServiceConnection() {
+                            @Override
+                            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                                notifService = ((NotificationService.MyBinder) iBinder).getService();
+                                notifActiv = true;
+                                notifService.registerClient(MainActivity.this);
+                            }
+
+                            @Override
+                            public void onServiceDisconnected(ComponentName componentName) {
+                                notifActiv = false;
+                            }
+                        };
+                        bindService(intentNotification, serviceConnection, 0);
+                    }else notifService.toPlayButton();
+                    changeRadioStatus();
+
+                    BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
+                    BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
+
+                    // load AAC and HLS add-ons (if present)
+                    BASS.BASS_PluginLoad("libbass_aac.so", 0);
+                    BASS.BASS_PluginLoad("libbasshls.so", 0);
+                    new Thread(new MainActivity.OpenURL(radioUrl + bitrate)).start();
+                } else {
+                    Toast.makeText(getApplicationContext(), getString(R.string.error) + " ToggleButton, MediaPlayer, Bitrate", Toast.LENGTH_SHORT).show();
+                    radioStatus = false;
+                }
+            } else {
+                radioStatus = false;
+            }
+        } else {
+            stopBASS();
+            changeRadioStatus();
+            if (notifService != null)
+                notifService.toStopButton();
+            //unbindService(serviceConnection);
+        }
     }
 
     @Override
@@ -135,9 +168,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         bitrate = sp.getString("bitrate", "128");
-        if (radioStatus) musicFab.changeMode(FloatingMusicActionButton.Mode.STOP_TO_PLAY);
-        else musicFab.changeMode(FloatingMusicActionButton.Mode.PLAY_TO_STOP);
-
+        Log.d("RadioStatus", radioStatus+"");
     }
 
     @Override
@@ -161,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("OK", null)
                         .show();
                 changeRadioStatus();
+                notifService.views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_arrow_24dp);
             }
         });
     }
@@ -172,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
             if (ti>=0) {
                 String title=meta.substring(ti+13, meta.indexOf("';", ti+13));
                 ((TextView)findViewById(R.id.status1)).setText(title);
+                notifService.refreshTitle(title);
             }
         } else {
             String[] ogg=(String[])BASS.BASS_ChannelGetTags(chan, BASS.BASS_TAG_OGG);
@@ -184,17 +217,24 @@ public class MainActivity extends AppCompatActivity {
                         title=s.substring(6);
                 }
                 if (title!=null) {
-                    if (artist!=null)
-                        ((TextView)findViewById(R.id.status1)).setText(title+" - "+title);
-                    else
+                    if (artist!=null) {
+                        ((TextView) findViewById(R.id.status1)).setText(title + " - " + title);
+                        notifService.refreshTitle(title + " - " + title);
+                    }
+                    else{
                         ((TextView)findViewById(R.id.status1)).setText(title);
+                        notifService.refreshTitle(title);
+                    }
+
                 }
             } else {
                 meta=(String)BASS.BASS_ChannelGetTags(chan, BASS_TAG_HLS_EXTINF);
                 if (meta!=null) { // got HLS segment info
                     int i=meta.indexOf(',');
-                    if (i>0)
-                        ((TextView)findViewById(R.id.status1)).setText(meta.substring(i+1));
+                    if (i>0) {
+                        ((TextView) findViewById(R.id.status1)).setText(meta.substring(i + 1));
+                        notifService.refreshTitle(meta.substring(i + 1));
+                    }
                 }
             }
         }
@@ -215,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 public void run() {
                     ((TextView)findViewById(R.id.status1)).setText("");
+                    notifService.refreshTitle("SomeRadio");
                 }
             });
         }
@@ -261,6 +302,8 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 public void run() {
                     ((TextView)findViewById(R.id.status1)).setText(R.string.connecting);
+                    if (notifService != null)
+                        notifService.refreshTitle(getString(R.string.connecting));
                 }
             });
             int c=BASS.BASS_StreamCreateURL(url, 0, BASS.BASS_STREAM_BLOCK|BASS.BASS_STREAM_STATUS|BASS.BASS_STREAM_AUTOFREE, StatusProc, r); // open URL
@@ -275,6 +318,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         ((TextView)findViewById(R.id.status1)).setText("");
+                        notifService.refreshTitle("SomeRadio");
                     }
                 });
                 Error("Can't play the stream");
@@ -288,18 +332,19 @@ public class MainActivity extends AppCompatActivity {
     void changeRadioStatus(){
         if (!radioStatus){
             radioStatus = true;
-            musicFab.playAnimation();
-            musicFab.changeMode(FloatingMusicActionButton.Mode.PLAY_TO_STOP);
             findViewById(R.id.status1).setVisibility(View.VISIBLE);
-            new ButtonTimeout(musicFab, 300).start();
         }else{
             radioStatus = false;
-            musicFab.playAnimation();
-            musicFab.changeMode(FloatingMusicActionButton.Mode.STOP_TO_PLAY);
             ((TextView) findViewById(R.id.status1)).setText("");
             findViewById(R.id.status1).setVisibility(View.INVISIBLE);
-            new ButtonTimeout(musicFab, 300).start();
+            notifService.refreshTitle("SomeRadio");
         }
+        musicFab.playAnimation();
+        new ButtonTimeout(musicFab, 300).start();
+    }
+
+    void stopBASS(){
+        BASS.BASS_Free();
     }
 
 
@@ -335,5 +380,11 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BASS.BASS_Free();
     }
 }

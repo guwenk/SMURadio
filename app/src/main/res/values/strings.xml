@@ -31,4 +31,6 @@
     <string name="done">"Done: "</string>
     <string name="connecting">Connecting…</string>
     <string name="buffering">Buffering…</string>
+    <string name="play_and_stop">Play and Stop</string>
+    <string name="close_notification">Close notification</string>
 </resources>
