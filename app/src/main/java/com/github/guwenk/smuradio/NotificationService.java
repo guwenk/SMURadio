@@ -13,11 +13,10 @@ import android.widget.RemoteViews;
 
 
 public class NotificationService extends Service{
-    String LOG_TAG = "NotificationService";
-    RemoteViews views;
-    boolean ready = false;
-    MyBinder binder = new MyBinder();
-    MainActivity activity;
+    private String LOG_TAG = "NotificationService";
+    protected RemoteViews views;
+    private MyBinder binder = new MyBinder();
+    private MainActivity activity;
 
 
     @Override
@@ -72,7 +71,6 @@ public class NotificationService extends Service{
         views.setInt(R.id.small_notification_bg, "setBackgroundResource", R.color.notificationOrange);
 
         views.setTextViewText(R.id.status_bar_track_name, "SomeRadio");
-        ready = true;
 
         status = new Notification.Builder(this).build();
         status.contentView = views;

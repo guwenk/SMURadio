@@ -33,26 +33,24 @@ import be.rijckaert.tim.animatedvector.FloatingMusicActionButton;
 
 public class MainActivity extends AppCompatActivity {
 
-    AudioManager am;
-    String radioUrl;
-    String bitrate;
-    boolean radioStatus = false;
+    protected AudioManager am;
+    private String radioUrl;
+    private String bitrate;
+    protected boolean radioStatus = false;
 
-    int req; // request number/counter
-    int chan; // stream handle
-    FloatingMusicActionButton musicFab;
-    ServiceConnection serviceConnection;
-    Intent intentNotification;
-    NotificationService notifService;
-    boolean notifActiv = false;
-    int connection;
+    private int req; // request number/counter
+    private int chan; // stream handle
+    private FloatingMusicActionButton musicFab;
+    private NotificationService notifService;
+    private boolean notifActiv = false;
+    private int connection;
 
     static final int BASS_SYNC_HLS_SEGMENT = 0x10300;
     static final int BASS_TAG_HLS_EXTINF = 0x14000;
 
-    Handler handler=new Handler();
-    Runnable timer;
-    final Object lock = new Object();
+    private Handler handler=new Handler();
+    private Runnable timer;
+    final private Object lock = new Object();
 
 
     @Override
@@ -115,10 +113,10 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                     if (!notifActiv){
-                        intentNotification = new Intent(MainActivity.this, NotificationService.class);
+                        Intent intentNotification = new Intent(MainActivity.this, NotificationService.class);
                         intentNotification.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
                         startService(intentNotification);
-                        serviceConnection = new ServiceConnection() {
+                        ServiceConnection serviceConnection = new ServiceConnection() {
                             @Override
                             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                                 notifService = ((NotificationService.MyBinder) iBinder).getService();

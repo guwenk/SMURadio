@@ -7,8 +7,7 @@ import android.widget.Toast;
 
 
 class InternetChecker {
-     boolean hasConnection(final Context context)
-    {
+     boolean hasConnection(final Context context) {
         ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         if (wifiInfo != null && wifiInfo.isConnected())

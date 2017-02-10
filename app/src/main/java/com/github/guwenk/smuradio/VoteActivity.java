@@ -37,15 +37,17 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
+
 
 public class VoteActivity extends AppCompatActivity {
 
-    NodeList trackNodeList;
+    private NodeList trackNodeList;
     //ProgressDialog pDialog;
-    List<Tracks> trackList = new ArrayList<>();
-    ArrayList<String> names = new ArrayList<>();
-    String filename;
-    String choose;
+    private List<Tracks> trackList = new ArrayList<>();
+    private ArrayList<String> names = new ArrayList<>();
+    private String filename;
+    private String choose;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
