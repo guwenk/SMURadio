@@ -80,11 +80,11 @@ public class NotificationService extends Service{
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
 
-    public void toStopButton(){
+    public void toPlayButton(){
         views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_arrow_24dp);
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
-    public void toPlayButton(){
+    public void toStopButton(){
         views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_stop_24dp);
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
