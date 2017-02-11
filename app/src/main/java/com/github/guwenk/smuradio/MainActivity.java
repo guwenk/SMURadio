@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     private int chan; // stream handle
     private FloatingMusicActionButton musicFab;
     private NotificationService notifService;
-    private boolean notifActiv = false;
     private int connection;
 
     static final int BASS_SYNC_HLS_SEGMENT = 0x10300;
@@ -97,7 +96,8 @@ public class MainActivity extends AppCompatActivity {
                     BASS.BASS_ChannelPlay(chan, false);
                 } else {
                     ((TextView) findViewById(R.id.status1)).setText(getString(R.string.buffering)+" (" + progress +"%)");
-                    notifService.refreshTitle(getString(R.string.buffering)+" (" + progress +"%)");
+                    if (notifService != null)
+                        notifService.refreshTitle(getString(R.string.buffering)+" (" + progress +"%)");
                     handler.postDelayed(this, 50);
                 }
             }
@@ -109,10 +109,10 @@ public class MainActivity extends AppCompatActivity {
             if (new InternetChecker().hasConnection(getApplicationContext())) {
                 if (radioUrl != null) {
                     if (!BASS.BASS_Init(-1, 44100, 0)) {
-                        Error("Can't initialize device");
+                        Error(getString(R.string.cant_initialize_device));
                         return;
                     }
-                    if (!notifActiv){
+                    if (notifService == null){
                         Intent intentNotification = new Intent(MainActivity.this, NotificationService.class);
                         intentNotification.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
                         startService(intentNotification);
@@ -120,17 +120,16 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                                 notifService = ((NotificationService.MyBinder) iBinder).getService();
-                                notifActiv = true;
                                 notifService.registerClient(MainActivity.this);
                             }
 
                             @Override
                             public void onServiceDisconnected(ComponentName componentName) {
-                                notifActiv = false;
+                                notifService = null;
                             }
                         };
                         bindService(intentNotification, serviceConnection, 0);
-                    }else notifService.toPlayButton();
+                    }else notifService.toStopButton();
                     changeRadioStatus();
 
                     BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
@@ -151,8 +150,7 @@ public class MainActivity extends AppCompatActivity {
             stopBASS();
             changeRadioStatus();
             if (notifService != null)
-                notifService.toStopButton();
-            //unbindService(serviceConnection);
+                notifService.toPlayButton();
         }
     }
 
@@ -172,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        //Отключение кнопки "назад"
     }
 
     class RunnableParam implements Runnable {
@@ -192,7 +189,8 @@ public class MainActivity extends AppCompatActivity {
                         .show();
                 if (radioStatus)
                     changeRadioStatus();
-                notifService.views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_arrow_24dp);
+                if (notifService != null)
+                    notifService.toPlayButton();
             }
         });
     }
@@ -204,7 +202,8 @@ public class MainActivity extends AppCompatActivity {
             if (ti>=0) {
                 String title=meta.substring(ti+13, meta.indexOf("';", ti+13));
                 ((TextView)findViewById(R.id.status1)).setText(title);
-                notifService.refreshTitle(title);
+                if (notifService != null)
+                    notifService.refreshTitle(title);
             }
         } else {
             String[] ogg=(String[])BASS.BASS_ChannelGetTags(chan, BASS.BASS_TAG_OGG);
@@ -219,11 +218,13 @@ public class MainActivity extends AppCompatActivity {
                 if (title!=null) {
                     if (artist!=null) {
                         ((TextView) findViewById(R.id.status1)).setText(title + " - " + title);
-                        notifService.refreshTitle(title + " - " + title);
+                        if (notifService != null)
+                            notifService.refreshTitle(title + " - " + title);
                     }
                     else{
                         ((TextView)findViewById(R.id.status1)).setText(title);
-                        notifService.refreshTitle(title);
+                        if (notifService != null)
+                            notifService.refreshTitle(title);
                     }
 
                 }
@@ -233,7 +234,8 @@ public class MainActivity extends AppCompatActivity {
                     int i=meta.indexOf(',');
                     if (i>0) {
                         ((TextView) findViewById(R.id.status1)).setText(meta.substring(i + 1));
-                        notifService.refreshTitle(meta.substring(i + 1));
+                        if (notifService != null)
+                            notifService.refreshTitle(meta.substring(i + 1));
                     }
                 }
             }
@@ -255,7 +257,8 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 public void run() {
                     ((TextView)findViewById(R.id.status1)).setText("");
-                    notifService.refreshTitle("SomeRadio");
+                    if (notifService != null)
+                        notifService.refreshTitle(getString(R.string.app_name));
                 }
             });
         }
@@ -265,25 +268,13 @@ public class MainActivity extends AppCompatActivity {
         public void DOWNLOADPROC(ByteBuffer buffer, int length, Object user) {
             if ((Integer)user!=req) return; // make sure this is still the current request
             if (buffer!=null && length==0) { // got HTTP/ICY tags
-                //String[] s;
                 try {
-                    //CharsetDecoder dec=
-                            Charset.forName("ISO-8859-1").newDecoder();
+                    Charset.forName("ISO-8859-1").newDecoder();
                     ByteBuffer temp=ByteBuffer.allocate(buffer.limit()); // CharsetDecoder doesn't like a direct buffer?
                     temp.put(buffer);
                     temp.position(0);
-                    //s=dec.decode(temp).toString().split("\0"); // convert buffer to string array
-                } catch (Exception e) {
-                    //return;
+                } catch (Exception ignored) {
                 }
-                /*
-                runOnUiThread(new MainActivity.RunnableParam(s[0]) { // 1st string = status
-                    public void run() {
-                        //((TextView)findViewById(R.id.status1)).setText((String)param);
-                        Log.i("Connection",(String)param);
-                    }
-                });
-                */
             }
         }
     };
@@ -318,10 +309,11 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         ((TextView)findViewById(R.id.status1)).setText("");
-                        notifService.refreshTitle("SomeRadio");
+                        if (notifService != null)
+                            notifService.refreshTitle(getString(R.string.app_name));
                     }
                 });
-                Error("Can't play the stream");
+                Error(getString(R.string.cant_play_the_stream));
             } else {
                 handler.postDelayed(timer, 50); // start prebuffer monitoring
             }
@@ -337,7 +329,8 @@ public class MainActivity extends AppCompatActivity {
             radioStatus = false;
             ((TextView) findViewById(R.id.status1)).setText("");
             findViewById(R.id.status1).setVisibility(View.INVISIBLE);
-            notifService.refreshTitle("SomeRadio");
+            if (notifService != null)
+                notifService.refreshTitle(getString(R.string.app_name));
         }
         musicFab.playAnimation();
         new ButtonTimeout(musicFab, 300).start();
