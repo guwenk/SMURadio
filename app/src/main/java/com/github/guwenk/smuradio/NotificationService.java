@@ -70,7 +70,7 @@ public class NotificationService extends Service{
         views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_stop_24dp);
         views.setInt(R.id.small_notification_bg, "setBackgroundResource", R.color.notificationOrange);
 
-        views.setTextViewText(R.id.status_bar_track_name, "SomeRadio");
+        views.setTextViewText(R.id.status_bar_track_name, getString(R.string.app_name));
 
         status = new Notification.Builder(this).build();
         status.contentView = views;

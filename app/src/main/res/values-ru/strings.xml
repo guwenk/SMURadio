@@ -23,6 +23,8 @@
     <string name="wrong_password">Неверный пароль</string>
     <string name="done">"Выполнено: "</string>
     <string name="nothing_selected">Ничего не выбрано</string>
-    <string name="dwnld_music_db">Загрузка мызукальной базы</string>
-    <string name="buffering_display">Дисплей буферизации</string>
+    <string name="cant_initialize_device">Не удалось инициализировать устройство</string>
+    <string name="cant_play_the_stream">Не удалюсь воспроизвести поток</string>
+    <string name="connecting">Подключение…</string>
+    <string name="buffering">Буферизация…</string>
 </resources>

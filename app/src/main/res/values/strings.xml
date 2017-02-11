@@ -31,8 +31,8 @@
     <string name="done">"Done: "</string>
     <string name="connecting">Connecting…</string>
     <string name="buffering">Buffering…</string>
-    <string name="play_and_stop">Play and Stop</string>
-    <string name="close_notification">Close notification</string>
+    <string name="play_and_stop" translatable="false">Play and Stop</string>
+    <string name="close_notification" translatable="false">Close notification</string>
     <string name="cant_play_the_stream">Can\'t play the stream</string>
     <string name="cant_initialize_device">Can\'t initialize device</string>
 </resources>
