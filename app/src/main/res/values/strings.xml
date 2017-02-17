@@ -36,4 +36,6 @@
     <string name="cant_play_the_stream">Can\'t play the stream</string>
     <string name="cant_initialize_device">Can\'t initialize device</string>
     <string name="background">background</string>
+    <string name="clear">Clear</string>
+    <string name="show_error_alerts">Show error alerts</string>
 </resources>

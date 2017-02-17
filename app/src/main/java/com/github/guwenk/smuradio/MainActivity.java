@@ -8,11 +8,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.icu.util.Calendar;
+import android.icu.util.GregorianCalendar;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +25,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.un4seen.bass.BASS;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import static com.un4seen.bass.BASS.BASS_ErrorGetCode;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -83,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             killPlayer();
-            changeRadioStatus();
         }
     }
 
@@ -109,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
             radioPlayer.stopBASS();
             radioPlayer = null;
         }
+        changeRadioStatus();
     }
 
     class RunnableParam implements Runnable {
@@ -119,15 +128,20 @@ public class MainActivity extends AppCompatActivity {
 
     void Error(String es) {
         // get error code in current thread for display in UI thread
-        @SuppressLint("DefaultLocale") String s=String.format("%s\n(error code: %d)", es, BASS.BASS_ErrorGetCode());
+        final int errorCode = BASS.BASS_ErrorGetCode();
+        @SuppressLint("DefaultLocale") String s=String.format("%s\n(error code: %d)", es, errorCode);
         runOnUiThread(new MainActivity.RunnableParam(s) {
             public void run() {
-                new AlertDialog.Builder(MainActivity.this)
-                        .setMessage((String)param)
-                        .setPositiveButton("OK", null)
-                        .show();
+                SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                if (sPref.getBoolean("showBASS_alerts", true))
+                    new AlertDialog.Builder(MainActivity.this).setMessage((String)param).setPositiveButton("OK", null).show();
                 killPlayer();
-                changeRadioStatus();
+                SharedPreferences.Editor ed = sPref.edit();
+                SimpleDateFormat format= new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault());
+                String myDate = format.format(new Date());
+                String savedText = sPref.getString("SAVED_TEXT", "");
+                ed.putString("SAVED_TEXT", savedText + myDate+" | E:"+errorCode+ " " + new Constants().getBASS_ErrorFromCode(errorCode)+"\n");
+                ed.apply();
             }
         });
     }
@@ -166,10 +180,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             case R.id.action_toAdminActivity:
-                if (new InternetChecker().hasConnection(getApplicationContext())){
-                    intent = new Intent(MainActivity.this, AdminActivity.class);
-                    startActivity(intent);
-                }
+                intent = new Intent(MainActivity.this, AdminActivity.class);
+                startActivity(intent);
                 return true;
             case R.id.action_copy:
                 if (radioUrl != null) {

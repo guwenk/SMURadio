@@ -24,7 +24,10 @@
     <string name="done">"Выполнено: "</string>
     <string name="nothing_selected">Ничего не выбрано</string>
     <string name="cant_initialize_device">Не удалось инициализировать устройство</string>
-    <string name="cant_play_the_stream">Не удалюсь воспроизвести поток</string>
+    <string name="cant_play_the_stream">Не удалoсь воспроизвести поток</string>
     <string name="connecting">Подключение…</string>
     <string name="buffering">Буферизация…</string>
+    <string name="show_error_alerts">Отображать оповещение при ошибке</string>
+    <string name="clear">Очистить</string>
+    <string name="background">Фон</string>
 </resources>
