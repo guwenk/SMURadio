@@ -48,6 +48,7 @@ public class VoteActivity extends AppCompatActivity {
     private ArrayList<String> names = new ArrayList<>();
     private String filename;
     private String choose;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +58,7 @@ public class VoteActivity extends AppCompatActivity {
         final ListView listView = (ListView) findViewById(R.id.listView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         new ParseXML().execute();
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.simple_list_item_single_choice, names);
+        adapter = new ArrayAdapter<>(this, R.layout.simple_list_item_single_choice, names);
         listView.setAdapter(adapter);
 
 
@@ -183,14 +184,14 @@ public class VoteActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            //pDialog.dismiss();
-            if (!caughtException) {
+            if (!caughtException && names.size()>0) {
                 ProgressBar pb = (ProgressBar)findViewById(R.id.progressBar_orderMenu);
                 pb.setVisibility(View.INVISIBLE);
                 EditText et = (EditText)findViewById(R.id.filter);
                 et.setVisibility(View.VISIBLE);
                 ListView lv = (ListView)findViewById(R.id.listView);
                 lv.setVisibility(View.VISIBLE);
+                adapter.notifyDataSetChanged();
             } else {
                 Toast.makeText(getApplicationContext(), R.string.unable_to_connect_to_server, Toast.LENGTH_LONG).show();
                 finish();

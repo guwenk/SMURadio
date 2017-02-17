@@ -35,4 +35,5 @@
     <string name="close_notification" translatable="false">Close notification</string>
     <string name="cant_play_the_stream">Can\'t play the stream</string>
     <string name="cant_initialize_device">Can\'t initialize device</string>
+    <string name="background">background</string>
 </resources>

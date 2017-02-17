@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/small_notification_bg"
-    android:background="@color/notificationOrange"
+    android:background="@color/notificationBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal" >
@@ -28,21 +28,21 @@
 
     <ImageButton
         android:id="@+id/status_bar_play"
-        android:layout_width="64dp"
-        android:src="@drawable/ic_play_arrow_24dp"
+        android:layout_width="62dp"
+        android:src="@drawable/ic_play_arrow"
         android:scaleType="centerCrop"
-        android:layout_height="64dp"
+        android:layout_height="62dp"
         android:layout_margin="1dp"
-        android:background="@drawable/back3"
+        android:background="@drawable/rectangle_gray_none"
         android:contentDescription="@string/play_and_stop" />
 
     <ImageButton
         android:id="@+id/status_bar_collapse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/back3"
+        android:background="@drawable/rectangle_gray_none"
         android:layout_margin="1dp"
-        android:src="@drawable/ic_close_24dp"
+        android:src="@drawable/ic_close"
         android:contentDescription="@string/close_notification" />
 
 </LinearLayout>

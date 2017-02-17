@@ -7,13 +7,11 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
-import android.widget.ImageButton;
 import android.widget.RemoteViews;
 
 
 public class NotificationService extends Service{
-    private String LOG_TAG = "NotificationService";
+    //private String LOG_TAG = "NotificationService";
     protected RemoteViews views;
     private MyBinder binder = new MyBinder();
     private MainActivity activity;
@@ -24,15 +22,10 @@ public class NotificationService extends Service{
         if (intent.getAction().equals(Constants.ACTION.STARTFOREGROUND_ACTION)) {
             showNotification();
         } else if (intent.getAction().equals(Constants.ACTION.PLAY_ACTION)) {
-            Log.i(LOG_TAG, "Clicked Play");
             activity.doPlayPause();
-            new ButtonTimeout((ImageButton)activity.findViewById(R.id.status_bar_play), 300); //Doesn't work!!!
-        } else if (intent.getAction().equals(
-                Constants.ACTION.STOPFOREGROUND_ACTION)) {
-            Log.i(LOG_TAG, "Received Stop Foreground Intent");
-            if(activity.radioStatus)
-                activity.changeRadioStatus();
-            activity.stopBASS();
+        } else if (intent.getAction().equals(Constants.ACTION.STOPFOREGROUND_ACTION)) {
+            activity.killPlayer();
+            activity.changeRadioStatus();
             stopForeground(true);
             stopSelf();
         }
@@ -43,14 +36,6 @@ public class NotificationService extends Service{
     private void showNotification() {
         views = new RemoteViews(getPackageName(),
                 R.layout.notification_layout);
-
-
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        notificationIntent.setAction(Constants.ACTION.MAIN_ACTION);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                notificationIntent, 0);
 
         Intent playIntent = new Intent(this, NotificationService.class);
         playIntent.setAction(Constants.ACTION.PLAY_ACTION);
@@ -67,8 +52,8 @@ public class NotificationService extends Service{
 
         views.setOnClickPendingIntent(R.id.status_bar_collapse, pcloseIntent);
 
-        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_stop_24dp);
-        views.setInt(R.id.small_notification_bg, "setBackgroundResource", R.color.notificationOrange);
+        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_stop);
+        views.setInt(R.id.small_notification_bg, "setBackgroundResource", R.color.notificationBackground);
 
         views.setTextViewText(R.id.status_bar_track_name, getString(R.string.app_name));
 
@@ -76,20 +61,19 @@ public class NotificationService extends Service{
         status.contentView = views;
         status.flags = Notification.FLAG_ONGOING_EVENT;
         status.icon = R.drawable.ic_radio_24dp;
-        status.contentIntent = pendingIntent;
+        //status.contentIntent = pendingIntent;
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
 
     public void toPlayButton(){
-        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_arrow_24dp);
+        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_arrow);
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
     public void toStopButton(){
-        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_stop_24dp);
+        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_stop);
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
     public void refreshTitle(String title){
-        Log.d(LOG_TAG, "Changing title");
         views.setTextViewText(R.id.status_bar_track_name, title);
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
