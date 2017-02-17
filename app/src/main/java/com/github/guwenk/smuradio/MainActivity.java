@@ -29,6 +29,7 @@ import com.un4seen.bass.BASS;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 import static com.un4seen.bass.BASS.BASS_ErrorGetCode;
 
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {}
     }
 
-    void Error(String es) {
+    void Error(final String es) {
         // get error code in current thread for display in UI thread
         final int errorCode = BASS.BASS_ErrorGetCode();
         @SuppressLint("DefaultLocale") String s=String.format("%s\n(error code: %d)", es, errorCode);
@@ -142,6 +143,9 @@ public class MainActivity extends AppCompatActivity {
                 String savedText = sPref.getString("SAVED_TEXT", "");
                 ed.putString("SAVED_TEXT", savedText + myDate+" | E:"+errorCode+ " " + new Constants().getBASS_ErrorFromCode(errorCode)+"\n");
                 ed.apply();
+                if (sPref.getBoolean("reconnect", false)){
+                    doPlayPause();
+                }
             }
         });
     }

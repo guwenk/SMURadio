@@ -11,4 +11,8 @@
         android:key="showBASS_alerts"
         android:title="@string/show_error_alerts"
         android:defaultValue="true"/>
+    <SwitchPreference
+        android:key="reconnect"
+        android:title="@string/auto_reconnect"
+        android:defaultValue="false"/>
 </PreferenceScreen>

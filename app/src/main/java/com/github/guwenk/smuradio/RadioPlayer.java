@@ -81,7 +81,7 @@ class RadioPlayer{
         public void SYNCPROC(int handle, int channel, int data, Object user) {
             mainActivity.runOnUiThread(new Runnable() {
                 public void run() {
-                    mainActivity.killPlayer();
+                    mainActivity.Error(mainActivity.getString(R.string.cant_play_the_stream));
                     ((TextView)mainActivity.findViewById(R.id.main_status1)).setText("");
                     if (mainActivity.notifService != null)
                         mainActivity.notifService.refreshTitle(mainActivity.getString(R.string.app_name));
