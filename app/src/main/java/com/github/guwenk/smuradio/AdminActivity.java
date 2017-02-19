@@ -5,6 +5,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +27,7 @@ public class AdminActivity extends AppCompatActivity {
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         tv = (TextView)findViewById(R.id.tvLog);
         refreshLog();
+        tv.setMovementMethod(new ScrollingMovementMethod());
 
         final EditText etPass = (EditText)findViewById(R.id.etPass);
 

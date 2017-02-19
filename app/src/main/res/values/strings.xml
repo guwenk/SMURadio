@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Some Radio</string>
+    <string name="app_name" translatable="false">TimeTrax</string>
     <string name="order">Order!</string>
     <string name="track_order">Music order</string>
     <string name="filter">Filter</string>
