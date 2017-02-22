@@ -30,4 +30,5 @@
     <string name="clear">Очистить</string>
     <string name="background">Фон</string>
     <string name="auto_reconnect">Авто-переподключение</string>
+    <string name="app_name">Радио TimeTrax</string>
 </resources>
