@@ -1,6 +1,7 @@
 package com.github.guwenk.smuradio;
 
 import android.os.Handler;
+import android.util.Log;
 import android.widget.TextView;
 import com.un4seen.bass.BASS;
 import java.nio.ByteBuffer;
@@ -192,6 +193,7 @@ class RadioPlayer{
     void stopBASS(){
         BASS.BASS_StreamFree(connection);
         BASS.BASS_Free();
+        mainActivity.radioPlayer = null;
     }
 
 }

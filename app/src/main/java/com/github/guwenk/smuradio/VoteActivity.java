@@ -1,17 +1,22 @@
 package com.github.guwenk.smuradio;
 
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -37,7 +42,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 
 public class VoteActivity extends AppCompatActivity {
@@ -49,12 +53,16 @@ public class VoteActivity extends AppCompatActivity {
     private String filename;
     private String choose;
     private ArrayAdapter<String> adapter;
+    private ImageView backgroundImage;
+    SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vote);
 
+        backgroundImage = (ImageView)findViewById(R.id.va_backgroundImage);
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
         final ListView listView = (ListView) findViewById(R.id.listView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         new ParseXML().execute();
@@ -129,7 +137,6 @@ public class VoteActivity extends AppCompatActivity {
         //<Кнопка голосования/>
     }
 
-
     //Парсинг XML из сети
     protected class ParseXML extends AsyncTask<String, Void, Void>{
         boolean caughtException = false;
@@ -196,6 +203,32 @@ public class VoteActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), R.string.unable_to_connect_to_server, Toast.LENGTH_LONG).show();
                 finish();
             }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        String path = sp.getString("backgroundPath", "");
+        Bitmap backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
+        Log.d("Load_Background", backgroundBitmap+"");
+        if (backgroundBitmap == null){
+            backgroundImage.setImageResource(R.drawable.clocks_bg);
+        } else {
+            backgroundImage.setImageBitmap(backgroundBitmap);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String path = sp.getString("backgroundPath", "");
+        Bitmap backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
+        Log.d("Load_Background", backgroundBitmap+"");
+        if (backgroundBitmap == null){
+            backgroundImage.setImageResource(R.drawable.clocks_bg);
+        } else {
+            backgroundImage.setImageBitmap(backgroundBitmap);
         }
     }
 }

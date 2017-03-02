@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TimeTrax Radio</string>
+    <string name="app_name">SomeRadio</string>
     <string name="order">Order!</string>
     <string name="track_order">Music order</string>
     <string name="filter">Filter</string>
@@ -39,4 +39,6 @@
     <string name="clear">Clear</string>
     <string name="show_error_alerts">Show error alerts</string>
     <string name="auto_reconnect">Auto reconnect</string>
+    <string name="set_background">Set Background</string>
+    <string name="restore_background">Restore Background</string>
 </resources>

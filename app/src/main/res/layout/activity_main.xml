@@ -6,9 +6,9 @@
     android:layout_height="match_parent"
     tools:context="com.github.guwenk.smuradio.MainActivity">
     <ImageView
+        android:id="@+id/main_backgroundImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/clocks_bg"
         android:scaleType="centerCrop"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"

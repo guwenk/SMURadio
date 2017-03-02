@@ -8,19 +8,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.icu.util.Calendar;
-import android.icu.util.GregorianCalendar;
+import android.graphics.Bitmap;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,9 +29,7 @@ import com.un4seen.bass.BASS;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 
-import static com.un4seen.bass.BASS.BASS_ErrorGetCode;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -39,14 +37,16 @@ public class MainActivity extends AppCompatActivity {
     private String radioUrl;
     private String bitrate;
     protected RadioPlayer radioPlayer;
-
+    private SharedPreferences sp;
     protected NotificationService notifService;
+    private ImageView backgroundImage;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        backgroundImage = (ImageView)findViewById(R.id.main_backgroundImage);
         radioUrl = getString(R.string.stream_host);
         final Button btnToTrackOrder = (Button) findViewById(R.id.main_btnToTrackOrder);
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
@@ -99,15 +99,36 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
         bitrate = sp.getString("bitrate", "128");
+
+        String path = sp.getString("backgroundPath", "");
+        Bitmap backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
+        if (backgroundBitmap == null){
+            backgroundImage.setImageResource(R.drawable.clocks_bg);
+        } else {
+            backgroundImage.setImageBitmap(backgroundBitmap);
+        }
+        Log.d("Load_Background", backgroundBitmap+"");
     }
+
+
     @Override
     protected void onResume() {
         super.onResume();
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
         bitrate = sp.getString("bitrate", "128");
+
+        String path = sp.getString("backgroundPath", "");
+        Bitmap backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
+        if (backgroundBitmap == null){
+            backgroundImage.setImageResource(R.drawable.clocks_bg);
+        } else {
+            backgroundImage.setImageBitmap(backgroundBitmap);
+        }
+        Log.d("Load_Background", backgroundBitmap+"");
     }
+
 
     @Override
     public void onBackPressed() {
@@ -116,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
     void killPlayer(){
         if (radioPlayer != null){
             radioPlayer.stopBASS();
-            radioPlayer = null;
         }
         changeRadioStatus();
     }

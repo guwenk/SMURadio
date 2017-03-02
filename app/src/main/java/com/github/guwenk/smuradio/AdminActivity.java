@@ -1,29 +1,37 @@
 package com.github.guwenk.smuradio;
 
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Objects;
 
+
 public class AdminActivity extends AppCompatActivity {
     private String pass = "6f9ed6e8c912cd72694616d106316d3c70d8411a5f80e7808fdd3ca00ea34e06";
     private String inputPass;
+    private ImageView backgroundImage;
     SharedPreferences sp;
     TextView tv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
+        backgroundImage = (ImageView)findViewById(R.id.aa_backgroundImage);
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         tv = (TextView)findViewById(R.id.tvLog);
         refreshLog();
@@ -83,14 +91,62 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        String path = sp.getString("backgroundPath", "");
+        Bitmap backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
+        if (backgroundBitmap == null){
+            backgroundImage.setImageResource(R.drawable.clocks_bg);
+        } else {
+            backgroundImage.setImageBitmap(backgroundBitmap);
+        }
+        Log.d("Load_Background", backgroundBitmap+"");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String path = sp.getString("backgroundPath", "");
+        Bitmap backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
+        if (backgroundBitmap == null){
+            backgroundImage.setImageResource(R.drawable.clocks_bg);
+        } else {
+            backgroundImage.setImageBitmap(backgroundBitmap);
+        }
+        Log.d("Load_Background", backgroundBitmap+"");
+    }
+
     void refreshLog(){
         new Thread(new Runnable() {
             public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv.setText(sp.getString("SAVED_TEXT", ""));
+                        tv.setGravity(Gravity.BOTTOM);
+                    }
+                });
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!sp.getString("SAVED_TEXT", "").equals(tv.getText()))
+                            tv.setText(sp.getString("SAVED_TEXT", ""));
+                        tv.setGravity(Gravity.NO_GRAVITY);
+                    }
+                });
                 while (!Thread.currentThread().isInterrupted()) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            tv.setText(sp.getString("SAVED_TEXT", ""));
+                            if (!sp.getString("SAVED_TEXT", "").equals(tv.getText()))
+                                tv.setText(sp.getString("SAVED_TEXT", ""));
                         }
                     });
                     try {
