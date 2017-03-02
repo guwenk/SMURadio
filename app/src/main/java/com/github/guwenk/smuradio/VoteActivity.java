@@ -210,24 +210,11 @@ public class VoteActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         String path = sp.getString("backgroundPath", "");
-        Bitmap backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
-        Log.d("Load_Background", backgroundBitmap+"");
-        if (backgroundBitmap == null){
+        Bitmap backgroundBitmap = null;
+        if (path.equals("")){
             backgroundImage.setImageResource(R.drawable.clocks_bg);
         } else {
-            backgroundImage.setImageBitmap(backgroundBitmap);
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        String path = sp.getString("backgroundPath", "");
-        Bitmap backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
-        Log.d("Load_Background", backgroundBitmap+"");
-        if (backgroundBitmap == null){
-            backgroundImage.setImageResource(R.drawable.clocks_bg);
-        } else {
+            backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
             backgroundImage.setImageBitmap(backgroundBitmap);
         }
     }

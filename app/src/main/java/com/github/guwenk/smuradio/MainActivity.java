@@ -103,10 +103,11 @@ public class MainActivity extends AppCompatActivity {
         bitrate = sp.getString("bitrate", "128");
 
         String path = sp.getString("backgroundPath", "");
-        Bitmap backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
-        if (backgroundBitmap == null){
+        Bitmap backgroundBitmap = null;
+        if (path.equals("")){
             backgroundImage.setImageResource(R.drawable.clocks_bg);
         } else {
+            backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
             backgroundImage.setImageBitmap(backgroundBitmap);
         }
         Log.d("Load_Background", backgroundBitmap+"");
@@ -120,13 +121,13 @@ public class MainActivity extends AppCompatActivity {
         bitrate = sp.getString("bitrate", "128");
 
         String path = sp.getString("backgroundPath", "");
-        Bitmap backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
-        if (backgroundBitmap == null){
+        Bitmap backgroundBitmap = null;
+        if (path.equals("")){
             backgroundImage.setImageResource(R.drawable.clocks_bg);
         } else {
+            backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
             backgroundImage.setImageBitmap(backgroundBitmap);
         }
-        Log.d("Load_Background", backgroundBitmap+"");
     }
 
 
@@ -163,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                 String savedText = sPref.getString("SAVED_TEXT", "");
                 ed.putString("SAVED_TEXT", savedText + myDate+" | E:"+errorCode+ " " + new Constants().getBASS_ErrorFromCode(errorCode)+"\n");
                 ed.apply();
-                if (sPref.getBoolean("reconnect", false)){
+                if (sPref.getBoolean("reconnect", false) && errorCode != 14){
                     doPlayPause();
                 }
             }
