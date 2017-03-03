@@ -11,7 +11,6 @@ import android.os.Bundle;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,6 +19,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,7 +49,6 @@ import javax.xml.parsers.ParserConfigurationException;
 public class VoteActivity extends AppCompatActivity {
 
     private NodeList trackNodeList;
-    //ProgressDialog pDialog;
     private List<Tracks> trackList = new ArrayList<>();
     private ArrayList<String> names = new ArrayList<>();
     private String filename;
@@ -55,6 +56,8 @@ public class VoteActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private ImageView backgroundImage;
     SharedPreferences sp;
+    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference mOrderRef = mRootRef.child("Requests").child("order");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +129,7 @@ public class VoteActivity extends AppCompatActivity {
                 }
 
                 if (!Objects.equals(filename, "") && filename != null) {
-                    new VoteRequest().execute(filename, getString(R.string.request_address), getString(R.string.request_pass));
+                    mOrderRef.setValue(filename);
                     Toast.makeText(getApplicationContext(), getString(R.string.done) + choose, Toast.LENGTH_SHORT).show();
                     finish();
                 } else{
@@ -148,9 +151,7 @@ public class VoteActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(String... strings) {
             try {
-                URL url = new URL("http://" + getString(R.string.request_address)
-                        + "/?pass=" + getString(R.string.request_pass)
-                        + "&action=library&filename=Base");
+                URL url = new URL("https://firebasestorage.googleapis.com/v0/b/someradio-4bfa5.appspot.com/o/Base.xml?alt=media&token=c43976d4-7528-4120-a8ee-d5a945d7267f");
                 URLConnection connection = url.openConnection();
                 connection.setConnectTimeout(10000);
                 connection.setReadTimeout(10000);
@@ -210,7 +211,7 @@ public class VoteActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         String path = sp.getString("backgroundPath", "");
-        Bitmap backgroundBitmap = null;
+        Bitmap backgroundBitmap;
         if (path.equals("")){
             backgroundImage.setImageResource(R.drawable.clocks_bg);
         } else {

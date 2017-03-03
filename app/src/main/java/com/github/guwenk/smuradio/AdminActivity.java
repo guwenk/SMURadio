@@ -16,15 +16,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.Objects;
+
+import static com.github.guwenk.smuradio.R.id.etPass;
 
 
 public class AdminActivity extends AppCompatActivity {
-    private String pass = "6f9ed6e8c912cd72694616d106316d3c70d8411a5f80e7808fdd3ca00ea34e06";
     private String inputPass;
     private ImageView backgroundImage;
     SharedPreferences sp;
     TextView tv;
+    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference mRequestsRef = mRootRef.child("Requests");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,16 +55,11 @@ public class AdminActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    if (Objects.equals(inputPass, pass)){
-                        new UrlRequest("next", getString(R.string.request_address), getString(R.string.request_pass)).start();
-                    } else {
-                        Toast.makeText(getApplicationContext(), R.string.wrong_password, Toast.LENGTH_SHORT).show();
-                    }
-                }
-
+                mRequestsRef.child("pass").setValue(inputPass);
+                mRequestsRef.child("cmd").setValue("next");
             }
         });
+
 
         final Button btnClear = (Button)findViewById(R.id.buttonClearLog);
         btnClear.setOnClickListener(new View.OnClickListener() {
@@ -81,13 +82,8 @@ public class AdminActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    if (Objects.equals(inputPass, pass)){
-                        new UrlRequest("prev", getString(R.string.request_address), getString(R.string.request_pass)).start();
-                    } else {
-                        Toast.makeText(getApplicationContext(), R.string.wrong_password, Toast.LENGTH_SHORT).show();
-                    }
-                }
+                    mRequestsRef.child("pass").setValue(inputPass);
+                    mRequestsRef.child("cmd").setValue("prev");
             }
         });
     }
@@ -96,7 +92,7 @@ public class AdminActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         String path = sp.getString("backgroundPath", "");
-        Bitmap backgroundBitmap = null;
+        Bitmap backgroundBitmap;
         if (path.equals("")){
             backgroundImage.setImageResource(R.drawable.clocks_bg);
         } else {

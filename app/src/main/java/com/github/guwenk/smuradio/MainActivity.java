@@ -24,6 +24,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.un4seen.bass.BASS;
 
 import java.text.SimpleDateFormat;
@@ -119,15 +124,6 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         bitrate = sp.getString("bitrate", "128");
-
-        String path = sp.getString("backgroundPath", "");
-        Bitmap backgroundBitmap = null;
-        if (path.equals("")){
-            backgroundImage.setImageResource(R.drawable.clocks_bg);
-        } else {
-            backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
-            backgroundImage.setImageBitmap(backgroundBitmap);
-        }
     }
 
 
