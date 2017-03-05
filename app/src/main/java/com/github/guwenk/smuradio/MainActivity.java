@@ -74,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
 
     void userClickPlayStop(){
         userStop = radioStatus;
-        doPlayPause(false);
+        if (!radioStatus)
+            doPlayPause(false);
+        else killPlayer();
         radioStatus = !radioStatus;
         changeRadioStatus();
     }
