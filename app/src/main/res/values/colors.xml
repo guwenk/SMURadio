@@ -3,6 +3,6 @@
     <color name="colorPrimary">#cf4c01</color>
     <color name="colorPrimaryDark">#a63c11</color>
     <color name="colorAccent">#0083cf</color>
-
-    <color name="notificationBackground">#c15808</color>
+    <color name="colorStick">#9E9E9E</color>
+    <color name="notificationBackground">#212121</color>
 </resources>
