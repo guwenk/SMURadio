@@ -3,7 +3,7 @@
     <ListPreference
         android:key="link"
         android:title="@string/bitrate"
-        android:defaultValue="http://free.radioheart.ru:8000/guwenk128"
+        android:defaultValue="@string/link_128"
         android:entries="@array/bitrate_names"
         android:entryValues="@array/bitrate_values"
         android:dialogTitle="@string/bitrate_choose"/>
