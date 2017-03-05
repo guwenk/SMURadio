@@ -22,10 +22,10 @@ public class NotificationService extends Service{
         if (intent.getAction().equals(Constants.ACTION.STARTFOREGROUND_ACTION)) {
             showNotification();
         } else if (intent.getAction().equals(Constants.ACTION.PLAY_ACTION)) {
-            activity.doPlayPause();
+            activity.userClickPlayStop();
         } else if (intent.getAction().equals(Constants.ACTION.STOPFOREGROUND_ACTION)) {
-            activity.killPlayer();
-            activity.changeRadioStatus();
+            if (activity.radioStatus)
+                activity.userClickPlayStop();
             stopForeground(true);
             stopSelf();
         }
@@ -52,7 +52,7 @@ public class NotificationService extends Service{
 
         views.setOnClickPendingIntent(R.id.status_bar_collapse, pcloseIntent);
 
-        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_pause_circle_outline_black_24px);
+        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_stop);
         views.setInt(R.id.small_notification_bg, "setBackgroundResource", R.color.notificationBackground);
 
         views.setTextViewText(R.id.status_bar_track_name, getString(R.string.app_name));
@@ -66,11 +66,11 @@ public class NotificationService extends Service{
     }
 
     public void toPlayButton(){
-        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_circle_outline_black_24px);
+        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_arrow);
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
     public void toStopButton(){
-        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_pause_circle_outline_black_24px);
+        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_stop);
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
     public void refreshTitle(String title){

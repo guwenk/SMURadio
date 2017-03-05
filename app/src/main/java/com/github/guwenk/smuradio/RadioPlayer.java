@@ -144,6 +144,7 @@ class RadioPlayer{
                 mainActivity.Error(mainActivity.getString(R.string.cant_play_the_stream));
             } else {
                 handler.postDelayed(timer, 50); // start prebuffer monitoring
+                Log.d("BASS_VOLUME", BASS.BASS_GetVolume()+"");
             }
         }
     }
