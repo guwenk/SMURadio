@@ -74,11 +74,17 @@ public class MainActivity extends AppCompatActivity {
 
     void userClickPlayStop(){
         userStop = radioStatus;
-        if (!radioStatus)
-            doPlayPause(false);
-        else killPlayer();
-        radioStatus = !radioStatus;
-        changeRadioStatus();
+        if (!radioStatus){
+            if (new InternetChecker().hasConnection(getApplicationContext())) {
+                doPlayPause(false);
+                radioStatus = !radioStatus;
+                changeRadioStatus();
+            }else Toast.makeText(getApplicationContext(), "Проверьте подключение к интернету", Toast.LENGTH_LONG).show();
+        } else {
+            killPlayer();
+            radioStatus = !radioStatus;
+            changeRadioStatus();
+        }
     }
 
     void doPlayPause(boolean isAutoReconnect){
@@ -108,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 radioPlayer = new RadioPlayer(this);
                 radioPlayer.startPlayer(streamLink);
-            }else Toast.makeText(getApplicationContext(), "Проверьте подключение к интернету", Toast.LENGTH_LONG).show();
+            }
         } else if (!isAutoReconnect){
             killPlayer();
         }
@@ -217,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
             findViewById(R.id.main_status1).setVisibility(View.INVISIBLE);
             imgBtn.setImageResource(R.drawable.ic_play_arrow);
             if (notifService != null){
-                notifService.refreshTitle(getString(R.string.app_name));
+                notifService.refreshTitle(getString(R.string.someradio));
                 notifService.toPlayButton();
             }
         }

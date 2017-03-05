@@ -15,21 +15,24 @@
         android:layout_marginLeft="6dp"
         android:layout_toRightOf="@+id/status_bar_play"
         android:textColor="#ffffff"
-        android:text="SomeRadio"
+        android:text="@string/app_name"
         android:textSize="16sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/status_bar_track_name"
-        android:layout_width="256dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingRight="2dp"
-        android:layout_marginLeft="6dp"
-        android:layout_toRightOf="@+id/radio_icon"
         android:layout_below="@id/radio_head"
         android:textColor="@color/colorStick"
         android:textSize="16sp"
-        />
+        android:layout_toLeftOf="@+id/status_bar_collapse"
+        android:layout_toRightOf="@+id/radio_icon"
+        android:layout_toStartOf="@+id/status_bar_collapse"
+        android:layout_toEndOf="@+id/radio_icon"
+        android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"/>
 
     <ImageView
         android:id="@+id/radio_icon"
@@ -39,13 +42,12 @@
         android:layout_toRightOf="@id/status_bar_play"
         android:layout_marginLeft="6dp"
         android:layout_below="@id/radio_head"
-        android:src="@drawable/ic_radio_black_24px"
-        />
+        android:src="@drawable/ic_radio_24px" />
 
 
     <ImageButton
         android:id="@+id/status_bar_play"
-        android:src="@drawable/ic_play_circle_outline_black_24px"
+        android:src="@drawable/ic_play_circle_outline_24px"
         android:layout_width="62dp"
         android:layout_height="62dp"
         android:scaleType="centerCrop"

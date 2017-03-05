@@ -86,7 +86,7 @@ class RadioPlayer{
                     mainActivity.Error(mainActivity.getString(R.string.cant_play_the_stream));
                     ((TextView)mainActivity.findViewById(R.id.main_status1)).setText("");
                     if (mainActivity.notifService != null)
-                        mainActivity.notifService.refreshTitle(mainActivity.getString(R.string.app_name));
+                        mainActivity.notifService.refreshTitle(mainActivity.getString(R.string.someradio));
                 }
             });
         }
@@ -139,7 +139,7 @@ class RadioPlayer{
                     public void run() {
                         ((TextView)mainActivity.findViewById(R.id.main_status1)).setText("");
                         if (mainActivity.notifService != null)
-                            mainActivity.notifService.refreshTitle(mainActivity.getString(R.string.app_name));
+                            mainActivity.notifService.refreshTitle(mainActivity.getString(R.string.someradio));
                     }
                 });
                 mainActivity.Error(mainActivity.getString(R.string.cant_play_the_stream));

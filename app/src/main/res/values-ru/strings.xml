@@ -30,9 +30,10 @@
     <string name="clear">Очистить</string>
     <string name="background">Фон</string>
     <string name="auto_reconnect">Авто-переподключение</string>
-    <string name="app_name">Какое-то радио</string>
+    <string name="app_name">SomeRadio</string>
     <string name="autoreconnect_summary">Ваш смартфон может зависнуть</string>
     <string name="restore_background">Восстановить фон</string>
     <string name="set_background">Установить фон</string>
     <string name="show_error_alerts_summary">Не рекомендуется использовать с авто-переподключением</string>
+    <string name="someradio">Какое-то радио</string>
 </resources>

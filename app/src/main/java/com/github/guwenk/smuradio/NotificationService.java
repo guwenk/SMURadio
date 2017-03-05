@@ -52,10 +52,10 @@ public class NotificationService extends Service{
 
         views.setOnClickPendingIntent(R.id.status_bar_collapse, pcloseIntent);
 
-        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_pause_circle_outline_black_24px);
+        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_pause_circle_outline_24px);
         views.setInt(R.id.small_notification_bg, "setBackgroundResource", R.color.notificationBackground);
 
-        views.setTextViewText(R.id.status_bar_track_name, getString(R.string.app_name));
+        views.setTextViewText(R.id.status_bar_track_name, getString(R.string.someradio));
 
         status = new Notification.Builder(this).build();
         status.contentView = views;
@@ -66,11 +66,11 @@ public class NotificationService extends Service{
     }
 
     public void toPlayButton(){
-        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_circle_outline_black_24px);
+        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_circle_outline_24px);
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
     public void toStopButton(){
-        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_pause_circle_outline_black_24px);
+        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_pause_circle_outline_24px);
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
     public void refreshTitle(String title){
