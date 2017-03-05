@@ -1,11 +1,11 @@
 package com.github.guwenk.smuradio;
 
 import android.os.Handler;
-import android.util.Log;
 import android.widget.TextView;
 import com.un4seen.bass.BASS;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+
 
 
 class RadioPlayer{
@@ -152,16 +152,14 @@ class RadioPlayer{
     RadioPlayer(final MainActivity mainActivity) {
         this.mainActivity = mainActivity;
         // initialize output device
-        if (!BASS.BASS_Init(-1, 44100, 0)) {
-            mainActivity.Error("Can't initialize device");
-            return;
-        }
-        BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
-        BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
+        if (BASS.BASS_Init(-1, 44100, 0)) {
+            BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
+            BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
 
-        // load AAC and HLS add-ons (if present)
-        BASS.BASS_PluginLoad("libbass_aac.so", 0);
-        BASS.BASS_PluginLoad("libbasshls.so", 0);
+            // load AAC and HLS add-ons (if present)
+            BASS.BASS_PluginLoad("libbass_aac.so", 0);
+            BASS.BASS_PluginLoad("libbasshls.so", 0);
+        }
 
         timer = new Runnable() {
             public void run() {
@@ -187,12 +185,11 @@ class RadioPlayer{
             }
         };
     }
-    void startPlayer(String radioUrl, String bitrate){
-        new Thread(new OpenURL(radioUrl + bitrate)).start();
+    void startPlayer(String link){
+        new Thread(new OpenURL(link)).start();
     }
     void stopBASS(){
         BASS.BASS_StreamFree(connection);
-        BASS.BASS_Free();
         mainActivity.radioPlayer = null;
     }
 

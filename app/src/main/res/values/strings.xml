@@ -25,6 +25,7 @@
         <item>96 kbps</item>
         <item>128 kbps</item>
         <item>256 kbps</item>
+        <item>128 kbps (reserve)</item>
     </string-array>
     <string name="wrong_password">Wrong password</string>
     <string name="nothing_selected">Nothing selected</string>
@@ -38,7 +39,9 @@
     <string name="background">background</string>
     <string name="clear">Clear</string>
     <string name="show_error_alerts">Show error alerts</string>
-    <string name="auto_reconnect">Auto reconnect</string>
+    <string name="auto_reconnect">Auto-reconnect</string>
     <string name="set_background">Set Background</string>
     <string name="restore_background">Restore Background</string>
+    <string name="autoreconnect_summary">Your smartphone may hang</string>
+    <string name="show_error_alerts_summary">Not recommended with auto reconnection</string>
 </resources>

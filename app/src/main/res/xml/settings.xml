@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
-        android:key="bitrate"
+        android:key="link"
         android:title="@string/bitrate"
-        android:defaultValue="128"
+        android:defaultValue="http://free.radioheart.ru:8000/guwenk128"
         android:entries="@array/bitrate_names"
         android:entryValues="@array/bitrate_values"
         android:dialogTitle="@string/bitrate_choose"/>
     <SwitchPreference
         android:key="showBASS_alerts"
         android:title="@string/show_error_alerts"
-        android:defaultValue="true" />
+        android:summary="@string/show_error_alerts_summary"
+        android:defaultValue="false" />
     <SwitchPreference
         android:key="reconnect"
         android:title="@string/auto_reconnect"
-        android:defaultValue="false"/>
+        android:summary="@string/autoreconnect_summary"
+        android:defaultValue="true"/>
 </PreferenceScreen>

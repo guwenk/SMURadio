@@ -22,7 +22,7 @@ public class NotificationService extends Service{
         if (intent.getAction().equals(Constants.ACTION.STARTFOREGROUND_ACTION)) {
             showNotification();
         } else if (intent.getAction().equals(Constants.ACTION.PLAY_ACTION)) {
-            activity.doPlayPause();
+            activity.doPlayPause(false);
         } else if (intent.getAction().equals(Constants.ACTION.STOPFOREGROUND_ACTION)) {
             activity.killPlayer();
             activity.changeRadioStatus();

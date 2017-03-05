@@ -24,11 +24,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.un4seen.bass.BASS;
 
 import java.text.SimpleDateFormat;
@@ -36,15 +31,14 @@ import java.util.Date;
 import java.util.Locale;
 
 
-
 public class MainActivity extends AppCompatActivity {
 
-    private String radioUrl;
-    private String bitrate;
+    private String streamLink;
     protected RadioPlayer radioPlayer;
     private SharedPreferences sp;
     protected NotificationService notifService;
     private ImageView backgroundImage;
+    boolean userStop = false;
 
 
     @Override
@@ -52,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         backgroundImage = (ImageView)findViewById(R.id.main_backgroundImage);
-        radioUrl = getString(R.string.stream_host);
         final Button btnToTrackOrder = (Button) findViewById(R.id.main_btnToTrackOrder);
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,14 +60,16 @@ public class MainActivity extends AppCompatActivity {
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                doPlayPause();
+                doPlayPause(false);
             }
         });
     }
 
-    void doPlayPause(){
+    void doPlayPause(boolean isAutoReconnect){
         if (radioPlayer == null){
-            if (new InternetChecker().hasConnection(getApplicationContext())) {
+            if (new InternetChecker().hasConnection(getApplicationContext()) || isAutoReconnect) {
+                if (!isAutoReconnect)
+                    userStop = false;
                 if (notifService == null){
                     Intent intentNotification = new Intent(MainActivity.this, NotificationService.class);
                     intentNotification.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
@@ -93,11 +88,14 @@ public class MainActivity extends AppCompatActivity {
                     bindService(intentNotification, serviceConnection, 0);
                 }
                 radioPlayer = new RadioPlayer(this);
-                radioPlayer.startPlayer(radioUrl, bitrate);
-                changeRadioStatus();
-            }
-        } else {
+                radioPlayer.startPlayer(streamLink);
+                if (!isAutoReconnect)
+                    changeRadioStatus();
+            }else Toast.makeText(getApplicationContext(), "Проверьте подключение к интернету", Toast.LENGTH_LONG).show();
+        } else if (!isAutoReconnect){
             killPlayer();
+            changeRadioStatus();
+            userStop = true;
         }
     }
 
@@ -105,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         sp = PreferenceManager.getDefaultSharedPreferences(this);
-        bitrate = sp.getString("bitrate", "128");
+        streamLink = sp.getString("link", "http://free.radioheart.ru:8000/guwenk128");
 
         String path = sp.getString("backgroundPath", "");
         Bitmap backgroundBitmap = null;
@@ -123,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         sp = PreferenceManager.getDefaultSharedPreferences(this);
-        bitrate = sp.getString("bitrate", "128");
+        streamLink = sp.getString("link", "http://free.radioheart.ru:8000/guwenk128");
     }
 
 
@@ -131,10 +129,16 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
     }
 
+    void stopPlayer(){
+        if (radioPlayer != null){
+            radioPlayer.stopBASS();
+        }
+    }
     void killPlayer(){
         if (radioPlayer != null){
             radioPlayer.stopBASS();
         }
+        BASS.BASS_Free();
         changeRadioStatus();
     }
 
@@ -151,17 +155,33 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new MainActivity.RunnableParam(s) {
             public void run() {
                 SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-                if (sPref.getBoolean("showBASS_alerts", true))
+                if (sPref.getBoolean("showBASS_alerts", false))
                     new AlertDialog.Builder(MainActivity.this).setMessage((String)param).setPositiveButton("OK", null).show();
-                killPlayer();
+                stopPlayer();
                 SharedPreferences.Editor ed = sPref.edit();
                 SimpleDateFormat format= new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault());
                 String myDate = format.format(new Date());
                 String savedText = sPref.getString("SAVED_TEXT", "");
                 ed.putString("SAVED_TEXT", savedText + myDate+" | E:"+errorCode+ " " + new Constants().getBASS_ErrorFromCode(errorCode)+"\n");
                 ed.apply();
-                if (sPref.getBoolean("reconnect", false) && errorCode != 14){
-                    doPlayPause();
+                if (sPref.getBoolean("reconnect", true) && errorCode != 14 && !userStop){
+                    Thread timeoutThread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    doPlayPause(true);
+                                }
+                            });
+                        }
+                    });
+                    timeoutThread.start();
                 }
             }
         });
@@ -205,12 +225,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             case R.id.action_copy:
-                if (radioUrl != null) {
+                if (streamLink != null) {
                     ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData clipData = ClipData.newPlainText("", radioUrl+bitrate);
+                    ClipData clipData = ClipData.newPlainText("", streamLink);
                     clipboard.setPrimaryClip(clipData);
-                    Toast.makeText(getApplicationContext(), getString(R.string.link_was_copied) + " (" + bitrate + "kbps)", Toast.LENGTH_SHORT).show();
-                }else Toast.makeText(getApplicationContext(), getString(R.string.error) + " Button, Clipboard, Bitrate", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.link_was_copied), Toast.LENGTH_SHORT).show();
+                }else Toast.makeText(getApplicationContext(), getString(R.string.error) + " Stream link not found!", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
