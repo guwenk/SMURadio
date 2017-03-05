@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="stream_host" translatable="false">http://free.radioheart.ru:8000/guwenk</string>
+    <string name="link_128">http://free.radioheart.ru:8000/guwenk128</string>
+    <string name="link_reserve_128">http://shaincast.caster.fm:37691/listen.mp3?authn1b0bfc5d60c798155ef455e21b868cac</string>
     <string-array name="bitrate_values">
-        <item>48</item>
-        <item>96</item>
-        <item>128</item>
-        <item>256</item>
+        <item>http://free.radioheart.ru:8000/guwenk48</item>
+        <item>http://free.radioheart.ru:8000/guwenk96</item>
+        <item>@string/link_128</item>
+        <item>http://free.radioheart.ru:8000/guwenk256</item>
+        <item>@string/link_reserve_128</item>
     </string-array>
 </resources>
