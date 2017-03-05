@@ -1,48 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/small_notification_bg"
     android:background="@color/notificationBackground"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal" >
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
-        android:layout_margin="1dp"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:paddingLeft="11dp" >
 
-        <TextView
-            android:id="@+id/status_bar_track_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingRight="2dp"
-            android:layout_gravity="center_vertical"
-            android:textColor="#ffffff"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+
+    <TextView
+        android:id="@+id/radio_head"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="6dp"
+        android:layout_toRightOf="@+id/status_bar_play"
+        android:textColor="#ffffff"
+        android:text="SomeRadio"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/status_bar_track_name"
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:paddingRight="2dp"
+        android:layout_marginLeft="6dp"
+        android:layout_toRightOf="@+id/radio_icon"
+        android:layout_below="@id/radio_head"
+        android:textColor="@color/colorStick"
+        android:textSize="16sp"
+        />
+
+    <ImageView
+        android:id="@+id/radio_icon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginTop="2dp"
+        android:layout_toRightOf="@id/status_bar_play"
+        android:layout_marginLeft="6dp"
+        android:layout_below="@id/radio_head"
+        android:src="@drawable/ic_radio_black_24px"
+        />
+
 
     <ImageButton
         android:id="@+id/status_bar_play"
+        android:src="@drawable/ic_play_circle_outline_black_24px"
         android:layout_width="62dp"
-        android:src="@drawable/ic_play_arrow"
-        android:scaleType="centerCrop"
         android:layout_height="62dp"
+        android:scaleType="centerCrop"
         android:layout_margin="1dp"
-        android:background="@drawable/rectangle_gray_none"
+        android:padding="8dp"
+        android:background="@null"
         android:contentDescription="@string/play_and_stop" />
+
+
 
     <ImageButton
         android:id="@+id/status_bar_collapse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/rectangle_gray_none"
+        android:background="@null"
         android:layout_margin="1dp"
-        android:src="@drawable/ic_close"
-        android:contentDescription="@string/close_notification" />
+        android:src="@drawable/ic_clear_black_24px"
+        android:contentDescription="@string/close_notification"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        />
 
-</LinearLayout>
+</RelativeLayout>
