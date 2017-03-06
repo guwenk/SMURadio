@@ -87,7 +87,7 @@ public class AdminActivity extends AppCompatActivity {
         String path = sp.getString("backgroundPath", "");
         Bitmap backgroundBitmap;
         if (path.equals("")){
-            backgroundImage.setImageResource(R.drawable.clocks_bg);
+            backgroundImage.setImageResource(R.drawable.main_background);
         } else {
             backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
             backgroundImage.setImageBitmap(backgroundBitmap);

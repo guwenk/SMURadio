@@ -37,6 +37,12 @@ public class NotificationService extends Service{
         views = new RemoteViews(getPackageName(),
                 R.layout.notification_layout);
 
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        notificationIntent.setAction(Constants.ACTION.MAIN_ACTION);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
         Intent playIntent = new Intent(this, NotificationService.class);
         playIntent.setAction(Constants.ACTION.PLAY_ACTION);
         PendingIntent pplayIntent = PendingIntent.getService(this, 0,
@@ -61,7 +67,7 @@ public class NotificationService extends Service{
         status.contentView = views;
         status.flags = Notification.FLAG_ONGOING_EVENT;
         status.icon = R.drawable.ic_radio_24dp;
-        //status.contentIntent = pendingIntent;
+        status.contentIntent = pendingIntent;
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
 

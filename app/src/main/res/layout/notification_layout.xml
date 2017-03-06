@@ -24,15 +24,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingRight="2dp"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:freezesText="true"
         android:layout_below="@id/radio_head"
         android:textColor="@color/colorStick"
         android:textSize="16sp"
         android:layout_toLeftOf="@+id/status_bar_collapse"
         android:layout_toRightOf="@+id/radio_icon"
         android:layout_toStartOf="@+id/status_bar_collapse"
-        android:layout_toEndOf="@+id/radio_icon"
-        android:layout_marginLeft="5dp"
-        android:layout_marginStart="5dp"/>
+        android:layout_toEndOf="@+id/radio_icon" />
 
     <ImageView
         android:id="@+id/radio_icon"
@@ -60,11 +65,11 @@
 
     <ImageButton
         android:id="@+id/status_bar_collapse"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:background="@null"
         android:layout_margin="1dp"
-        android:src="@drawable/ic_clear_black_24px"
+        android:src="@drawable/ic_close_24dp"
         android:contentDescription="@string/close_notification"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"

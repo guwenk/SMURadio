@@ -10,17 +10,20 @@
         android:layout_height="match_parent"
         android:id="@+id/va_backgroundImage"
         android:scaleType="centerCrop"
+        android:src="#000000"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:contentDescription="@string/background" />
 
     <Button
+        android:id="@+id/buttonVote"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:text="@string/order"
-        android:id="@+id/buttonVote"/>
+        android:textColor="#fafafa" />
 
     <EditText
         android:layout_width="match_parent"

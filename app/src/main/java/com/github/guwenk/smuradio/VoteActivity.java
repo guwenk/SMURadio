@@ -141,7 +141,7 @@ public class VoteActivity extends AppCompatActivity {
     }
 
     //Парсинг XML из сети
-    protected class ParseXML extends AsyncTask<String, Void, Void>{
+    private class ParseXML extends AsyncTask<String, Void, Void>{
         boolean caughtException = false;
         @Override
         protected void onPreExecute() {
@@ -213,7 +213,7 @@ public class VoteActivity extends AppCompatActivity {
         String path = sp.getString("backgroundPath", "");
         Bitmap backgroundBitmap;
         if (path.equals("")){
-            backgroundImage.setImageResource(R.drawable.clocks_bg);
+            backgroundImage.setImageResource(R.drawable.main_background);
         } else {
             backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
             backgroundImage.setImageBitmap(backgroundBitmap);

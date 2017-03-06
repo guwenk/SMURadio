@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         String path = sp.getString("backgroundPath", "");
         Bitmap backgroundBitmap = null;
         if (path.equals("")){
-            backgroundImage.setImageResource(R.drawable.clocks_bg);
+            backgroundImage.setImageResource(R.drawable.main_background);
         } else {
             backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
             backgroundImage.setImageBitmap(backgroundBitmap);
@@ -146,9 +146,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public void onBackPressed() {
-    }
+    //@Override public void onBackPressed() {}
 
     void stopPlayer(){
         if (radioPlayer != null){
@@ -166,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(AF_LOG_TAG, "abandoned");
     }
 
-    class RunnableParam implements Runnable {
+    private class RunnableParam implements Runnable {
         Object param;
         RunnableParam(Object p) { param=p; }
         public void run() {}
@@ -267,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
         killPlayer();
     }
 
-    class AFListener implements AudioManager.OnAudioFocusChangeListener {
+    private class AFListener implements AudioManager.OnAudioFocusChangeListener {
         @Override
         public void onAudioFocusChange(int focusChange) {
             String event = "";
