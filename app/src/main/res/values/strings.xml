@@ -42,6 +42,6 @@
     <string name="auto_reconnect">Auto-reconnect</string>
     <string name="set_background">Set Background</string>
     <string name="restore_background">Restore Background</string>
-    <string name="autoreconnect_summary">Your smartphone may hang</string>
+    <string name="autoreconnect_summary">Unstable</string>
     <string name="show_error_alerts_summary">Not recommended with auto reconnection</string>
 </resources>
