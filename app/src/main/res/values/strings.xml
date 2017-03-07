@@ -25,7 +25,6 @@
         <item>48 kbps</item>
         <item>96 kbps</item>
         <item>128 kbps</item>
-        <item>256 kbps</item>
     </string-array>
     <string name="wrong_password">Wrong password</string>
     <string name="nothing_selected">Nothing selected</string>
@@ -44,4 +43,6 @@
     <string name="restore_background">Restore Background</string>
     <string name="autoreconnect_summary">Unstable</string>
     <string name="show_error_alerts_summary">Not recommended with auto reconnection</string>
+    <string name="hint_search">Search</string>
+    <string name="on_back_pressed">Press once again to exit!</string>
 </resources>

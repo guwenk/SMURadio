@@ -6,15 +6,16 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -46,7 +47,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 
 
-public class VoteActivity extends AppCompatActivity {
+public class OrderActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private NodeList trackNodeList;
     private List<Tracks> trackList = new ArrayList<>();
@@ -62,45 +63,18 @@ public class VoteActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_vote);
+        setContentView(R.layout.activity_order);
 
         backgroundImage = (ImageView)findViewById(R.id.va_backgroundImage);
         sp = PreferenceManager.getDefaultSharedPreferences(this);
-        final ListView listView = (ListView) findViewById(R.id.listView);
+        final ListView listView = (ListView) findViewById(R.id.musicBaseView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         new ParseXML().execute();
         adapter = new ArrayAdapter<>(this, R.layout.simple_list_item_single_choice, names);
         listView.setAdapter(adapter);
 
-
-        //<Поисковик>
-        final EditText etFilter = (EditText)findViewById(R.id.filter);
-        etFilter.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                names.clear();
-                String filter = etFilter.getText().toString();
-                String trackName1, trackName2;
-                for (int j = 0; j < trackList.size(); j++){
-                    trackName1 = trackList.get(j).getArtist() + " " + trackList.get(j).getTitle();
-                    trackName2 = trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle();
-                    if (trackName1.toUpperCase().contains(filter.toUpperCase()) || trackName2.toUpperCase().contains(filter.toUpperCase())){
-                        names.add((j+1)+ ". " + trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle());
-                    }
-                }
-                adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {}
-        });
-        //<Поисковик/>
-
         //<Кнопка голосования>
-        Button btnVote = (Button)findViewById(R.id.buttonVote);
+        Button btnVote = (Button)findViewById(R.id.buttonOrder);
         btnVote.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
@@ -195,10 +169,9 @@ public class VoteActivity extends AppCompatActivity {
             if (!caughtException && names.size()>0) {
                 ProgressBar pb = (ProgressBar)findViewById(R.id.progressBar_orderMenu);
                 pb.setVisibility(View.INVISIBLE);
-                EditText et = (EditText)findViewById(R.id.filter);
-                et.setVisibility(View.VISIBLE);
-                ListView lv = (ListView)findViewById(R.id.listView);
-                lv.setVisibility(View.VISIBLE);
+                findViewById(R.id.musicBaseView).setVisibility(View.VISIBLE);
+                findViewById(R.id.oa_line).setVisibility(View.VISIBLE);
+                findViewById(R.id.buttonOrder).setVisibility(View.VISIBLE);
                 adapter.notifyDataSetChanged();
             } else {
                 Toast.makeText(getApplicationContext(), R.string.unable_to_connect_to_server, Toast.LENGTH_LONG).show();
@@ -218,5 +191,50 @@ public class VoteActivity extends AppCompatActivity {
             backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
             backgroundImage.setImageBitmap(backgroundBitmap);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(this);
+
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String filter) {
+        onQueryTextChange(filter);
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(final String filter) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final ArrayList<String> stringArrayList = new ArrayList<>();
+                stringArrayList.clear();
+                String trackName1, trackName2;
+                for (int j = 0; j < trackList.size(); j++){
+                    trackName1 = trackList.get(j).getArtist() + " " + trackList.get(j).getTitle();
+                    trackName2 = trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle();
+                    if (trackName1.toUpperCase().contains(filter.toUpperCase()) || trackName2.toUpperCase().contains(filter.toUpperCase())){
+                        stringArrayList.add((j+1)+ ". " + trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle());
+                    }
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        names.clear();
+                        names.addAll(stringArrayList);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
+        return false;
     }
 }

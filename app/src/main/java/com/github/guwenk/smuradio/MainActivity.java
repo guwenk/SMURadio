@@ -10,11 +10,11 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +34,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
+
     private String streamLink;
     protected RadioPlayer radioPlayer;
     private SharedPreferences sp;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     String AF_LOG_TAG = "AudioFocusListener";
     boolean radioStatus = false;
     String focusLastReason;
+    ServiceConnection serviceConnection;
+    private static long back_pressed;
 
 
     @Override
@@ -58,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (new InternetChecker().hasConnection(getApplicationContext())) {
-                    Intent intent = new Intent(MainActivity.this, VoteActivity.class);
+                    Intent intent = new Intent(MainActivity.this, OrderActivity.class);
                     startActivity(intent);
                 }
             }
@@ -93,13 +96,13 @@ public class MainActivity extends AppCompatActivity {
                 if (!isAutoReconnect){
                     afListener = new AFListener();
                     int requestResult = audioManager.requestAudioFocus(afListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-                    Log.d(AF_LOG_TAG, "Music request focus, result: " + requestResult);
+                    Log.i(AF_LOG_TAG, "Music request focus, result: " + requestResult);
                 }
                 if (notifService == null){
                     Intent intentNotification = new Intent(MainActivity.this, NotificationService.class);
                     intentNotification.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
                     startService(intentNotification);
-                    ServiceConnection serviceConnection = new ServiceConnection() {
+                    serviceConnection = new ServiceConnection() {
                         @Override
                         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                             notifService = ((NotificationService.MyBinder) iBinder).getService();
@@ -134,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
             backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
             backgroundImage.setImageBitmap(backgroundBitmap);
         }
-        Log.d("Load_Background", backgroundBitmap+"");
+        Log.i("Load_Background", backgroundBitmap+"");
     }
 
 
@@ -146,7 +149,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //@Override public void onBackPressed() {}
+    @Override
+    public void onBackPressed() {
+        if (back_pressed + 2000 > System.currentTimeMillis())
+            super.onBackPressed();
+        else
+            Toast.makeText(getBaseContext(), R.string.on_back_pressed,
+                    Toast.LENGTH_SHORT).show();
+        back_pressed = System.currentTimeMillis();
+    }
 
     void stopPlayer(){
         if (radioPlayer != null){
@@ -159,9 +170,8 @@ public class MainActivity extends AppCompatActivity {
         }
         BASS.BASS_Free();
         changeRadioStatus();
-        Log.d("BASS", "kill");
         audioManager.abandonAudioFocus(afListener);
-        Log.d(AF_LOG_TAG, "abandoned");
+        Log.i(AF_LOG_TAG, "abandoned");
     }
 
     private class RunnableParam implements Runnable {
@@ -262,7 +272,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        killPlayer();
+        if (radioStatus) userClickPlayStop();
+        unbindService(serviceConnection);
     }
 
     private class AFListener implements AudioManager.OnAudioFocusChangeListener {
@@ -293,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
                     BASS.BASS_SetVolume((float)1.0);
                     break;
             }
-            Log.d(AF_LOG_TAG, "onAudioFocusChange: " + event);
+            Log.i(AF_LOG_TAG, "onAudioFocusChange: " + event);
         }
     }
 }

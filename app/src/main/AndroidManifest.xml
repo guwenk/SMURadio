@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".VoteActivity" />
+        <activity android:name=".OrderActivity" />
         <activity android:name=".AdminActivity" android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".SettingsActivity"
