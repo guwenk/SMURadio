@@ -46,7 +46,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 
-
 public class OrderActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private NodeList trackNodeList;
@@ -65,7 +64,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
 
-        backgroundImage = (ImageView)findViewById(R.id.va_backgroundImage);
+        backgroundImage = (ImageView) findViewById(R.id.va_backgroundImage);
         sp = PreferenceManager.getDefaultSharedPreferences(this);
         final ListView listView = (ListView) findViewById(R.id.musicBaseView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -74,17 +73,17 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
         listView.setAdapter(adapter);
 
         //<Кнопка голосования>
-        Button btnVote = (Button)findViewById(R.id.buttonOrder);
+        Button btnVote = (Button) findViewById(R.id.buttonOrder);
         btnVote.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View view) {
                 try {
                     StringBuilder sb = new StringBuilder(names.get(listView.getCheckedItemPosition()));
-                    while (true){
-                        if (sb.charAt(0) != '.'){
+                    while (true) {
+                        if (sb.charAt(0) != '.') {
                             sb.deleteCharAt(0);
-                        }else {
+                        } else {
                             sb.deleteCharAt(0);
                             sb.deleteCharAt(0);
                             //Log.d("MusicName", sb.toString());
@@ -97,7 +96,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
                             choose = trackList.get(i).getTitle();
                         }
                     }
-                } catch (ArrayIndexOutOfBoundsException e){
+                } catch (ArrayIndexOutOfBoundsException e) {
                     filename = "";
                     choose = "";
                 }
@@ -106,7 +105,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
                     mOrderRef.setValue(filename);
                     Toast.makeText(getApplicationContext(), getString(R.string.done) + choose, Toast.LENGTH_SHORT).show();
                     finish();
-                } else{
+                } else {
                     Toast.makeText(getApplicationContext(), R.string.nothing_selected, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -115,8 +114,9 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
     }
 
     //Парсинг XML из сети
-    private class ParseXML extends AsyncTask<String, Void, Void>{
+    private class ParseXML extends AsyncTask<String, Void, Void> {
         boolean caughtException = false;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -134,7 +134,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                 Document doc = documentBuilder.parse(new InputSource(stream));
                 trackNodeList = doc.getElementsByTagName("Track");
-            } catch (SocketTimeoutException e){
+            } catch (SocketTimeoutException e) {
                 caughtException = true;
             } catch (SAXException | ParserConfigurationException | IOException e) {
                 e.printStackTrace();
@@ -156,7 +156,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
                         return s1.compareToIgnoreCase(s2);
                     }
                 });
-                for (int i = 0; i < names_mem.size(); i++){
+                for (int i = 0; i < names_mem.size(); i++) {
                     names.add((i + 1) + ". " + names_mem.get(i));
                 }
             }
@@ -166,8 +166,8 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (!caughtException && names.size()>0) {
-                ProgressBar pb = (ProgressBar)findViewById(R.id.progressBar_orderMenu);
+            if (!caughtException && names.size() > 0) {
+                ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar_orderMenu);
                 pb.setVisibility(View.INVISIBLE);
                 findViewById(R.id.musicBaseView).setVisibility(View.VISIBLE);
                 findViewById(R.id.oa_line).setVisibility(View.VISIBLE);
@@ -185,7 +185,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
         super.onStart();
         String path = sp.getString("backgroundPath", "");
         Bitmap backgroundBitmap;
-        if (path.equals("")){
+        if (path.equals("")) {
             backgroundImage.setImageResource(R.drawable.main_background);
         } else {
             backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
@@ -218,11 +218,11 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
                 final ArrayList<String> stringArrayList = new ArrayList<>();
                 stringArrayList.clear();
                 String trackName1, trackName2;
-                for (int j = 0; j < trackList.size(); j++){
+                for (int j = 0; j < trackList.size(); j++) {
                     trackName1 = trackList.get(j).getArtist() + " " + trackList.get(j).getTitle();
                     trackName2 = trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle();
-                    if (trackName1.toUpperCase().contains(filter.toUpperCase()) || trackName2.toUpperCase().contains(filter.toUpperCase())){
-                        stringArrayList.add((j+1)+ ". " + trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle());
+                    if (trackName1.toUpperCase().contains(filter.toUpperCase()) || trackName2.toUpperCase().contains(filter.toUpperCase())) {
+                        stringArrayList.add((j + 1) + ". " + trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle());
                     }
                 }
                 runOnUiThread(new Runnable() {

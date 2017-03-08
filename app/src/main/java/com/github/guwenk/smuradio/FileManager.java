@@ -13,16 +13,16 @@ import java.io.IOException;
 
 class FileManager {
     private Context context;
-    FileManager(Context context){
+
+    FileManager(Context context) {
         this.context = context;
     }
 
     Bitmap loadBitmap(String path, String filename) {
         try {
-            File f=new File(path, filename+".png");
+            File f = new File(path, filename + ".png");
             return BitmapFactory.decodeStream(new FileInputStream(f));
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         return null;
@@ -31,7 +31,7 @@ class FileManager {
     String saveBitmap(Bitmap bitmapImage, String filename, String path) {
         ContextWrapper cw = new ContextWrapper(context);
         File directory = cw.getDir(path, Context.MODE_PRIVATE);
-        File mypath=new File(directory,filename+".png");
+        File mypath = new File(directory, filename + ".png");
 
         FileOutputStream fos = null;
         try {

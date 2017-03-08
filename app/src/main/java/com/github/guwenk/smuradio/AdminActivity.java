@@ -30,15 +30,15 @@ public class AdminActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
-        backgroundImage = (ImageView)findViewById(R.id.aa_backgroundImage);
+        backgroundImage = (ImageView) findViewById(R.id.aa_backgroundImage);
         sp = PreferenceManager.getDefaultSharedPreferences(this);
-        tv = (TextView)findViewById(R.id.tvLog);
+        tv = (TextView) findViewById(R.id.tvLog);
         refreshLog();
         tv.setMovementMethod(new ScrollingMovementMethod());
 
-        final EditText etPass = (EditText)findViewById(R.id.etPass);
+        final EditText etPass = (EditText) findViewById(R.id.etPass);
 
-        final Button btnNext = (Button)findViewById(R.id.btnNext);
+        final Button btnNext = (Button) findViewById(R.id.btnNext);
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -54,7 +54,7 @@ public class AdminActivity extends AppCompatActivity {
         });
 
 
-        final Button btnClear = (Button)findViewById(R.id.buttonClearLog);
+        final Button btnClear = (Button) findViewById(R.id.buttonClearLog);
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,7 +65,7 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
-        final Button btnPrev = (Button)findViewById(R.id.btnPrev);
+        final Button btnPrev = (Button) findViewById(R.id.btnPrev);
         btnPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,8 +75,8 @@ public class AdminActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                    mRequestsRef.child("pass").setValue(inputPass);
-                    mRequestsRef.child("cmd").setValue("prev");
+                mRequestsRef.child("pass").setValue(inputPass);
+                mRequestsRef.child("cmd").setValue("prev");
             }
         });
     }
@@ -86,7 +86,7 @@ public class AdminActivity extends AppCompatActivity {
         super.onStart();
         String path = sp.getString("backgroundPath", "");
         Bitmap backgroundBitmap;
-        if (path.equals("")){
+        if (path.equals("")) {
             backgroundImage.setImageResource(R.drawable.main_background);
         } else {
             backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
@@ -94,7 +94,7 @@ public class AdminActivity extends AppCompatActivity {
         }
     }
 
-    void refreshLog(){
+    void refreshLog() {
         new Thread(new Runnable() {
             public void run() {
                 runOnUiThread(new Runnable() {

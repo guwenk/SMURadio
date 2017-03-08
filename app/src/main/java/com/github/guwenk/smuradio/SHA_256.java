@@ -4,8 +4,7 @@ import java.security.MessageDigest;
 
 
 class SHA_256 {
-    String hashing(String password) throws Exception
-    {
+    String hashing(String password) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update(password.getBytes());
 

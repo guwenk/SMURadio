@@ -3,13 +3,14 @@ package com.github.guwenk.smuradio;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
+
 import com.un4seen.bass.BASS;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 
-
-class RadioPlayer{
+class RadioPlayer {
     private int req, chan;
     private MainActivity mainActivity;
 
@@ -23,43 +24,42 @@ class RadioPlayer{
 
 
     private void DoMeta() {
-        String meta=(String)BASS.BASS_ChannelGetTags(chan, BASS.BASS_TAG_META);
-        if (meta!=null) { // got Shoutcast metadata
-            int ti=meta.indexOf("StreamTitle='");
-            if (ti>=0) {
-                String title=meta.substring(ti+13, meta.indexOf("';", ti+13));
-                ((TextView)mainActivity.findViewById(R.id.main_status1)).setText(title);
+        String meta = (String) BASS.BASS_ChannelGetTags(chan, BASS.BASS_TAG_META);
+        if (meta != null) { // got Shoutcast metadata
+            int ti = meta.indexOf("StreamTitle='");
+            if (ti >= 0) {
+                String title = meta.substring(ti + 13, meta.indexOf("';", ti + 13));
+                ((TextView) mainActivity.findViewById(R.id.main_status1)).setText(title);
                 if (mainActivity.notifService != null)
                     mainActivity.notifService.refreshTitle(title);
             }
         } else {
-            String[] ogg=(String[])BASS.BASS_ChannelGetTags(chan, BASS.BASS_TAG_OGG);
-            if (ogg!=null) { // got Icecast/OGG tags
-                String artist=null, title=null;
-                for (String s: ogg) {
+            String[] ogg = (String[]) BASS.BASS_ChannelGetTags(chan, BASS.BASS_TAG_OGG);
+            if (ogg != null) { // got Icecast/OGG tags
+                String artist = null, title = null;
+                for (String s : ogg) {
                     if (s.regionMatches(true, 0, "artist=", 0, 7))
-                        artist=s.substring(7);
+                        artist = s.substring(7);
                     else if (s.regionMatches(true, 0, "title=", 0, 6))
-                        title=s.substring(6);
+                        title = s.substring(6);
                 }
-                if (title!=null) {
-                    if (artist!=null) {
+                if (title != null) {
+                    if (artist != null) {
                         ((TextView) mainActivity.findViewById(R.id.main_status1)).setText(title + " - " + title);
                         if (mainActivity.notifService != null)
                             mainActivity.notifService.refreshTitle(title + " - " + title);
-                    }
-                    else{
-                        ((TextView)mainActivity.findViewById(R.id.main_status1)).setText(title);
+                    } else {
+                        ((TextView) mainActivity.findViewById(R.id.main_status1)).setText(title);
                         if (mainActivity.notifService != null)
                             mainActivity.notifService.refreshTitle(title);
                     }
 
                 }
             } else {
-                meta=(String)BASS.BASS_ChannelGetTags(chan, BASS_TAG_HLS_EXTINF);
-                if (meta!=null) { // got HLS segment info
-                    int i=meta.indexOf(',');
-                    if (i>0) {
+                meta = (String) BASS.BASS_ChannelGetTags(chan, BASS_TAG_HLS_EXTINF);
+                if (meta != null) { // got HLS segment info
+                    int i = meta.indexOf(',');
+                    if (i > 0) {
                         ((TextView) mainActivity.findViewById(R.id.main_status1)).setText(meta.substring(i + 1));
                         if (mainActivity.notifService != null)
                             mainActivity.notifService.refreshTitle(meta.substring(i + 1));
@@ -69,7 +69,7 @@ class RadioPlayer{
         }
     }
 
-    private BASS.SYNCPROC MetaSync=new BASS.SYNCPROC() {
+    private BASS.SYNCPROC MetaSync = new BASS.SYNCPROC() {
         public void SYNCPROC(int handle, int channel, int data, Object user) {
             mainActivity.runOnUiThread(new Runnable() {
                 public void run() {
@@ -79,12 +79,12 @@ class RadioPlayer{
         }
     };
 
-    private BASS.SYNCPROC EndSync=new BASS.SYNCPROC() {
+    private BASS.SYNCPROC EndSync = new BASS.SYNCPROC() {
         public void SYNCPROC(int handle, int channel, int data, Object user) {
             mainActivity.runOnUiThread(new Runnable() {
                 public void run() {
                     mainActivity.Error(mainActivity.getString(R.string.cant_play_the_stream));
-                    ((TextView)mainActivity.findViewById(R.id.main_status1)).setText("");
+                    ((TextView) mainActivity.findViewById(R.id.main_status1)).setText("");
                     if (mainActivity.notifService != null)
                         mainActivity.notifService.refreshTitle(mainActivity.getString(R.string.someradio));
                 }
@@ -92,13 +92,13 @@ class RadioPlayer{
         }
     };
 
-    private BASS.DOWNLOADPROC StatusProc=new BASS.DOWNLOADPROC() {
+    private BASS.DOWNLOADPROC StatusProc = new BASS.DOWNLOADPROC() {
         public void DOWNLOADPROC(ByteBuffer buffer, int length, Object user) {
-            if ((Integer)user!=req) return; // make sure this is still the current request
-            if (buffer!=null && length==0) { // got HTTP/ICY tags
+            if ((Integer) user != req) return; // make sure this is still the current request
+            if (buffer != null && length == 0) { // got HTTP/ICY tags
                 try {
                     Charset.forName("ISO-8859-1").newDecoder();
-                    ByteBuffer temp=ByteBuffer.allocate(buffer.limit()); // CharsetDecoder doesn't like a direct buffer?
+                    ByteBuffer temp = ByteBuffer.allocate(buffer.limit()); // CharsetDecoder doesn't like a direct buffer?
                     temp.put(buffer);
                     temp.position(0);
                 } catch (Exception ignored) {
@@ -110,34 +110,36 @@ class RadioPlayer{
 
     private class OpenURL implements Runnable {
         String url;
+
         OpenURL(String p) {
-            url=p;
+            url = p;
         }
+
         public void run() {
             int r;
-            synchronized(lock) { // make sure only 1 thread at a time can do the following
-                r=++req; // increment the request counter for this request
+            synchronized (lock) { // make sure only 1 thread at a time can do the following
+                r = ++req; // increment the request counter for this request
             }
             BASS.BASS_StreamFree(chan); // close old stream
             mainActivity.runOnUiThread(new Runnable() {
                 public void run() {
-                    ((TextView)mainActivity.findViewById(R.id.main_status1)).setText(R.string.connecting);
+                    ((TextView) mainActivity.findViewById(R.id.main_status1)).setText(R.string.connecting);
                     if (mainActivity.notifService != null)
                         mainActivity.notifService.refreshTitle(mainActivity.getString(R.string.connecting));
                 }
             });
-            connection = BASS.BASS_StreamCreateURL(url, 0, BASS.BASS_STREAM_BLOCK|BASS.BASS_STREAM_STATUS|BASS.BASS_STREAM_AUTOFREE, StatusProc, r); // open URL
-            synchronized(lock) {
-                if (r!=req) { // there is a newer request, discard this stream
-                    if (connection!=0) BASS.BASS_StreamFree(connection);
+            connection = BASS.BASS_StreamCreateURL(url, 0, BASS.BASS_STREAM_BLOCK | BASS.BASS_STREAM_STATUS | BASS.BASS_STREAM_AUTOFREE, StatusProc, r); // open URL
+            synchronized (lock) {
+                if (r != req) { // there is a newer request, discard this stream
+                    if (connection != 0) BASS.BASS_StreamFree(connection);
                     return;
                 }
-                chan=connection; // this is now the current stream
+                chan = connection; // this is now the current stream
             }
-            if (chan==0) { // failed to open
+            if (chan == 0) { // failed to open
                 mainActivity.runOnUiThread(new Runnable() {
                     public void run() {
-                        ((TextView)mainActivity.findViewById(R.id.main_status1)).setText("");
+                        ((TextView) mainActivity.findViewById(R.id.main_status1)).setText("");
                         if (mainActivity.notifService != null)
                             mainActivity.notifService.refreshTitle(mainActivity.getString(R.string.someradio));
                     }
@@ -145,7 +147,7 @@ class RadioPlayer{
                 mainActivity.Error(mainActivity.getString(R.string.cant_play_the_stream));
             } else {
                 handler.postDelayed(timer, 50); // start prebuffer monitoring
-                Log.d("BASS_VOLUME", BASS.BASS_GetVolume()+"");
+                Log.d("BASS_VOLUME", BASS.BASS_GetVolume() + "");
             }
         }
     }
@@ -179,18 +181,20 @@ class RadioPlayer{
                     // play it!
                     BASS.BASS_ChannelPlay(chan, false);
                 } else {
-                    ((TextView) mainActivity.findViewById(R.id.main_status1)).setText(mainActivity.getString(R.string.buffering)+" (" + progress +"%)");
+                    ((TextView) mainActivity.findViewById(R.id.main_status1)).setText(mainActivity.getString(R.string.buffering) + " (" + progress + "%)");
                     if (mainActivity.notifService != null)
-                        mainActivity.notifService.refreshTitle(mainActivity.getString(R.string.buffering)+" (" + progress +"%)");
+                        mainActivity.notifService.refreshTitle(mainActivity.getString(R.string.buffering) + " (" + progress + "%)");
                     handler.postDelayed(this, 50);
                 }
             }
         };
     }
-    void startPlayer(String link){
+
+    void startPlayer(String link) {
         new Thread(new OpenURL(link)).start();
     }
-    void stopBASS(){
+
+    void stopBASS() {
         BASS.BASS_StreamFree(connection);
         mainActivity.radioPlayer = null;
     }

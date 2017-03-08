@@ -13,19 +13,32 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity" android:launchMode="singleTask">
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".OrderActivity" />
-        <activity android:name=".AdminActivity" android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".OrderActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AdminActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/action_settings" />
-        <service android:name=".NotificationService" android:enabled="true"/>
+            android:label="@string/action_settings"
+            android:screenOrientation="portrait" />
+
+        <service
+            android:name=".NotificationService"
+            android:enabled="true"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

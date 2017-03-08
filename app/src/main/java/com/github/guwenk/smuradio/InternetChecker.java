@@ -7,7 +7,7 @@ import android.net.NetworkInfo;
 
 class InternetChecker {
     boolean hasConnection(final Context context) {
-        ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         if (wifiInfo != null && wifiInfo.isConnected())
             return true;
@@ -16,5 +16,5 @@ class InternetChecker {
             return true;
         wifiInfo = cm.getActiveNetworkInfo();
         return wifiInfo != null && wifiInfo.isConnected();
-     }
+    }
 }

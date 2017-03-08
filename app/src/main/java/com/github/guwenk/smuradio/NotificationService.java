@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 import android.widget.RemoteViews;
 
 
-public class NotificationService extends Service{
+public class NotificationService extends Service {
     //private String LOG_TAG = "NotificationService";
     protected RemoteViews views;
     private MyBinder binder = new MyBinder();
@@ -33,6 +33,7 @@ public class NotificationService extends Service{
     }
 
     Notification status;
+
     private void showNotification() {
         views = new RemoteViews(getPackageName(),
                 R.layout.notification_layout);
@@ -71,15 +72,17 @@ public class NotificationService extends Service{
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
 
-    public void toPlayButton(){
+    public void toPlayButton() {
         views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_circle_outline_24px);
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
-    public void toStopButton(){
+
+    public void toStopButton() {
         views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_pause_circle_outline_24px);
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
-    public void refreshTitle(String title){
+
+    public void refreshTitle(String title) {
         views.setTextViewText(R.id.status_bar_track_name, title);
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
@@ -101,11 +104,12 @@ public class NotificationService extends Service{
         super.onDestroy();
     }
 
-    public void registerClient(MainActivity activity){
+    public void registerClient(MainActivity activity) {
         this.activity = activity;
     }
-    class MyBinder extends Binder{
-        NotificationService getService(){
+
+    class MyBinder extends Binder {
+        NotificationService getService() {
             return NotificationService.this;
         }
     }

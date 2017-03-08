@@ -16,12 +16,13 @@ import java.io.IOException;
 
 public class SettingsActivity extends PreferenceActivity {
     static final int GALLERY_REQUEST = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
         setContentView(R.layout.activity_settings);
-        Button btnSetBG = (Button)findViewById(R.id.pref_btn_set_bg);
+        Button btnSetBG = (Button) findViewById(R.id.pref_btn_set_bg);
         btnSetBG.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -30,7 +31,7 @@ public class SettingsActivity extends PreferenceActivity {
                 startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
             }
         });
-        Button btnRestoreBG = (Button)findViewById(R.id.pref_btn_restore_bg);
+        Button btnRestoreBG = (Button) findViewById(R.id.pref_btn_restore_bg);
         btnRestoreBG.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -48,9 +49,9 @@ public class SettingsActivity extends PreferenceActivity {
         Bitmap bitmap = null;
         //ImageView imageView = (ImageView) findViewById(R.id.imageView2);
 
-        switch(requestCode) {
+        switch (requestCode) {
             case GALLERY_REQUEST:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     Uri selectedImage = imageReturnedIntent.getData();
                     try {
                         bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
