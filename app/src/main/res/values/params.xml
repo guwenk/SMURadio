@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="link_128" translatable="false">http://free.radioheart.ru:8000/guwenk128</string>
+    <string name="default_lang" translatable="false">default</string>
     <string-array name="bitrate_values">
         <item>http://free.radioheart.ru:8000/guwenk48</item>
         <item>http://free.radioheart.ru:8000/guwenk96</item>
         <item>http://free.radioheart.ru:8000/guwenk128</item>
+    </string-array>
+    <string-array name="lang_values">
+        <item>default</item>
+        <item>en</item>
+        <item>ru</item>
     </string-array>
 </resources>

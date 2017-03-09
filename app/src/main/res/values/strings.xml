@@ -26,6 +26,11 @@
         <item>96 kbps</item>
         <item>128 kbps</item>
     </string-array>
+    <string-array name="lang_names">
+        <item>Default</item>
+        <item>English</item>
+        <item>Русский</item>
+    </string-array>
     <string name="wrong_password">Wrong password</string>
     <string name="nothing_selected">Nothing selected</string>
     <string name="done">"Done: "</string>
@@ -45,4 +50,6 @@
     <string name="show_error_alerts_summary">Not recommended with auto reconnection</string>
     <string name="hint_search">Search</string>
     <string name="on_back_pressed">Press once again to exit!</string>
+    <string name="settings_lang_summary">Restart the application to accept the changes.</string>
+    <string name="lang_title">Language</string>
 </resources>

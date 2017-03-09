@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
+        android:key="lang"
+        android:title="@string/lang_title"
+        android:summary="@string/settings_lang_summary"
+        android:defaultValue="@string/default_lang"
+        android:entries="@array/lang_names"
+        android:entryValues="@array/lang_values"
+        android:dialogTitle="Choose language"/>
+    <ListPreference
         android:key="link"
         android:title="@string/bitrate"
         android:defaultValue="@string/link_128"
