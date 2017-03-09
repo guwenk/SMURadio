@@ -24,6 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingRight="2dp"
+
         android:singleLine="true"
         android:ellipsize="marquee"
         android:marqueeRepeatLimit="marquee_forever"
@@ -31,6 +32,7 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:freezesText="true"
+
         android:layout_below="@id/radio_head"
         android:textColor="@color/colorStick"
         android:textSize="16sp"

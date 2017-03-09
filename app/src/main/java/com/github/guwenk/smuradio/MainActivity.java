@@ -35,11 +35,9 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 
 
-    private String streamLink;
+    private static long back_pressed;
     protected RadioPlayer radioPlayer;
-    private SharedPreferences sp;
     protected NotificationService notifService;
-    private ImageView backgroundImage;
     boolean userStop = false;
     AudioManager audioManager;
     AFListener afListener;
@@ -47,8 +45,9 @@ public class MainActivity extends AppCompatActivity {
     boolean radioStatus = false;
     String focusLastReason;
     ServiceConnection serviceConnection;
-    private static long back_pressed;
-
+    private String streamLink;
+    private SharedPreferences sp;
+    private ImageView backgroundImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,17 +176,6 @@ public class MainActivity extends AppCompatActivity {
         Log.i(AF_LOG_TAG, "abandoned");
     }
 
-    private class RunnableParam implements Runnable {
-        Object param;
-
-        RunnableParam(Object p) {
-            param = p;
-        }
-
-        public void run() {
-        }
-    }
-
     void Error(final String es) {
         // get error code in current thread for display in UI thread
         final int errorCode = BASS.BASS_ErrorGetCode();
@@ -282,7 +270,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (radioStatus) userClickPlayStop();
-        unbindService(serviceConnection);
+        if (notifService != null) {
+            unbindService(serviceConnection);
+        }
+
+    }
+
+    private class RunnableParam implements Runnable {
+        Object param;
+
+        RunnableParam(Object p) {
+            param = p;
+        }
+
+        public void run() {
+        }
     }
 
     private class AFListener implements AudioManager.OnAudioFocusChangeListener {

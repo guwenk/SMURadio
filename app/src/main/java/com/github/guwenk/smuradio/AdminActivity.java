@@ -2,9 +2,9 @@ package com.github.guwenk.smuradio;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
 import android.view.View;
@@ -18,12 +18,12 @@ import com.google.firebase.database.FirebaseDatabase;
 
 
 public class AdminActivity extends AppCompatActivity {
-    private String inputPass;
-    private ImageView backgroundImage;
     SharedPreferences sp;
     TextView tv;
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mRequestsRef = mRootRef.child("Requests");
+    private String inputPass;
+    private ImageView backgroundImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

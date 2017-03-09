@@ -4,12 +4,11 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -48,6 +47,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class OrderActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
+    SharedPreferences sp;
+    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference mOrderRef = mRootRef.child("Requests").child("order");
     private NodeList trackNodeList;
     private List<Tracks> trackList = new ArrayList<>();
     private ArrayList<String> names = new ArrayList<>();
@@ -55,9 +57,6 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
     private String choose;
     private ArrayAdapter<String> adapter;
     private ImageView backgroundImage;
-    SharedPreferences sp;
-    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference mOrderRef = mRootRef.child("Requests").child("order");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +110,64 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
             }
         });
         //<Кнопка голосования/>
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        String path = sp.getString("backgroundPath", "");
+        Bitmap backgroundBitmap;
+        if (path.equals("")) {
+            backgroundImage.setImageResource(R.drawable.main_background);
+        } else {
+            backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
+            backgroundImage.setImageBitmap(backgroundBitmap);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(this);
+
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String filter) {
+        onQueryTextChange(filter);
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(final String filter) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final ArrayList<String> stringArrayList = new ArrayList<>();
+                stringArrayList.clear();
+                String trackName1, trackName2;
+                for (int j = 0; j < trackList.size(); j++) {
+                    trackName1 = trackList.get(j).getArtist() + " " + trackList.get(j).getTitle();
+                    trackName2 = trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle();
+                    if (trackName1.toUpperCase().contains(filter.toUpperCase()) || trackName2.toUpperCase().contains(filter.toUpperCase())) {
+                        stringArrayList.add((j + 1) + ". " + trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle());
+                    }
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        names.clear();
+                        names.addAll(stringArrayList);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
+        return false;
     }
 
     //Парсинг XML из сети
@@ -178,63 +235,5 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
                 finish();
             }
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        String path = sp.getString("backgroundPath", "");
-        Bitmap backgroundBitmap;
-        if (path.equals("")) {
-            backgroundImage.setImageResource(R.drawable.main_background);
-        } else {
-            backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
-            backgroundImage.setImageBitmap(backgroundBitmap);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_search, menu);
-
-        MenuItem searchItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(this);
-
-        return true;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String filter) {
-        onQueryTextChange(filter);
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(final String filter) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final ArrayList<String> stringArrayList = new ArrayList<>();
-                stringArrayList.clear();
-                String trackName1, trackName2;
-                for (int j = 0; j < trackList.size(); j++) {
-                    trackName1 = trackList.get(j).getArtist() + " " + trackList.get(j).getTitle();
-                    trackName2 = trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle();
-                    if (trackName1.toUpperCase().contains(filter.toUpperCase()) || trackName2.toUpperCase().contains(filter.toUpperCase())) {
-                        stringArrayList.add((j + 1) + ". " + trackList.get(j).getArtist() + " - " + trackList.get(j).getTitle());
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        names.clear();
-                        names.addAll(stringArrayList);
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        }).start();
-        return false;
     }
 }

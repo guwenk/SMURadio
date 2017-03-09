@@ -13,9 +13,9 @@ import android.widget.RemoteViews;
 public class NotificationService extends Service {
     //private String LOG_TAG = "NotificationService";
     protected RemoteViews views;
+    Notification status;
     private MyBinder binder = new MyBinder();
     private MainActivity activity;
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -31,8 +31,6 @@ public class NotificationService extends Service {
         }
         return START_STICKY;
     }
-
-    Notification status;
 
     private void showNotification() {
         views = new RemoteViews(getPackageName(),
