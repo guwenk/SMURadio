@@ -301,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                     event = "AUDIOFOCUS_LOSS_TRANSIENT";
                     focusLastReason = event;
-                    stopPlayer();
+                    userClickPlayStop();
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                     event = "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK";
@@ -310,9 +310,6 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case AudioManager.AUDIOFOCUS_GAIN:
                     event = "AUDIOFOCUS_GAIN";
-                    if (focusLastReason.equals("AUDIOFOCUS_LOSS_TRANSIENT")) {
-                        userClickPlayStop();
-                    }
                     BASS.BASS_SetVolume((float) 1.0);
                     break;
             }
