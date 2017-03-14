@@ -69,12 +69,12 @@ public class MainActivity extends AppCompatActivity {
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                userClickPlayStop();
+                userClickPlayStop(false);
             }
         });
     }
 
-    void userClickPlayStop() {
+    void userClickPlayStop(boolean isAM) {
         userStop = radioStatus;
         if (!radioStatus) {
             if (new InternetChecker().hasConnection(getApplicationContext())) {
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             } else
                 Toast.makeText(getApplicationContext(), "Проверьте подключение к интернету", Toast.LENGTH_LONG).show();
         } else {
-            killPlayer();
+            killPlayer(isAM);
             radioStatus = !radioStatus;
             changeRadioStatus();
         }
@@ -118,10 +118,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 radioPlayer = new RadioPlayer(this);
                 radioPlayer.startPlayer(streamLink);
-            }
-        } else if (!isAutoReconnect) {
-            killPlayer();
-        }
+            } else killPlayer(false);
+        } else if (!isAutoReconnect) killPlayer(false);
     }
 
     @Override
@@ -160,19 +158,13 @@ public class MainActivity extends AppCompatActivity {
         back_pressed = System.currentTimeMillis();
     }
 
-    void stopPlayer() {
+    void killPlayer(boolean isAM) {
         if (radioPlayer != null) {
-            radioPlayer.stopBASS();
-        }
-    }
-
-    void killPlayer() {
-        if (radioPlayer != null) {
-            radioPlayer.stopBASS();
+            radioPlayer.killBASS();
         }
         BASS.BASS_Free();
         changeRadioStatus();
-        audioManager.abandonAudioFocus(afListener);
+        if (!isAM) audioManager.abandonAudioFocus(afListener);
         Log.i(AF_LOG_TAG, "abandoned");
     }
 
@@ -185,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                 if (sPref.getBoolean("showBASS_alerts", false))
                     new AlertDialog.Builder(MainActivity.this).setMessage((String) param).setPositiveButton("OK", null).show();
-                stopPlayer();
+                doPlayPause(sPref.getBoolean("reconnect", true) && errorCode != 14 && !userStop);
                 SharedPreferences.Editor ed = sPref.edit();
                 SimpleDateFormat format = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault());
                 String myDate = format.format(new Date());
@@ -269,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (radioStatus) userClickPlayStop();
+        if (radioStatus) userClickPlayStop(false);
         if (notifService != null) {
             unbindService(serviceConnection);
         }
@@ -295,12 +287,12 @@ public class MainActivity extends AppCompatActivity {
                 case AudioManager.AUDIOFOCUS_LOSS:
                     event = "AUDIOFOCUS_LOSS";
                     focusLastReason = event;
-                    userClickPlayStop();
+                    userClickPlayStop(false);
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                     event = "AUDIOFOCUS_LOSS_TRANSIENT";
                     focusLastReason = event;
-                    stopPlayer();
+                    userClickPlayStop(true);
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                     event = "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK";
@@ -310,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
                 case AudioManager.AUDIOFOCUS_GAIN:
                     event = "AUDIOFOCUS_GAIN";
                     if (focusLastReason.equals("AUDIOFOCUS_LOSS_TRANSIENT")) {
-                        userClickPlayStop();
+                        userClickPlayStop(true);
                     }
                     BASS.BASS_SetVolume((float) 1.0);
                     break;

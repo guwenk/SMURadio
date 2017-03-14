@@ -22,10 +22,10 @@ public class NotificationService extends Service {
         if (intent.getAction().equals(Constants.ACTION.STARTFOREGROUND_ACTION)) {
             showNotification();
         } else if (intent.getAction().equals(Constants.ACTION.PLAY_ACTION)) {
-            activity.userClickPlayStop();
+            activity.userClickPlayStop(false);
         } else if (intent.getAction().equals(Constants.ACTION.STOPFOREGROUND_ACTION)) {
             if (activity.radioStatus)
-                activity.userClickPlayStop();
+                activity.userClickPlayStop(false);
             stopForeground(true);
             stopSelf();
         }

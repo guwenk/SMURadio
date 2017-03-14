@@ -15,6 +15,7 @@ class RadioPlayer {
     private static final int BASS_TAG_HLS_EXTINF = 0x14000;
     private final Object lock = new Object();
     private int req, chan;
+    private boolean stopRequest = false;
     private MainActivity mainActivity;
     private int connection;
     private Handler handler = new Handler();
@@ -70,6 +71,9 @@ class RadioPlayer {
         timer = new Runnable() {
             public void run() {
                 // monitor prebuffering progress
+                if (stopRequest){
+                    killBASS();
+                }
                 int progress = (int) BASS.BASS_StreamGetFilePosition(chan, BASS.BASS_FILEPOS_BUFFER);
                 if (progress < 0) return; // failed, eg. stream freed
                 progress = progress * 100 / (int) BASS.BASS_StreamGetFilePosition(chan, BASS.BASS_FILEPOS_END); // percentage of buffer filled
@@ -145,6 +149,14 @@ class RadioPlayer {
     void stopBASS() {
         BASS.BASS_StreamFree(connection);
         mainActivity.radioPlayer = null;
+    }
+    void killBASS() {
+        BASS.BASS_StreamFree(connection);
+        mainActivity.radioPlayer = null;
+        Log.d("Player", "Убит");
+    }
+    void killRequest(){
+        stopRequest = true;
     }
 
     private class OpenURL implements Runnable {
