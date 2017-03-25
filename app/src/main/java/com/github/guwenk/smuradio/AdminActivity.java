@@ -60,7 +60,7 @@ public class AdminActivity extends AppCompatActivity {
             public void onClick(View view) {
                 tv.setText("");
                 SharedPreferences.Editor ed = sp.edit();
-                ed.putString("SAVED_TEXT", "");
+                ed.putString(Constants.UI.BASS_ERROR_LOG, "");
                 ed.apply();
             }
         });
@@ -100,7 +100,7 @@ public class AdminActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        tv.setText(sp.getString("SAVED_TEXT", ""));
+                        tv.setText(sp.getString(Constants.UI.BASS_ERROR_LOG, ""));
                         tv.setGravity(Gravity.BOTTOM);
                     }
                 });
@@ -112,8 +112,8 @@ public class AdminActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (!sp.getString("SAVED_TEXT", "").equals(tv.getText()))
-                            tv.setText(sp.getString("SAVED_TEXT", ""));
+                        if (!sp.getString(Constants.UI.BASS_ERROR_LOG, "").equals(tv.getText()))
+                            tv.setText(sp.getString(Constants.UI.BASS_ERROR_LOG, ""));
                         tv.setGravity(Gravity.NO_GRAVITY);
                     }
                 });
@@ -121,8 +121,8 @@ public class AdminActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (!sp.getString("SAVED_TEXT", "").equals(tv.getText()))
-                                tv.setText(sp.getString("SAVED_TEXT", ""));
+                            if (!sp.getString(Constants.UI.BASS_ERROR_LOG, "").equals(tv.getText()))
+                                tv.setText(sp.getString(Constants.UI.BASS_ERROR_LOG, ""));
                         }
                     });
                     try {

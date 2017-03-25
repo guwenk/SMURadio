@@ -9,7 +9,7 @@
         android:entryValues="@array/lang_values"
         android:dialogTitle="Choose language"/>
     <ListPreference
-        android:key="link"
+        android:key="stream_link"
         android:title="@string/bitrate"
         android:defaultValue="@string/link_128"
         android:entries="@array/bitrate_names"

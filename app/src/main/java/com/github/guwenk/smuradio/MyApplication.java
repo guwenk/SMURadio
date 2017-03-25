@@ -9,15 +9,14 @@ import java.util.Locale;
 
 
 public class MyApplication extends Application {
-    private SharedPreferences preferences;
     private Locale locale;
     private String lang;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        lang = preferences.getString("lang", "default");
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        lang = preferences.getString(Constants.PREFERENCES.LANGUAGE, "default");
         if (lang.equals("default")) {
             lang = getResources().getConfiguration().locale.getCountry();
         }
