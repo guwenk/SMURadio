@@ -1,12 +1,10 @@
 package com.github.guwenk.smuradio;
 
-import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -25,13 +23,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
 
     private static long back_pressed;
-    BroadcastReceiver broadcastReceiver;
     PlayerService playerService;
-    private SharedPreferences sp;
+    private SharedPreferences sPref;
     private ImageView backgroundImage;
     ServiceConnection serviceConnection;
 
@@ -39,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sp = PreferenceManager.getDefaultSharedPreferences(this);
+        sPref = PreferenceManager.getDefaultSharedPreferences(this);
         backgroundImage = (ImageView) findViewById(R.id.main_backgroundImage);
         final Button btnToTrackOrder = (Button) findViewById(R.id.main_btnToTrackOrder);
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
@@ -75,33 +72,14 @@ public class MainActivity extends AppCompatActivity {
                 bindService(intent, serviceConnection, 0);
             }
         });
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                ImageButton imgBtn = (ImageButton) findViewById(R.id.main_play_button);
-                int status = intent.getIntExtra(Constants.MESSAGE.PLAYER_STATUS, -1);
-                String s = intent.getStringExtra(Constants.MESSAGE.MUSIC_TITLE);
-                if (status == -1 && s != null){
-                    ((TextView) findViewById(R.id.main_status1)).setText(s);
-                } else if (status == 0){
-                    ((TextView) findViewById(R.id.main_status1)).setText("");
-                    findViewById(R.id.main_status1).setVisibility(View.INVISIBLE);
-                    imgBtn.setImageResource(R.drawable.ic_play_arrow);
-                } else if (status == 1){
-                    findViewById(R.id.main_status1).setVisibility(View.VISIBLE);
-                    imgBtn.setImageResource(R.drawable.ic_stop);
-                }
-            }
-        };
-        IntentFilter intentFilter = new IntentFilter(Constants.ACTION.MESSAGE_TO_MA);
-        registerReceiver(broadcastReceiver, intentFilter);
+        sPref.registerOnSharedPreferenceChangeListener(this);
     }
 
 
     @Override
     protected void onStart() {
         super.onStart();
-        String path = sp.getString("backgroundPath", "");
+        String path = sPref.getString("backgroundPath", "");
         Bitmap backgroundBitmap = null;
         if (path.equals("")) {
             backgroundImage.setImageResource(R.drawable.main_background);
@@ -146,12 +124,33 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_copy:
                 ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clipData = ClipData.newPlainText("", sp.getString("link", "http://free.radioheart.ru:8000/guwenk128"));
+                ClipData clipData = ClipData.newPlainText("", sPref.getString("link", "http://free.radioheart.ru:8000/guwenk128"));
                 clipboard.setPrimaryClip(clipData);
                 Toast.makeText(getApplicationContext(), getString(R.string.link_was_copied), Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        ImageButton imageButton = (ImageButton)findViewById(R.id.main_play_button);
+        int player_status = sharedPreferences.getInt(Constants.MESSAGE.PLAYER_STATUS, -1);
+        String player_title = sharedPreferences.getString(Constants.MESSAGE.MUSIC_TITLE, "");
+        switch (player_status){
+            case 0:{
+                ((TextView)findViewById(R.id.main_status1)).setText("");
+                findViewById(R.id.main_status1).setVisibility(View.INVISIBLE);
+                imageButton.setImageResource(R.drawable.ic_play_arrow);
+                break;
+            }
+            case 1:{
+                ((TextView)findViewById(R.id.main_status1)).setText(player_title);
+                findViewById(R.id.main_status1).setVisibility(View.VISIBLE);
+                imageButton.setImageResource(R.drawable.ic_stop);
+                break;
+            }
         }
     }
 }

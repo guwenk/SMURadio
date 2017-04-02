@@ -10,9 +10,11 @@ import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.un4seen.bass.BASS;
 
@@ -22,22 +24,23 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+
 public class PlayerService extends Service {
     private static final int BASS_SYNC_HLS_SEGMENT = 0x10300;
     private static final int BASS_TAG_HLS_EXTINF = 0x14000;
     private final Object lock = new Object();
-    String LOG_TAG = "PLAYER_SERVICE";
-    AFListener afListener;
-    String focusLastReason;
-    String AF_LOG_TAG = "AudioFocusListener";
-    AudioManager audioManager;
     boolean isStarted = false;
-
+    private String LOG_TAG = "PLAYER_SERVICE";
+    private AFListener afListener;
+    private String AF_LOG_TAG = "AudioFocusListener";
+    private AudioManager audioManager;
     private MyBinder binder = new MyBinder();
     private RemoteViews views;
     private Notification status;
     private SharedPreferences sPref;
     private boolean isPlaying = false;
+    private boolean reconnectCancel = false;
+
     private int req, chan;
     private Handler handler = new Handler();
     private BASS.SYNCPROC MetaSync = new BASS.SYNCPROC() {
@@ -99,23 +102,38 @@ public class PlayerService extends Service {
         if (intent.getAction().equals(Constants.ACTION.STARTFOREGROUND_ACTION)) {
             if (!isStarted) {
                 showNotification();
-                startPlayer(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)));
+                Log.d(LOG_TAG, "START_BASS");
+                if (BASS.BASS_Init(-1, 44100, 0)) {
+                    BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
+                    BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
+                    // load AAC and HLS add-ons (if present)
+                    BASS.BASS_PluginLoad("libbass_aac.so", 0);
+                    BASS.BASS_PluginLoad("libbasshls.so", 0);
+                }
+                startPlayer();
                 isStarted = true;
             } else {
                 if (isPlaying)
                     stopBASS();
-                else
-                    startPlayer(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)));
+                else {
+                    afListener = new AFListener();
+                    int requestResult = audioManager.requestAudioFocus(afListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+                    Log.i(AF_LOG_TAG, "Music request focus, result: " + requestResult);
+                    startPlayer();
+                }
                 updateUI(Constants.UI.BUTTON, null);
             }
         } else if (intent.getAction().equals(Constants.ACTION.PLAY_ACTION)) {
             if (isPlaying)
                 stopBASS();
-            else
-                startPlayer(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)));
-
+            else {
+                afListener = new AFListener();
+                int requestResult = audioManager.requestAudioFocus(afListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+                Log.i(AF_LOG_TAG, "Music request focus, result: " + requestResult);
+                startPlayer();
+            }
         } else if (intent.getAction().equals(Constants.ACTION.STOPFOREGROUND_ACTION)) {
-            stopBASS();
+            fullStopBASS();
             updateUI(Constants.UI.BUTTON, null);
             stopForeground(true);
             stopSelf();
@@ -123,33 +141,50 @@ public class PlayerService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void startPlayer(String link) {
-        afListener = new AFListener();
-        int requestResult = audioManager.requestAudioFocus(afListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-        Log.i(AF_LOG_TAG, "Music request focus, result: " + requestResult);
-        Log.d(LOG_TAG, "START_BASS");
-        if (BASS.BASS_Init(-1, 44100, 0)) {
-            BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
-            BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
-            // load AAC and HLS add-ons (if present)
-            BASS.BASS_PluginLoad("libbass_aac.so", 0);
-            BASS.BASS_PluginLoad("libbasshls.so", 0);
+    private void startPlayer() {
+        if (new InternetChecker().hasConnection(getApplicationContext())) {
+            new Thread(new BASS_OpenURL(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)))).start();
+            isPlaying = true;
+            updateUI(Constants.UI.BUTTON, null);
+        } else {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(), getString(R.string.check_internet_connection), Toast.LENGTH_SHORT).show();
+                }
+            });
+            stopBASS();
         }
-        new Thread(new BASS_OpenURL(link)).start();
-        isPlaying = true;
-        updateUI(Constants.UI.BUTTON, null);
     }
 
-    private void sendBroadcastToActivity(String message_type, String message) {
-        Intent intent = new Intent(Constants.ACTION.MESSAGE_TO_MA);
-        if (message_type.equals(Constants.MESSAGE.MUSIC_TITLE)) {
-            intent.putExtra(Constants.MESSAGE.MUSIC_TITLE, message);
-            sendBroadcast(intent);
-        } else if (message_type.equals(Constants.MESSAGE.PLAYER_STATUS)) {
-            if (isPlaying) intent.putExtra(Constants.MESSAGE.PLAYER_STATUS, 1);
-            else intent.putExtra(Constants.MESSAGE.PLAYER_STATUS, 0);
-            sendBroadcast(intent);
+    private void reconnectPlayer() {
+        if (new InternetChecker().hasConnection(getApplicationContext())){
+            new Thread(new BASS_OpenURL(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)))).start();
+        } else {
+            updateUI(Constants.UI.STATUS, getString(R.string.waiting_for_internet));
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            reconnectPlayer();
         }
+
+    }
+
+
+    private void updateActivity(String message_type, String message) {
+        SharedPreferences.Editor ed = sPref.edit();
+        if (message_type.equals(Constants.MESSAGE.MUSIC_TITLE)) {
+            ed.putString(Constants.MESSAGE.MUSIC_TITLE, message);
+            Log.d("SharedPref", "put title");
+        } else if (message_type.equals(Constants.MESSAGE.PLAYER_STATUS)) {
+            if (isPlaying) ed.putInt(Constants.MESSAGE.PLAYER_STATUS, 1);
+            else ed.putInt(Constants.MESSAGE.PLAYER_STATUS, 0);
+            Log.d("SharedPref", "put status");
+        }
+        ed.apply();
     }
 
     private void showNotification() {
@@ -171,7 +206,7 @@ public class PlayerService extends Service {
 
         views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_pause_circle_outline_24px);
         views.setInt(R.id.small_notification_bg, "setBackgroundResource", R.color.notificationBackground);
-        views.setTextViewText(R.id.status_bar_track_name, getString(R.string.someradio));
+        views.setTextViewText(R.id.status_bar_track_name, getString(R.string.default_status));
 
         status = new Notification.Builder(this).build();
         status.contentView = views;
@@ -185,23 +220,35 @@ public class PlayerService extends Service {
         switch (element) {
             case Constants.UI.STATUS: {
                 refreshTitle(text);
-                sendBroadcastToActivity(Constants.MESSAGE.MUSIC_TITLE, text);
+                updateActivity(Constants.MESSAGE.MUSIC_TITLE, text);
+                break;
             }
             case Constants.UI.BUTTON: {
                 if (isPlaying) toStopButton();
-                else toPlayButton();
-                sendBroadcastToActivity(Constants.MESSAGE.PLAYER_STATUS, null);
+                else {
+                    toPlayButton();
+                    updateUI(Constants.UI.STATUS, getString(R.string.default_status));
+                }
+                updateActivity(Constants.MESSAGE.PLAYER_STATUS, null);
+                break;
             }
         }
     }
 
+    private void fullStopBASS() {
+        audioManager.abandonAudioFocus(afListener);
+        Log.d(LOG_TAG, "FULL_STOP_BASS");
+        BASS.BASS_StreamFree(chan);
+        BASS.BASS_Free();
+        isPlaying = false;
+        updateUI(Constants.UI.BUTTON, null);
+    }
+
     private void stopBASS() {
         audioManager.abandonAudioFocus(afListener);
+        reconnectCancel = true;
         Log.d(LOG_TAG, "STOP_BASS");
         BASS.BASS_StreamFree(chan);
-        req = 0;
-        chan = 0;
-        BASS.BASS_Free();
         isPlaying = false;
         updateUI(Constants.UI.BUTTON, null);
     }
@@ -241,11 +288,18 @@ public class PlayerService extends Service {
         String savedText = sPref.getString(Constants.UI.BASS_ERROR_LOG, "");
         ed.putString(Constants.UI.BASS_ERROR_LOG, savedText + myDate + " | E:" + errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + " (" + es + ")\n");
         ed.apply();
-        stopBASS();
+        if (sPref.getBoolean(Constants.PREFERENCES.RECONNECT, true)) {
+            reconnectPlayer();
+        } else
+            stopBASS();
     }
 
     private void doMeta() {
         String meta = (String) BASS.BASS_ChannelGetTags(chan, BASS.BASS_TAG_META);
+        if (reconnectCancel) {
+            BASS.BASS_StreamFree(chan);
+            reconnectCancel = false;
+        }
         if (meta != null) {
             int ti = meta.indexOf("StreamTitle='");
             if (ti >= 0) {
@@ -295,7 +349,6 @@ public class PlayerService extends Service {
                 r = ++req;
             }
             BASS.BASS_StreamFree(chan);
-
             updateUI(Constants.UI.STATUS, getString(R.string.connecting));
 
             int connection = BASS.BASS_StreamCreateURL(url, 0, BASS.BASS_STREAM_BLOCK | BASS.BASS_STREAM_STATUS | BASS.BASS_STREAM_AUTOFREE, StatusProc, r);
@@ -307,7 +360,6 @@ public class PlayerService extends Service {
                 chan = connection;
             }
             if (chan == 0) {
-                updateUI(Constants.UI.STATUS, getString(R.string.default_status));
                 bassError(getString(R.string.cant_play_the_stream));
             } else {
                 handler.postDelayed(timer, 50);
@@ -317,36 +369,33 @@ public class PlayerService extends Service {
     }
 
 
-        private class AFListener implements AudioManager.OnAudioFocusChangeListener {
-            @Override
-            public void onAudioFocusChange(int focusChange) {
-                String event = "";
-                switch (focusChange) {
-                    case AudioManager.AUDIOFOCUS_LOSS:
-                        event = "AUDIOFOCUS_LOSS";
-                        focusLastReason = event;
-                        stopBASS();
-                        break;
-                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                        event = "AUDIOFOCUS_LOSS_TRANSIENT";
-                        focusLastReason = event;
-                        stopBASS();
-                        break;
-                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                        event = "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK";
-                        focusLastReason = event;
-                        BASS.BASS_SetVolume((float) 0.5);
-                        break;
-                    case AudioManager.AUDIOFOCUS_GAIN:
-                        event = "AUDIOFOCUS_GAIN";
-                        if (!isPlaying)
-                            startPlayer(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)));
-                        BASS.BASS_SetVolume((float) 1.0);
-                        break;
-                }
-                Log.i(AF_LOG_TAG, "onAudioFocusChange: " + event);
+    private class AFListener implements AudioManager.OnAudioFocusChangeListener {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            String event = "";
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    event = "AUDIOFOCUS_LOSS";
+                    stopBASS();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    event = "AUDIOFOCUS_LOSS_TRANSIENT";
+                    stopBASS();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    event = "AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK";
+                    BASS.BASS_SetVolume((float) 0.5);
+                    break;
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    event = "AUDIOFOCUS_GAIN";
+                    if (!isPlaying)
+                        startPlayer();
+                    BASS.BASS_SetVolume((float) 1.0);
+                    break;
             }
+            Log.i(AF_LOG_TAG, "onAudioFocusChange: " + event);
         }
+    }
 
     class MyBinder extends Binder {
         PlayerService getService() {

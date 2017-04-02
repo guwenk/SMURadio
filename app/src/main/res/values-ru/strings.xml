@@ -35,7 +35,9 @@
     <string name="restore_background">Восстановить фон</string>
     <string name="set_background">Установить фон</string>
     <string name="show_error_alerts_summary">Не рекомендуется использовать с авто-переподключением</string>
-    <string name="someradio">Радио выключено</string>
     <string name="on_back_pressed">Нажмите еще раз, чтобы выйти!</string>
     <string name="hint_search">Поиск</string>
+    <string name="default_status">Радио выключено</string>
+    <string name="waiting_for_internet">Ожидание интернет соединения…</string>
+    <string name="check_internet_connection">Проверьте подключение к Интернету</string>
 </resources>
