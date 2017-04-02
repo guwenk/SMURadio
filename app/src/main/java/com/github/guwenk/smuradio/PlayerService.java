@@ -159,8 +159,10 @@ public class PlayerService extends Service {
     }
 
     private void reconnectPlayer() {
-        if (new InternetChecker().hasConnection(getApplicationContext())){
+        if (new InternetChecker().hasConnection(getApplicationContext()) && !reconnectCancel){
             new Thread(new BASS_OpenURL(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)))).start();
+        } else if (reconnectCancel) {
+            reconnectCancel = false;
         } else {
             updateUI(Constants.UI.STATUS, getString(R.string.waiting_for_internet));
             try {
@@ -170,7 +172,6 @@ public class PlayerService extends Service {
             }
             reconnectPlayer();
         }
-
     }
 
 
@@ -296,10 +297,6 @@ public class PlayerService extends Service {
 
     private void doMeta() {
         String meta = (String) BASS.BASS_ChannelGetTags(chan, BASS.BASS_TAG_META);
-        if (reconnectCancel) {
-            BASS.BASS_StreamFree(chan);
-            reconnectCancel = false;
-        }
         if (meta != null) {
             int ti = meta.indexOf("StreamTitle='");
             if (ti >= 0) {
