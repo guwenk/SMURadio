@@ -104,6 +104,8 @@ public class PlayerService extends Service {
                 showNotification();
                 Log.d(LOG_TAG, "START_BASS");
                 if (BASS.BASS_Init(-1, 44100, 0)) {
+                    BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_READTIMEOUT, 15000); // read timeout
+                    BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_TIMEOUT, 5000); // connection timeout
                     BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
                     BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
                     // load AAC and HLS add-ons (if present)
@@ -273,12 +275,16 @@ public class PlayerService extends Service {
         return binder;
     }
 
+
     @Override
     public boolean onUnbind(Intent intent) {
-        stopBASS();
-        stopSelf();
+        if (isStarted){
+            stopBASS();
+            stopSelf();
+        }
         return super.onUnbind(intent);
     }
+
 
     private void bassError(final String es) {
         final int errorCode = BASS.BASS_ErrorGetCode();

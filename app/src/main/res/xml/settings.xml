@@ -25,4 +25,8 @@
         android:title="@string/auto_reconnect"
         android:summary="@string/autoreconnect_summary"
         android:defaultValue="true"/>
+    <EditTextPreference
+        android:key="base_link"
+        android:title="Base Link"
+        />
 </PreferenceScreen>

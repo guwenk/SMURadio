@@ -182,7 +182,8 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
         @Override
         protected Void doInBackground(String... strings) {
             try {
-                URL url = new URL("https://firebasestorage.googleapis.com/v0/b/someradio-4bfa5.appspot.com/o/Base.xml?alt=media&token=c43976d4-7528-4120-a8ee-d5a945d7267f");
+                //URL url = new URL(sp.getString("base_link", "https://firebasestorage.googleapis.com/v0/b/someradio-4bfa5.appspot.com/o/Base.xml?alt=media&token=4b54682f-d705-4dcf-afec-83816b4b7098"));
+                URL url = new URL("https://firebasestorage.googleapis.com/v0/b/someradio-4bfa5.appspot.com/o/Base.xml?alt=media&token=4b54682f-d705-4dcf-afec-83816b4b7098");
                 URLConnection connection = url.openConnection();
                 connection.setConnectTimeout(10000);
                 connection.setReadTimeout(10000);
