@@ -25,8 +25,12 @@
         android:title="@string/auto_reconnect"
         android:summary="@string/autoreconnect_summary"
         android:defaultValue="true"/>
-    <EditTextPreference
-        android:key="base_link"
-        android:title="Base Link"
-        />
+    <Preference
+        android:key="setBackground"
+        android:title="@string/set_background"
+        android:summary="@string/dont_use_big_images" />
+    <Preference
+        android:key="restoreBackground"
+        android:title="@string/restore_background" />
+
 </PreferenceScreen>

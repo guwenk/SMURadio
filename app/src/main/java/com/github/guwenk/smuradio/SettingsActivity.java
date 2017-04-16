@@ -3,14 +3,15 @@ package com.github.guwenk.smuradio;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+import android.view.Display;
 
 import java.io.IOException;
 
@@ -22,23 +23,25 @@ public class SettingsActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
         setContentView(R.layout.activity_settings);
-        Button btnSetBG = (Button) findViewById(R.id.pref_btn_set_bg);
-        btnSetBG.setOnClickListener(new View.OnClickListener() {
+        Preference btnSetBG = findPreference(Constants.PREFERENCES.SET_BACKGROUND);
+        btnSetBG.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onPreferenceClick(Preference preference) {
                 Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                 photoPickerIntent.setType("image/*");
                 startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
+                return true;
             }
         });
-        Button btnRestoreBG = (Button) findViewById(R.id.pref_btn_restore_bg);
-        btnRestoreBG.setOnClickListener(new View.OnClickListener() {
+        Preference btnRestoreBG = findPreference(Constants.PREFERENCES.RESTORE_BACKGROUND);
+        btnRestoreBG.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onPreferenceClick(Preference preference) {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(SettingsActivity.this);
                 SharedPreferences.Editor ed = sp.edit();
                 ed.putString("backgroundPath", "");
                 ed.apply();
+                return true;
             }
         });
     }
@@ -59,6 +62,8 @@ public class SettingsActivity extends PreferenceActivity {
                         e.printStackTrace();
                     }
                     String path = new FileManager(getApplicationContext()).saveBitmap(bitmap, "background", "imageDir");
+                    //bitmap = resize(path);
+                    //new FileManager(getApplicationContext()).saveBitmap(bitmap, "background", "imageDir");
                     Log.d("Save_Background", path);
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
                     SharedPreferences.Editor ed = sp.edit();
@@ -67,5 +72,37 @@ public class SettingsActivity extends PreferenceActivity {
                 }
         }
     }
+/*
+    Bitmap resize(String path) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, options);
+        options.inSampleSize = calculateInSampleSize(options);
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(path, options);
+    }
+
+    int calculateInSampleSize(BitmapFactory.Options options) {
+        Display display = getWindowManager().getDefaultDisplay();
+        int displayHeight = display.getHeight();
+        int displayWidth = display.getWidth();
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > displayHeight || width > displayWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            while ((halfHeight / inSampleSize) > displayHeight
+                    && (halfWidth / inSampleSize) > displayWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+*/
 
 }

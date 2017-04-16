@@ -8,30 +8,4 @@
     <ListView android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
-    <View android:background="#E0E0E0"
-        android:layout_width = "fill_parent"
-        android:layout_height="1dip" />
-    <Button
-        android:text="@string/set_background"
-        android:layout_width="match_parent"
-        android:textSize="16sp"
-        android:gravity="fill"
-        android:paddingLeft="16dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/pref_btn_set_bg"
-        android:textAppearance="@android:style/TextAppearance.Widget.Button"
-        style="@style/Widget.AppCompat.Button.Borderless" />
-    <View android:background="#E0E0E0"
-        android:layout_width = "fill_parent"
-        android:layout_height="1dip" />
-    <Button
-        android:text="@string/restore_background"
-        android:layout_width="match_parent"
-        android:textSize="16sp"
-        android:gravity="fill"
-        android:paddingLeft="16dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/pref_btn_restore_bg"
-        android:textAppearance="@android:style/TextAppearance.Widget.Button"
-        style="@style/Widget.AppCompat.Button.Borderless" />
 </LinearLayout>

@@ -25,6 +25,7 @@
         <item>64 kbps</item>
         <item>96 kbps</item>
         <item>128 kbps</item>
+        <item>dev_channel</item>
     </string-array>
     <string-array name="lang_names">
         <item>Default</item>
@@ -54,4 +55,5 @@
     <string name="lang_title" translatable="false">Language</string>
     <string name="waiting_for_internet">Waiting for internet connection…</string>
     <string name="check_internet_connection">Check your Internet connection</string>
+    <string name="dont_use_big_images">Don\'t use big images</string>
 </resources>

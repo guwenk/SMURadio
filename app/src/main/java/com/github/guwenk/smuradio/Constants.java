@@ -136,6 +136,8 @@ class Constants {
         String LANGUAGE = "lang";
         String BASS_ERROR_ALERTS = "showBASS_alerts";
         String RECONNECT = "reconnect";
+        String SET_BACKGROUND = "setBackground";
+        String RESTORE_BACKGROUND = "restoreBackground";
     }
     interface MESSAGE {
         String PLAYER_STATUS = "player_status";

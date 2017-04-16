@@ -28,9 +28,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private static long back_pressed;
     PlayerService playerService;
+    ServiceConnection serviceConnection;
     private SharedPreferences sPref;
     private ImageView backgroundImage;
-    ServiceConnection serviceConnection;
+    String LOG_TAG = "MainActivity";
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        unbindService(serviceConnection);
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +60,25 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 }
             }
         });
+
+        Intent intent = new Intent(MainActivity.this, PlayerService.class);
+        startService(intent);
+        serviceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                playerService = ((PlayerService.MyBinder) iBinder).getService();
+                //playerService.registerClient(MainActivity.this);
+                Log.d(LOG_TAG, "Service connected");
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+                playerService = null;
+                Log.d(LOG_TAG, "Service disconnected");
+            }
+        };
+        bindService(intent, serviceConnection, 0);
+
         final ImageButton btnPlay = (ImageButton) findViewById(R.id.main_play_button);
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,18 +89,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 Intent intent = new Intent(MainActivity.this, PlayerService.class);
                 intent.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
                 startService(intent);
-                serviceConnection = new ServiceConnection() {
-                    @Override
-                    public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                        playerService = ((PlayerService.MyBinder) iBinder).getService();
-                        //playerService.registerClient(MainActivity.this);
-                    }
-                    @Override
-                    public void onServiceDisconnected(ComponentName componentName) {
-                        playerService = null;
-                    }
-                };
-                bindService(intent, serviceConnection, 0);
             }
         });
         sPref.registerOnSharedPreferenceChangeListener(this);
@@ -79,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onStart() {
         super.onStart();
+        onSharedPreferenceChanged(sPref, "");
         String path = sPref.getString("backgroundPath", "");
         Bitmap backgroundBitmap = null;
         if (path.equals("")) {
@@ -88,8 +108,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             backgroundImage.setImageBitmap(backgroundBitmap);
         }
         Log.i("Load_Background", backgroundBitmap + "");
-
-        if (playerService != null) playerService.updateUI(Constants.UI.BUTTON, null);
+        Intent intent = new Intent(MainActivity.this, PlayerService.class);
+        bindService(intent, serviceConnection, 0);
     }
 
 
@@ -135,18 +155,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        ImageButton imageButton = (ImageButton)findViewById(R.id.main_play_button);
+        ImageButton imageButton = (ImageButton) findViewById(R.id.main_play_button);
         int player_status = sharedPreferences.getInt(Constants.MESSAGE.PLAYER_STATUS, -1);
         String player_title = sharedPreferences.getString(Constants.MESSAGE.MUSIC_TITLE, "");
-        switch (player_status){
-            case 0:{
-                ((TextView)findViewById(R.id.main_status1)).setText("");
+        switch (player_status) {
+            case 0: {
+                ((TextView) findViewById(R.id.main_status1)).setText("");
                 findViewById(R.id.main_status1).setVisibility(View.INVISIBLE);
                 imageButton.setImageResource(R.drawable.ic_play_arrow);
                 break;
             }
-            case 1:{
-                ((TextView)findViewById(R.id.main_status1)).setText(player_title);
+            case 1: {
+                ((TextView) findViewById(R.id.main_status1)).setText(player_title);
                 findViewById(R.id.main_status1).setVisibility(View.VISIBLE);
                 imageButton.setImageResource(R.drawable.ic_stop);
                 break;

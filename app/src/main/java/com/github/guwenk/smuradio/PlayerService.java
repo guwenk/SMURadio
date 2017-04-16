@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -20,9 +21,6 @@ import com.un4seen.bass.BASS;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 
 public class PlayerService extends Service {
@@ -99,22 +97,38 @@ public class PlayerService extends Service {
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.getAction().equals(Constants.ACTION.STARTFOREGROUND_ACTION)) {
-            if (!isStarted) {
-                showNotification();
-                Log.d(LOG_TAG, "START_BASS");
-                if (BASS.BASS_Init(-1, 44100, 0)) {
-                    BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_READTIMEOUT, 15000); // read timeout
-                    BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_TIMEOUT, 5000); // connection timeout
-                    BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
-                    BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
-                    // load AAC and HLS add-ons (if present)
-                    BASS.BASS_PluginLoad("libbass_aac.so", 0);
-                    BASS.BASS_PluginLoad("libbasshls.so", 0);
+        String action = (intent.getAction() == null ? "null" : intent.getAction());
+
+        switch (action) {
+            case Constants.ACTION.STARTFOREGROUND_ACTION: {
+                if (!isStarted) {
+                    showNotification();
+                    Log.d(LOG_TAG, "START_BASS");
+                    if (BASS.BASS_Init(-1, 44100, 0)) {
+                        BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_READTIMEOUT, 15000); // read timeout
+                        BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_TIMEOUT, 5000); // connection timeout
+                        BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
+                        BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
+                        // load AAC and HLS add-ons (if present)
+                        BASS.BASS_PluginLoad("libbass_aac.so", 0);
+                        BASS.BASS_PluginLoad("libbasshls.so", 0);
+                    }
+                    startPlayer();
+                    isStarted = true;
+                } else {
+                    if (isPlaying)
+                        stopBASS();
+                    else {
+                        afListener = new AFListener();
+                        int requestResult = audioManager.requestAudioFocus(afListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+                        Log.i(AF_LOG_TAG, "Music request focus, result: " + requestResult);
+                        startPlayer();
+                    }
+                    updateUI(Constants.UI.BUTTON, null);
                 }
-                startPlayer();
-                isStarted = true;
-            } else {
+                break;
+            }
+            case Constants.ACTION.PLAY_ACTION: {
                 if (isPlaying)
                     stopBASS();
                 else {
@@ -123,22 +137,15 @@ public class PlayerService extends Service {
                     Log.i(AF_LOG_TAG, "Music request focus, result: " + requestResult);
                     startPlayer();
                 }
+                break;
+            }
+            case Constants.ACTION.STOPFOREGROUND_ACTION: {
+                fullStopBASS();
                 updateUI(Constants.UI.BUTTON, null);
+                stopForeground(true);
+                stopSelf();
+                break;
             }
-        } else if (intent.getAction().equals(Constants.ACTION.PLAY_ACTION)) {
-            if (isPlaying)
-                stopBASS();
-            else {
-                afListener = new AFListener();
-                int requestResult = audioManager.requestAudioFocus(afListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-                Log.i(AF_LOG_TAG, "Music request focus, result: " + requestResult);
-                startPlayer();
-            }
-        } else if (intent.getAction().equals(Constants.ACTION.STOPFOREGROUND_ACTION)) {
-            fullStopBASS();
-            updateUI(Constants.UI.BUTTON, null);
-            stopForeground(true);
-            stopSelf();
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -161,7 +168,7 @@ public class PlayerService extends Service {
     }
 
     private void reconnectPlayer() {
-        if (new InternetChecker().hasConnection(getApplicationContext()) && !reconnectCancel){
+        if (new InternetChecker().hasConnection(getApplicationContext()) && !reconnectCancel) {
             new Thread(new BASS_OpenURL(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)))).start();
         } else if (reconnectCancel) {
             reconnectCancel = false;
@@ -176,6 +183,11 @@ public class PlayerService extends Service {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        updateUI(Constants.UI.BUTTON, null);
+        super.onDestroy();
+    }
 
     private void updateActivity(String message_type, String message) {
         SharedPreferences.Editor ed = sPref.edit();
@@ -272,31 +284,42 @@ public class PlayerService extends Service {
     }
 
     public IBinder onBind(Intent intent) {
+        Log.d(LOG_TAG, "bind");
         return binder;
     }
 
 
     @Override
     public boolean onUnbind(Intent intent) {
-        if (isStarted){
+        Log.d(LOG_TAG, "unbind");
+        if (sPref.getInt(Constants.MESSAGE.PLAYER_STATUS, -1) != 1) {
             stopBASS();
             stopSelf();
         }
-        return super.onUnbind(intent);
+        return true;
     }
 
 
     private void bassError(final String es) {
         final int errorCode = BASS.BASS_ErrorGetCode();
+        if (sPref.getBoolean(Constants.PREFERENCES.BASS_ERROR_ALERTS, false)) {
+            new AlertDialog.Builder(PlayerService.this).setMessage(errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + "\n(" + es + ")").setPositiveButton("OK", null).show();
+        }
         //@SuppressLint("DefaultLocale") String s = String.format("%s\n(error cod: %d)", es, errorCode);
-        SharedPreferences.Editor ed = sPref.edit();
-        SimpleDateFormat format = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault());
-        String myDate = format.format(new Date());
-        String savedText = sPref.getString(Constants.UI.BASS_ERROR_LOG, "");
-        ed.putString(Constants.UI.BASS_ERROR_LOG, savedText + myDate + " | E:" + errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + " (" + es + ")\n");
-        ed.apply();
+        //SharedPreferences.Editor ed = sPref.edit();
+        //SimpleDateFormat format = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault());
+        //String myDate = format.format(new Date());
+        //String savedText = sPref.getString(Constants.UI.BASS_ERROR_LOG, "");
+        //ed.putString(Constants.UI.BASS_ERROR_LOG, savedText + myDate + " | E:" + errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + " (" + es + ")\n");
+        //ed.apply();
         if (sPref.getBoolean(Constants.PREFERENCES.RECONNECT, true)) {
-            reconnectPlayer();
+            try {
+                Thread.sleep(300);
+                reconnectPlayer();
+            } catch (InterruptedException e) {
+                stopBASS();
+                e.printStackTrace();
+            }
         } else
             stopBASS();
     }
