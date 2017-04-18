@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -59,6 +58,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     Intent intent = new Intent(MainActivity.this, OrderActivity.class);
                     startActivity(intent);
                 }
+            }
+        });
+
+        final TextView trackLabel = (TextView)findViewById(R.id.main_status1);
+        trackLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clipData = ClipData.newPlainText("", trackLabel.getText());
+                clipboard.setPrimaryClip(clipData);
+                Toast.makeText(getApplicationContext(), R.string.name_copied, Toast.LENGTH_SHORT).show();
             }
         });
 

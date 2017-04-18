@@ -41,4 +41,5 @@
     <string name="waiting_for_internet">Ожидание интернет соединения…</string>
     <string name="check_internet_connection">Проверьте подключение к Интернету</string>
     <string name="dont_use_big_images">Не используйте большие изображения</string>
+    <string name="name_copied">Название скопировано</string>
 </resources>

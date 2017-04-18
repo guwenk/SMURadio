@@ -56,4 +56,5 @@
     <string name="waiting_for_internet">Waiting for internet connection…</string>
     <string name="check_internet_connection">Check your Internet connection</string>
     <string name="dont_use_big_images">Don\'t use big images</string>
+    <string name="name_copied">Title copied</string>
 </resources>
