@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onStart() {
         super.onStart();
-        onSharedPreferenceChanged(sPref, "");
+        onSharedPreferenceChanged(sPref, Constants.MESSAGE.PLAYER_STATUS);
         String path = sPref.getString("backgroundPath", "");
         Bitmap backgroundBitmap = null;
         if (path.equals("")) {
@@ -176,10 +176,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         break;
                     }
                 }
-                break;
-            }
-            case Constants.MESSAGE.ERROR_ALERT: {
-                new AlertDialog.Builder(MainActivity.this).setMessage(sharedPreferences.getString(key, "Unknown error!")).setPositiveButton("OK", null).show();
                 break;
             }
         }

@@ -321,9 +321,6 @@ public class PlayerService extends Service {
 
     private void bassError(final String es) {
         final int errorCode = BASS.BASS_ErrorGetCode();
-        if (sPref.getBoolean(Constants.PREFERENCES.BASS_ERROR_ALERTS, false)) {
-            sPref.edit().putString(Constants.MESSAGE.ERROR_ALERT, errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + "\n(" + es + ")").apply();
-        }
         //@SuppressLint("DefaultLocale") String s = String.format("%s\n(error cod: %d)", es, errorCode);
         //SharedPreferences.Editor ed = sPref.edit();
         //SimpleDateFormat format = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault());
@@ -331,6 +328,7 @@ public class PlayerService extends Service {
         //String savedText = sPref.getString(Constants.UI.BASS_ERROR_LOG, "");
         //ed.putString(Constants.UI.BASS_ERROR_LOG, savedText + myDate + " | E:" + errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + " (" + es + ")\n");
         //ed.apply();
+        Log.d(LOG_TAG, errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + " (" + es + ")");
         if (sPref.getBoolean(Constants.PREFERENCES.RECONNECT, true)) {
             try {
                 Thread.sleep(300);

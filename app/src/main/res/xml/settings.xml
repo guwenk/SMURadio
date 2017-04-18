@@ -16,11 +16,6 @@
         android:entryValues="@array/bitrate_values"
         android:dialogTitle="@string/bitrate_choose"/>
     <SwitchPreference
-        android:key="showBASS_alerts"
-        android:title="@string/show_error_alerts"
-        android:summary="@string/show_error_alerts_summary"
-        android:defaultValue="false" />
-    <SwitchPreference
         android:key="reconnect"
         android:title="@string/auto_reconnect"
         android:summary="@string/autoreconnect_summary"
