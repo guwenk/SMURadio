@@ -12,14 +12,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 
 public class AdminActivity extends AppCompatActivity {
-    SharedPreferences sp;
-    TextView tv;
+
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mRequestsRef = mRootRef.child("Requests");
     private String inputPass;
@@ -29,13 +29,7 @@ public class AdminActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
-
         backgroundImage = (ImageView) findViewById(R.id.aa_backgroundImage);
-        sp = PreferenceManager.getDefaultSharedPreferences(this);
-        tv = (TextView) findViewById(R.id.tvLog);
-        refreshLog();
-        tv.setMovementMethod(new ScrollingMovementMethod());
-
         final EditText etPass = (EditText) findViewById(R.id.etPass);
 
         final Button btnNext = (Button) findViewById(R.id.btnNext);
@@ -50,18 +44,7 @@ public class AdminActivity extends AppCompatActivity {
                 }
                 mRequestsRef.child("pass").setValue(inputPass);
                 mRequestsRef.child("cmd").setValue("next");
-            }
-        });
-
-
-        final Button btnClear = (Button) findViewById(R.id.buttonClearLog);
-        btnClear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                tv.setText("");
-                SharedPreferences.Editor ed = sp.edit();
-                ed.putString(Constants.UI.BASS_ERROR_LOG, "");
-                ed.apply();
+                Toast.makeText(getApplicationContext(), "Запрос отправлен (next)", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -77,6 +60,7 @@ public class AdminActivity extends AppCompatActivity {
                 }
                 mRequestsRef.child("pass").setValue(inputPass);
                 mRequestsRef.child("cmd").setValue("prev");
+                Toast.makeText(getApplicationContext(), "Запрос отправлен (prev)", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -84,6 +68,7 @@ public class AdminActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String path = sp.getString("backgroundPath", "");
         Bitmap backgroundBitmap;
         if (path.equals("")) {
@@ -94,44 +79,4 @@ public class AdminActivity extends AppCompatActivity {
         }
     }
 
-    void refreshLog() {
-        new Thread(new Runnable() {
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        tv.setText(sp.getString(Constants.UI.BASS_ERROR_LOG, ""));
-                        tv.setGravity(Gravity.BOTTOM);
-                    }
-                });
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!sp.getString(Constants.UI.BASS_ERROR_LOG, "").equals(tv.getText()))
-                            tv.setText(sp.getString(Constants.UI.BASS_ERROR_LOG, ""));
-                        tv.setGravity(Gravity.NO_GRAVITY);
-                    }
-                });
-                while (!Thread.currentThread().isInterrupted()) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!sp.getString(Constants.UI.BASS_ERROR_LOG, "").equals(tv.getText()))
-                                tv.setText(sp.getString(Constants.UI.BASS_ERROR_LOG, ""));
-                        }
-                    });
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
-    }
 }

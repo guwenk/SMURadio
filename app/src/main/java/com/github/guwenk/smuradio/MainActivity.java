@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -29,9 +30,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private static long back_pressed;
     PlayerService playerService;
     ServiceConnection serviceConnection;
+    String LOG_TAG = "MainActivity";
     private SharedPreferences sPref;
     private ImageView backgroundImage;
-    String LOG_TAG = "MainActivity";
 
     @Override
     protected void onPause() {
@@ -154,21 +155,31 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        ImageButton imageButton = (ImageButton) findViewById(R.id.main_play_button);
-        int player_status = sharedPreferences.getInt(Constants.MESSAGE.PLAYER_STATUS, -1);
-        String player_title = sharedPreferences.getString(Constants.MESSAGE.MUSIC_TITLE, "");
-        switch (player_status) {
-            case 0: {
-                ((TextView) findViewById(R.id.main_status1)).setText("");
-                findViewById(R.id.main_status1).setVisibility(View.INVISIBLE);
-                imageButton.setImageResource(R.drawable.ic_play_arrow);
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        switch (key) {
+            case Constants.MESSAGE.MUSIC_TITLE:
+            case Constants.MESSAGE.PLAYER_STATUS: {
+                ImageButton imageButton = (ImageButton) findViewById(R.id.main_play_button);
+                int player_status = sharedPreferences.getInt(Constants.MESSAGE.PLAYER_STATUS, -1);
+                String player_title = sharedPreferences.getString(Constants.MESSAGE.MUSIC_TITLE, "");
+                switch (player_status) {
+                    case 0: {
+                        ((TextView) findViewById(R.id.main_status1)).setText("");
+                        findViewById(R.id.main_status1).setVisibility(View.INVISIBLE);
+                        imageButton.setImageResource(R.drawable.ic_play_arrow);
+                        break;
+                    }
+                    case 1: {
+                        ((TextView) findViewById(R.id.main_status1)).setText(player_title);
+                        findViewById(R.id.main_status1).setVisibility(View.VISIBLE);
+                        imageButton.setImageResource(R.drawable.ic_stop);
+                        break;
+                    }
+                }
                 break;
             }
-            case 1: {
-                ((TextView) findViewById(R.id.main_status1)).setText(player_title);
-                findViewById(R.id.main_status1).setVisibility(View.VISIBLE);
-                imageButton.setImageResource(R.drawable.ic_stop);
+            case Constants.MESSAGE.ERROR_ALERT: {
+                new AlertDialog.Builder(MainActivity.this).setMessage(sharedPreferences.getString(key, "Unknown error!")).setPositiveButton("OK", null).show();
                 break;
             }
         }

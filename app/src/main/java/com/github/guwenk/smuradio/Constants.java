@@ -140,6 +140,7 @@ class Constants {
         String RESTORE_BACKGROUND = "restoreBackground";
     }
     interface MESSAGE {
+        String ERROR_ALERT = "error_alert";
         String PLAYER_STATUS = "player_status";
         String MUSIC_TITLE = "music_title";
     }

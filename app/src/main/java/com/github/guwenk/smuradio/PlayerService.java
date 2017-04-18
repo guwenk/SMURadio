@@ -3,8 +3,10 @@ package com.github.guwenk.smuradio;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Binder;
@@ -38,6 +40,7 @@ public class PlayerService extends Service {
     private SharedPreferences sPref;
     private boolean isPlaying = false;
     private boolean reconnectCancel = false;
+    private SpeakerChecker speakerChecker;
 
     private int req, chan;
     private Handler handler = new Handler();
@@ -91,6 +94,7 @@ public class PlayerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        speakerChecker = new SpeakerChecker();
         sPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         Log.d(LOG_TAG, "CREATED");
@@ -153,6 +157,8 @@ public class PlayerService extends Service {
     private void startPlayer() {
         if (new InternetChecker().hasConnection(getApplicationContext())) {
             new Thread(new BASS_OpenURL(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)))).start();
+            IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+            registerReceiver(speakerChecker, intentFilter);
             isPlaying = true;
             updateUI(Constants.UI.BUTTON, null);
         } else {
@@ -252,6 +258,7 @@ public class PlayerService extends Service {
 
     private void fullStopBASS() {
         audioManager.abandonAudioFocus(afListener);
+        unregisterReceiver(speakerChecker);
         Log.d(LOG_TAG, "FULL_STOP_BASS");
         BASS.BASS_StreamFree(chan);
         BASS.BASS_Free();
@@ -261,6 +268,7 @@ public class PlayerService extends Service {
 
     private void stopBASS() {
         audioManager.abandonAudioFocus(afListener);
+        unregisterReceiver(speakerChecker);
         reconnectCancel = true;
         Log.d(LOG_TAG, "STOP_BASS");
         BASS.BASS_StreamFree(chan);
@@ -269,18 +277,24 @@ public class PlayerService extends Service {
     }
 
     private void toPlayButton() {
-        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_circle_outline_24px);
-        startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
+        if (isStarted) {
+            views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_circle_outline_24px);
+            startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
+        }
     }
 
     private void toStopButton() {
-        views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_pause_circle_outline_24px);
-        startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
+        if (isStarted) {
+            views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_pause_circle_outline_24px);
+            startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
+        }
     }
 
     private void refreshTitle(String title) {
-        views.setTextViewText(R.id.status_bar_track_name, title);
-        startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
+        if (isStarted) {
+            views.setTextViewText(R.id.status_bar_track_name, title);
+            startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
+        }
     }
 
     public IBinder onBind(Intent intent) {
@@ -293,7 +307,7 @@ public class PlayerService extends Service {
     public boolean onUnbind(Intent intent) {
         Log.d(LOG_TAG, "unbind");
         if (sPref.getInt(Constants.MESSAGE.PLAYER_STATUS, -1) != 1) {
-            stopBASS();
+            fullStopBASS();
             stopSelf();
         }
         return true;
@@ -303,7 +317,7 @@ public class PlayerService extends Service {
     private void bassError(final String es) {
         final int errorCode = BASS.BASS_ErrorGetCode();
         if (sPref.getBoolean(Constants.PREFERENCES.BASS_ERROR_ALERTS, false)) {
-            new AlertDialog.Builder(PlayerService.this).setMessage(errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + "\n(" + es + ")").setPositiveButton("OK", null).show();
+            sPref.edit().putString(Constants.MESSAGE.ERROR_ALERT, errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + "\n(" + es + ")").apply();
         }
         //@SuppressLint("DefaultLocale") String s = String.format("%s\n(error cod: %d)", es, errorCode);
         //SharedPreferences.Editor ed = sPref.edit();
@@ -426,6 +440,13 @@ public class PlayerService extends Service {
     class MyBinder extends Binder {
         PlayerService getService() {
             return PlayerService.this;
+        }
+    }
+
+    private class SpeakerChecker extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            stopBASS();
         }
     }
 }
