@@ -257,7 +257,10 @@ public class PlayerService extends Service {
 
     private void fullStopBASS() {
         audioManager.abandonAudioFocus(afListener);
-        unregisterReceiver(speakerChecker);
+        try {
+            unregisterReceiver(speakerChecker);
+        } catch (IllegalArgumentException ignored) {
+        }
         Log.d(LOG_TAG, "FULL_STOP_BASS");
         BASS.BASS_StreamFree(chan);
         BASS.BASS_Free();
@@ -267,7 +270,10 @@ public class PlayerService extends Service {
 
     private void stopBASS() {
         audioManager.abandonAudioFocus(afListener);
-        unregisterReceiver(speakerChecker);
+        try {
+            unregisterReceiver(speakerChecker);
+        } catch (IllegalArgumentException ignored) {
+        }
         reconnectCancel = true;
         Log.d(LOG_TAG, "STOP_BASS");
         BASS.BASS_StreamFree(chan);
