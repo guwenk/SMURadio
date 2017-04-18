@@ -3,7 +3,6 @@ package com.github.guwenk.smuradio;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -11,7 +10,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Display;
 
 import java.io.IOException;
 

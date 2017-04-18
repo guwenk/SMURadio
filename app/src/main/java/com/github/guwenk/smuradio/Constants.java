@@ -125,9 +125,7 @@ class Constants {
     }
 
     interface ACTION {
-        String MAIN_ACTION = "com.github.guwenk.smuradio.action.main";
         String PLAY_ACTION = "com.github.guwenk.smuradio.action.play";
-        String MESSAGE_TO_MA = "com.github.guwenk.smuradio.action.mainActivity.message";
         String STARTFOREGROUND_ACTION = "com.github.guwenk.smuradio.action.startforeground";
         String STOPFOREGROUND_ACTION = "com.github.guwenk.smuradio.action.stopforeground";
     }
@@ -147,7 +145,6 @@ class Constants {
     interface UI {
         String STATUS = "status_text_update";
         String BUTTON = "play_button_update";
-        String BASS_ERROR_LOG = "bass_error_log";
     }
 
     interface NOTIFICATION_ID {
