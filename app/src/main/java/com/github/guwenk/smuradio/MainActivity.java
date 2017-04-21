@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,19 +21,35 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
 
     private static long back_pressed;
-    PlayerService playerService;
-    ServiceConnection serviceConnection;
-    String LOG_TAG = "MainActivity";
+    protected PlayerService playerService;
+    protected ServiceConnection serviceConnection;
+    protected String LOG_TAG = "MainActivity";
     private SharedPreferences sPref;
     private ImageView backgroundImage;
+    private TextView title;
+    protected String nowPlaying;
+    protected float rateValue;
+    protected long rateCount;
+    private TextView ratingTV;
+
+    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    DatabaseReference mRatingRef = mRootRef.child("Rating");
+
 
     @Override
     protected void onPause() {
@@ -50,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setContentView(R.layout.activity_main);
         sPref = PreferenceManager.getDefaultSharedPreferences(this);
         backgroundImage = (ImageView) findViewById(R.id.main_backgroundImage);
+        title = (TextView)findViewById(R.id.main_status1);
+        ratingTV = (TextView) findViewById(R.id.main_ratingTV);
         final Button btnToTrackOrder = (Button) findViewById(R.id.main_btnToTrackOrder);
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,14 +80,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 }
             }
         });
-
-        final TextView trackLabel = (TextView)findViewById(R.id.main_status1);
-        trackLabel.setOnClickListener(new View.OnClickListener() {
+        title.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clipData = ClipData.newPlainText("", trackLabel.getText());
+                ClipData clipData = ClipData.newPlainText("", title.getText());
                 clipboard.setPrimaryClip(clipData);
                 Toast.makeText(getApplicationContext(), R.string.name_copied, Toast.LENGTH_SHORT).show();
             }
@@ -104,6 +122,61 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         });
         sPref.registerOnSharedPreferenceChangeListener(this);
+        title.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence cs, int start, int before, int count) {
+                final RatingBar ratingBar = (RatingBar)findViewById(R.id.main_RatingBar);
+                nowPlaying = cs.toString();
+                ratingBar.setRating((float) 0);
+                if (!nowPlaying.equals("") && !nowPlaying.equals(getString(R.string.connecting)) && !nowPlaying.equals(getString(R.string.default_status))){
+                    ratingBar.setVisibility(View.VISIBLE);
+                    ratingTV.setVisibility(View.VISIBLE);
+                    mRatingRef.child(nowPlaying).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            rateCount = 0;
+                            rateValue = 0;
+                            try {
+                                rateCount = dataSnapshot.child("count").getValue(Long.class);
+                                rateValue = dataSnapshot.child("rate").getValue(Float.class);
+                            } catch (NullPointerException ignored){}
+                            String s = String.format("%.2f", rateValue/rateCount);
+                            ratingTV.setText(!s.equals("NaN") ? s : "0.0");
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                } else {
+                    ratingTV.setText("");
+                    ratingTV.setVisibility(View.INVISIBLE);
+                    ratingBar.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        RatingBar ratingBar = (RatingBar) findViewById(R.id.main_RatingBar);
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                if (fromUser){
+                    mRatingRef.child(nowPlaying).child("rate").setValue(rateValue+rating);
+                    mRatingRef.child(nowPlaying).child("count").setValue(rateCount+1);
+                }
+            }
+        });
     }
 
 
@@ -175,13 +248,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 String player_title = sharedPreferences.getString(Constants.MESSAGE.MUSIC_TITLE, "");
                 switch (player_status) {
                     case 0: {
-                        ((TextView) findViewById(R.id.main_status1)).setText("");
+                        title.setText("");
                         findViewById(R.id.main_status1).setVisibility(View.INVISIBLE);
                         imageButton.setImageResource(R.drawable.ic_play_arrow);
                         break;
                     }
                     case 1: {
-                        ((TextView) findViewById(R.id.main_status1)).setText(player_title);
+                        title.setText(player_title);
                         findViewById(R.id.main_status1).setVisibility(View.VISIBLE);
                         imageButton.setImageResource(R.drawable.ic_stop);
                         break;

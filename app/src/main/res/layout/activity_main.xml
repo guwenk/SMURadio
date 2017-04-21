@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:src="#000000"
+        android:src="@drawable/main_background"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -38,28 +38,47 @@
         android:layout_above="@+id/main_btnToTrackOrder">
 
         <TextView
-            android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/main_status1"
-            android:visibility="invisible"
-            android:background="@drawable/rectangle_orange_white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="24sp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/rectangle_orange_white"
             android:elevation="8dp"
 
-            android:singleLine="true"
             android:ellipsize="marquee"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:scrollHorizontally="true"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:freezesText="true"
-
+            android:marqueeRepeatLimit="marquee_forever"
             android:paddingLeft="15dip"
             android:paddingRight="15dip"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="24sp"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/main_ratingTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main_status1"
+            android:layout_centerHorizontal="true"
+            android:text="rate"
+            android:textSize="30sp"
+            android:visibility="invisible" />
+
+        <RatingBar
+            android:id="@+id/main_RatingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main_ratingTV"
+            android:layout_centerHorizontal="true"
+            android:numStars="5"
+            android:visibility="invisible" />
 
         <ImageButton
             android:id="@+id/main_play_button"

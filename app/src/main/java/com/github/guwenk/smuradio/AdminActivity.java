@@ -88,7 +88,7 @@ public class AdminActivity extends AppCompatActivity {
                 RatingBar ratingBar = (RatingBar)findViewById(R.id.admin_rating);
                 if (!s.equals("")) {
                     float rate = ratingBar.getRating();
-                    mRootRef.child("Rating").child(s).push().child("rate").setValue(rate);
+                    mRootRef.child("Rating").child(s).child("rate").setValue(rate);
                 }
             }
         });
