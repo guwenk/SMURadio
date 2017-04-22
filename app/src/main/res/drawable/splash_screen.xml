@@ -4,9 +4,20 @@
     <item android:drawable="@color/colorPrimary" />
 
     <item>
+        <bitmap android:src="@drawable/splash_texture"
+            android:tileMode="repeat"/>
+    </item>
+
+    <item>
         <bitmap
             android:gravity="center"
             android:src="@drawable/splash_image"/>
     </item>
+
+    <item android:bottom="64dp">
+        <bitmap android:src="@drawable/splash_text"
+            android:gravity="center|bottom"/>
+    </item>
+
 
 </layer-list>
