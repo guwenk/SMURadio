@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                             } catch (NullPointerException ignored) {
                             }
                             String s = String.format("%.2f", rateValue / rateCount);
-                            ratingTV.setText(!s.equals("NaN") ? s : "0.0");
+                            ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
                         }
 
                         @Override
@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         } catch (NullPointerException ignored) {
                         }
                         String s = String.format("%.2f", rateValue / rateCount);
-                        ratingTV.setText(!s.equals("NaN") ? s : "0.0");
+                        ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
                         ratingBar.setVisibility(View.VISIBLE);
                         ratingTV.setVisibility(View.VISIBLE);
                         float user_rate_from_pref = sPref.getFloat(Constants.OTHER.USER_RATE + getTitle(), 0);

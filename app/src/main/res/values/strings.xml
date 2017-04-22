@@ -59,4 +59,5 @@
     <string name="name_copied">Title copied</string>
     <string name="order_freeze_msg_one">"Wait "</string>
     <string name="order_freeze_msg_two">" sec until next order"</string>
+    <string name="zero" translatable="false">0,00</string>
 </resources>

@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="numberPassword"
-        android:background="@drawable/rectangle_orange_white"
+        android:background="@drawable/rectangle_gray"
         android:ems="10"
         android:padding="2dp"
         android:textSize="24sp"

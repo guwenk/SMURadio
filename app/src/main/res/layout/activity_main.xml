@@ -40,7 +40,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/main_status1"
             android:visibility="invisible"
-            android:background="@drawable/rectangle_orange_white"
+            android:background="@drawable/rectangle_gray"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="24sp"
@@ -60,24 +60,39 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
-        <TextView
-            android:id="@+id/main_ratingTV"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnCount="2"
+            android:orientation="horizontal"
             android:layout_below="@+id/main_status1"
-            android:layout_centerHorizontal="true"
-            android:textSize="30sp"
-            android:visibility="invisible" />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
 
-        <RatingBar
-            android:id="@+id/main_RatingBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/main_ratingTV"
-            android:layout_centerHorizontal="true"
-            android:numStars="5"
-            android:isIndicator="true"
-            android:visibility="invisible" />
+            <TextView
+                android:id="@+id/main_ratingTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                android:singleLine="true"
+                android:text="@string/zero"
+                android:textSize="24sp"
+                android:visibility="invisible" />
+
+            <RatingBar
+                android:id="@+id/main_RatingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:isIndicator="true"
+                android:numStars="5"
+                android:visibility="invisible" />
+
+
+        </GridLayout>
 
         <ImageButton
             android:id="@+id/main_play_button"
