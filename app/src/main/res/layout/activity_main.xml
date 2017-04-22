@@ -46,7 +46,7 @@
             android:textSize="24sp"
             android:elevation="8dp"
 
-            android:maxLines="1"
+            android:singleLine="true"
             android:ellipsize="marquee"
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
