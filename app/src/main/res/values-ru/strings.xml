@@ -42,4 +42,6 @@
     <string name="check_internet_connection">Проверьте подключение к Интернету</string>
     <string name="dont_use_big_images">Не используйте большие изображения</string>
     <string name="name_copied">Название скопировано</string>
+    <string name="order_freeze_msg_one">"Подождите "</string>
+    <string name="order_freeze_msg_two">" сек. до следующего заказа"</string>
 </resources>

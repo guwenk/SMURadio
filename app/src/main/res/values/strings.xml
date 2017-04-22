@@ -57,4 +57,6 @@
     <string name="check_internet_connection">Check your Internet connection</string>
     <string name="dont_use_big_images">Don\'t use big images</string>
     <string name="name_copied">Title copied</string>
+    <string name="order_freeze_msg_one">"Wait "</string>
+    <string name="order_freeze_msg_two">" sec until next order"</string>
 </resources>

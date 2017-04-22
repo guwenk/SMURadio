@@ -47,7 +47,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class OrderActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
-    SharedPreferences sp;
+    SharedPreferences sPref;
     DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
     DatabaseReference mOrderRef = mRootRef.child("Requests").child("order");
     private NodeList trackNodeList;
@@ -64,7 +64,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
         setContentView(R.layout.activity_order);
 
         backgroundImage = (ImageView) findViewById(R.id.va_backgroundImage);
-        sp = PreferenceManager.getDefaultSharedPreferences(this);
+        sPref = PreferenceManager.getDefaultSharedPreferences(this);
         final ListView listView = (ListView) findViewById(R.id.musicBaseView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         new ParseXML().execute();
@@ -85,7 +85,6 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
                         } else {
                             sb.deleteCharAt(0);
                             sb.deleteCharAt(0);
-                            //Log.d("MusicName", sb.toString());
                             break;
                         }
                     }
@@ -103,6 +102,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
                 if (!Objects.equals(filename, "") && filename != null) {
                     mOrderRef.setValue(filename);
                     Toast.makeText(getApplicationContext(), getString(R.string.done) + choose, Toast.LENGTH_SHORT).show();
+                    sPref.edit().putLong(Constants.OTHER.ORDER_FREEZE, System.currentTimeMillis() + 300000).apply();
                     finish();
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.nothing_selected, Toast.LENGTH_SHORT).show();
@@ -115,12 +115,12 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
     @Override
     protected void onStart() {
         super.onStart();
-        String path = sp.getString("backgroundPath", "");
+        String path = sPref.getString(Constants.PREFERENCES.BACKGROUND_PATH, "");
         Bitmap backgroundBitmap;
         if (path.equals("")) {
             backgroundImage.setImageResource(R.drawable.main_background);
         } else {
-            backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
+            backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, Constants.PREFERENCES.BACKGROUND);
             backgroundImage.setImageBitmap(backgroundBitmap);
         }
     }
@@ -182,7 +182,6 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
         @Override
         protected Void doInBackground(String... strings) {
             try {
-                //URL url = new URL(sp.getString("base_link", "https://firebasestorage.googleapis.com/v0/b/someradio-4bfa5.appspot.com/o/Base.xml?alt=media&token=4b54682f-d705-4dcf-afec-83816b4b7098"));
                 URL url = new URL("https://firebasestorage.googleapis.com/v0/b/someradio-4bfa5.appspot.com/o/Base.xml?alt=media&token=4b54682f-d705-4dcf-afec-83816b4b7098");
                 URLConnection connection = url.openConnection();
                 connection.setConnectTimeout(10000);

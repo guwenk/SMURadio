@@ -9,7 +9,6 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import java.io.IOException;
 
@@ -20,7 +19,7 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
-        setContentView(R.layout.activity_settings);
+        //setContentView(R.layout.activity_settings);
         Preference btnSetBG = findPreference(Constants.PREFERENCES.SET_BACKGROUND);
         btnSetBG.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -37,7 +36,7 @@ public class SettingsActivity extends PreferenceActivity {
             public boolean onPreferenceClick(Preference preference) {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(SettingsActivity.this);
                 SharedPreferences.Editor ed = sp.edit();
-                ed.putString("backgroundPath", "");
+                ed.putString(Constants.PREFERENCES.BACKGROUND_PATH, "");
                 ed.apply();
                 return true;
             }
@@ -59,13 +58,12 @@ public class SettingsActivity extends PreferenceActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    String path = new FileManager(getApplicationContext()).saveBitmap(bitmap, "background", "imageDir");
+                    String path = new FileManager(getApplicationContext()).saveBitmap(bitmap, Constants.PREFERENCES.BACKGROUND, "imageDir");
                     //bitmap = resize(path);
                     //new FileManager(getApplicationContext()).saveBitmap(bitmap, "background", "imageDir");
-                    Log.d("Save_Background", path);
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
                     SharedPreferences.Editor ed = sp.edit();
-                    ed.putString("backgroundPath", path);
+                    ed.putString(Constants.PREFERENCES.BACKGROUND_PATH, path);
                     ed.apply();
                 }
         }

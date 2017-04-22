@@ -129,17 +129,22 @@ class Constants {
         String STARTFOREGROUND_ACTION = "com.github.guwenk.smuradio.action.startforeground";
         String STOPFOREGROUND_ACTION = "com.github.guwenk.smuradio.action.stopforeground";
     }
+
     interface PREFERENCES {
         String LINK = "stream_link";
         String LANGUAGE = "lang";
         String RECONNECT = "reconnect";
         String SET_BACKGROUND = "setBackground";
         String RESTORE_BACKGROUND = "restoreBackground";
+        String BACKGROUND_PATH = "backgroundPath";
+        String BACKGROUND = "background";
     }
+
     interface MESSAGE {
         String PLAYER_STATUS = "player_status";
         String MUSIC_TITLE = "music_title";
     }
+
     interface UI {
         String STATUS = "status_text_update";
         String BUTTON = "play_button_update";
@@ -147,5 +152,10 @@ class Constants {
 
     interface NOTIFICATION_ID {
         int FOREGROUND_SERVICE = 101;
+    }
+
+    interface OTHER {
+        String USER_RATE = "rate_value";
+        String ORDER_FREEZE = "order_freeze";
     }
 }

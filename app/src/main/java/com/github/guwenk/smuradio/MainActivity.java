@@ -12,8 +12,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,20 +34,19 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
 
     private static long back_pressed;
+    final String FBDB_RATE_VAL = "rate";
+    final String FBDB_RATE_COUNT = "count";
     protected PlayerService playerService;
     protected ServiceConnection serviceConnection;
-    protected String LOG_TAG = "MainActivity";
+    protected float rateValue;
+    protected long rateCount;
+    private TitleString titleString;
+    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference mRatingRef = mRootRef.child("Rating");
     private SharedPreferences sPref;
     private ImageView backgroundImage;
     private TextView title;
-    protected String nowPlaying;
-    protected float rateValue;
-    protected long rateCount;
     private TextView ratingTV;
-
-    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference mRatingRef = mRootRef.child("Rating");
-
 
     @Override
     protected void onPause() {
@@ -68,15 +65,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setContentView(R.layout.activity_main);
         sPref = PreferenceManager.getDefaultSharedPreferences(this);
         backgroundImage = (ImageView) findViewById(R.id.main_backgroundImage);
-        title = (TextView)findViewById(R.id.main_status1);
+        title = (TextView) findViewById(R.id.main_status1);
+        titleString = new TitleString();
         ratingTV = (TextView) findViewById(R.id.main_ratingTV);
         final Button btnToTrackOrder = (Button) findViewById(R.id.main_btnToTrackOrder);
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (new InternetChecker().hasConnection(getApplicationContext())) {
-                    Intent intent = new Intent(MainActivity.this, OrderActivity.class);
-                    startActivity(intent);
+                    long order_freeze = sPref.getLong(Constants.OTHER.ORDER_FREEZE, 0);
+                    long current_time = System.currentTimeMillis();
+                    if (current_time >= order_freeze || order_freeze == 0) {
+                        Intent intent = new Intent(MainActivity.this, OrderActivity.class);
+                        startActivity(intent);
+                    } else {
+                        int seconds_left = (int) ((order_freeze - current_time) / 1000);
+                        Toast.makeText(getApplicationContext(), getString(R.string.order_freeze_msg_one) + seconds_left + getString(R.string.order_freeze_msg_two), Toast.LENGTH_SHORT).show();
+                    }
+
                 }
             }
         });
@@ -98,13 +104,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                 playerService = ((PlayerService.MyBinder) iBinder).getService();
                 //playerService.registerClient(MainActivity.this);
-                Log.d(LOG_TAG, "Service connected");
             }
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
                 playerService = null;
-                Log.d(LOG_TAG, "Service disconnected");
             }
         };
         bindService(intent, serviceConnection, 0);
@@ -122,30 +126,29 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         });
         sPref.registerOnSharedPreferenceChangeListener(this);
-        title.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            }
-
+        RatingBar ratingBar = (RatingBar) findViewById(R.id.main_RatingBar);
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
-            public void onTextChanged(CharSequence cs, int start, int before, int count) {
-                final RatingBar ratingBar = (RatingBar)findViewById(R.id.main_RatingBar);
-                nowPlaying = cs.toString();
-                ratingBar.setRating((float) 0);
-                if (!nowPlaying.equals("") && !nowPlaying.equals(getString(R.string.connecting)) && !nowPlaying.equals(getString(R.string.default_status))){
-                    ratingBar.setVisibility(View.VISIBLE);
-                    ratingTV.setVisibility(View.VISIBLE);
-                    mRatingRef.child(nowPlaying).addListenerForSingleValueEvent(new ValueEventListener() {
+            public void onRatingChanged(final RatingBar ratingBar, float rating, boolean fromUser) {
+                if (fromUser) {
+                    char[] chars = titleString.getTitle().toCharArray();
+                    for (int i = 0; i < chars.length; i++){
+                        if (chars[i] == '.' || chars[i] == '#' || chars[i] == '$' || chars[i] == '[' || chars[i] == ']'){
+                            chars[i] = ' ';
+                        }
+                    }
+                    mRatingRef.child(String.valueOf(chars)).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             rateCount = 0;
                             rateValue = 0;
                             try {
-                                rateCount = dataSnapshot.child("count").getValue(Long.class);
-                                rateValue = dataSnapshot.child("rate").getValue(Float.class);
-                            } catch (NullPointerException ignored){}
-                            String s = String.format("%.2f", rateValue/rateCount);
+                                rateCount = dataSnapshot.child(FBDB_RATE_COUNT).getValue(Long.class);
+                                rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
+                            } catch (NullPointerException ignored) {
+                            }
+                            String s = String.format("%.2f", rateValue / rateCount);
                             ratingTV.setText(!s.equals("NaN") ? s : "0.0");
                         }
 
@@ -154,26 +157,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
                         }
                     });
-                } else {
-                    ratingTV.setText("");
-                    ratingTV.setVisibility(View.INVISIBLE);
-                    ratingBar.setVisibility(View.INVISIBLE);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-        RatingBar ratingBar = (RatingBar) findViewById(R.id.main_RatingBar);
-        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                if (fromUser){
-                    mRatingRef.child(nowPlaying).child("rate").setValue(rateValue+rating);
-                    mRatingRef.child(nowPlaying).child("count").setValue(rateCount+1);
+                    mRatingRef.child(titleString.getTitle()).child(FBDB_RATE_VAL).setValue(rateValue + rating);
+                    mRatingRef.child(titleString.getTitle()).child(FBDB_RATE_COUNT).setValue(rateCount + 1);
+                    ratingBar.setIsIndicator(true);
+                    sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
                 }
             }
         });
@@ -184,15 +171,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     protected void onStart() {
         super.onStart();
         onSharedPreferenceChanged(sPref, Constants.MESSAGE.PLAYER_STATUS);
-        String path = sPref.getString("backgroundPath", "");
-        Bitmap backgroundBitmap = null;
+        String path = sPref.getString(Constants.PREFERENCES.BACKGROUND_PATH, "");
+        Bitmap backgroundBitmap;
         if (path.equals("")) {
             backgroundImage.setImageResource(R.drawable.main_background);
         } else {
-            backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
+            backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, Constants.PREFERENCES.BACKGROUND);
             backgroundImage.setImageBitmap(backgroundBitmap);
         }
-        Log.i("Load_Background", backgroundBitmap + "");
+
         Intent intent = new Intent(MainActivity.this, PlayerService.class);
         bindService(intent, serviceConnection, 0);
     }
@@ -229,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
             case R.id.action_copy:
                 ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clipData = ClipData.newPlainText("", sPref.getString("link", "http://free.radioheart.ru:8000/guwenk128"));
+                ClipData clipData = ClipData.newPlainText("", sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)));
                 clipboard.setPrimaryClip(clipData);
                 Toast.makeText(getApplicationContext(), getString(R.string.link_was_copied), Toast.LENGTH_SHORT).show();
                 return true;
@@ -249,18 +236,79 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 switch (player_status) {
                     case 0: {
                         title.setText("");
+                        titleString.setTitle("");
                         findViewById(R.id.main_status1).setVisibility(View.INVISIBLE);
                         imageButton.setImageResource(R.drawable.ic_play_arrow);
                         break;
                     }
                     case 1: {
                         title.setText(player_title);
+                        if (!titleString.getTitle().equals(player_title))
+                            titleString.setTitle(player_title);
                         findViewById(R.id.main_status1).setVisibility(View.VISIBLE);
                         imageButton.setImageResource(R.drawable.ic_stop);
                         break;
                     }
                 }
                 break;
+            }
+        }
+    }
+
+    private class TitleString {
+        private String title;
+        private RatingBar ratingBar = (RatingBar) findViewById(R.id.main_RatingBar);
+
+        TitleString() {
+            title = "";
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+
+            ratingBar.setRating((float) 0);
+            if (!titleString.getTitle().equals("") && !titleString.getTitle().equals(getString(R.string.connecting)) && !titleString.getTitle().equals(getString(R.string.default_status))) {
+                char[] chars = titleString.getTitle().toCharArray();
+                for (int i = 0; i < chars.length; i++){
+                    if (chars[i] == '.' || chars[i] == '#' || chars[i] == '$' || chars[i] == '[' || chars[i] == ']'){
+                        chars[i] = ' ';
+                    }
+                }
+                mRatingRef.child(String.valueOf(chars)).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        rateCount = 0;
+                        rateValue = 0;
+                        try {
+                            rateCount = dataSnapshot.child(FBDB_RATE_COUNT).getValue(Long.class);
+                            rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
+                        } catch (NullPointerException ignored) {
+                        }
+                        String s = String.format("%.2f", rateValue / rateCount);
+                        ratingTV.setText(!s.equals("NaN") ? s : "0.0");
+                        ratingBar.setVisibility(View.VISIBLE);
+                        ratingTV.setVisibility(View.VISIBLE);
+                        float user_rate_from_pref = sPref.getFloat(Constants.OTHER.USER_RATE + getTitle(), 0);
+                        if (user_rate_from_pref != 0) {
+                            ratingBar.setRating(user_rate_from_pref);
+                            ratingBar.setIsIndicator(true);
+                        } else ratingBar.setIsIndicator(false);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            } else {
+                ratingBar.setIsIndicator(true);
+                ratingTV.setText("");
+                ratingTV.setVisibility(View.INVISIBLE);
+                ratingBar.setVisibility(View.INVISIBLE);
             }
         }
     }

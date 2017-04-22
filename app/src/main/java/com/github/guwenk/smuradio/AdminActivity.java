@@ -2,7 +2,6 @@ package com.github.guwenk.smuradio;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.media.Rating;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -10,18 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RatingBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class AdminActivity extends AppCompatActivity {
@@ -30,15 +21,6 @@ public class AdminActivity extends AppCompatActivity {
     DatabaseReference mRequestsRef = mRootRef.child("Requests");
     private String inputPass;
     private ImageView backgroundImage;
-
-    private class Music {
-        int count;
-        int rate;
-        Music(int rate, int count) {
-            this.rate = rate;
-            this.count = count;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,57 +60,18 @@ public class AdminActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Запрос отправлен (prev)", Toast.LENGTH_SHORT).show();
             }
         });
-
-        final Button btnVote = (Button) findViewById(R.id.admin_vote);
-        btnVote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                EditText editText = (EditText) findViewById(R.id.admin_et);
-                String s = String.valueOf(editText.getText());
-                RatingBar ratingBar = (RatingBar)findViewById(R.id.admin_rating);
-                if (!s.equals("")) {
-                    float rate = ratingBar.getRating();
-                    mRootRef.child("Rating").child(s).child("rate").setValue(rate);
-                }
-            }
-        });
-        final Button btnCheck = (Button) findViewById(R.id.admin_check);
-        btnCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                EditText editText = (EditText) findViewById(R.id.admin_et);
-                String s = String.valueOf(editText.getText());
-                if (!s.equals("")) {
-                    DatabaseReference ratingRef = mRootRef.child("Rating").child(s);
-                    ratingRef.child("rate").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            TextView tv = (TextView) findViewById(R.id.admin_tv);
-                            long l = dataSnapshot.getValue(Long.class);
-                            String text = String.valueOf(l);
-                            tv.setText(text);
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-                }
-            }
-        });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        String path = sp.getString("backgroundPath", "");
+        String path = sp.getString(Constants.PREFERENCES.BACKGROUND_PATH, "");
         Bitmap backgroundBitmap;
         if (path.equals("")) {
             backgroundImage.setImageResource(R.drawable.main_background);
         } else {
-            backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, "background");
+            backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, Constants.PREFERENCES.BACKGROUND);
             backgroundImage.setImageBitmap(backgroundBitmap);
         }
     }

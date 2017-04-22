@@ -29,7 +29,6 @@ public class PlayerService extends Service {
     private static final int BASS_TAG_HLS_EXTINF = 0x14000;
     private final Object lock = new Object();
     boolean isStarted = false;
-    private String LOG_TAG = "PLAYER_SERVICE";
     private AFListener afListener;
     private String AF_LOG_TAG = "AudioFocusListener";
     private AudioManager audioManager;
@@ -96,7 +95,6 @@ public class PlayerService extends Service {
         speakerChecker = new SpeakerChecker();
         sPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        Log.d(LOG_TAG, "CREATED");
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -106,7 +104,6 @@ public class PlayerService extends Service {
             case Constants.ACTION.STARTFOREGROUND_ACTION: {
                 if (!isStarted) {
                     showNotification();
-                    Log.d(LOG_TAG, "START_BASS");
                     if (BASS.BASS_Init(-1, 44100, 0)) {
                         BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_READTIMEOUT, 15000); // read timeout
                         BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_TIMEOUT, 5000); // connection timeout
@@ -198,11 +195,9 @@ public class PlayerService extends Service {
         SharedPreferences.Editor ed = sPref.edit();
         if (message_type.equals(Constants.MESSAGE.MUSIC_TITLE)) {
             ed.putString(Constants.MESSAGE.MUSIC_TITLE, message);
-            Log.d("SharedPref", "put title");
         } else if (message_type.equals(Constants.MESSAGE.PLAYER_STATUS)) {
             if (isPlaying) ed.putInt(Constants.MESSAGE.PLAYER_STATUS, 1);
             else ed.putInt(Constants.MESSAGE.PLAYER_STATUS, 0);
-            Log.d("SharedPref", "put status");
         }
         ed.apply();
     }
@@ -261,7 +256,6 @@ public class PlayerService extends Service {
             unregisterReceiver(speakerChecker);
         } catch (IllegalArgumentException ignored) {
         }
-        Log.d(LOG_TAG, "FULL_STOP_BASS");
         BASS.BASS_StreamFree(chan);
         BASS.BASS_Free();
         isPlaying = false;
@@ -275,7 +269,6 @@ public class PlayerService extends Service {
         } catch (IllegalArgumentException ignored) {
         }
         reconnectCancel = true;
-        Log.d(LOG_TAG, "STOP_BASS");
         BASS.BASS_StreamFree(chan);
         isPlaying = false;
         updateUI(Constants.UI.BUTTON, null);
@@ -303,14 +296,12 @@ public class PlayerService extends Service {
     }
 
     public IBinder onBind(Intent intent) {
-        Log.d(LOG_TAG, "bind");
         return binder;
     }
 
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.d(LOG_TAG, "unbind");
         if (sPref.getInt(Constants.MESSAGE.PLAYER_STATUS, -1) != 1) {
             fullStopBASS();
             stopSelf();
@@ -328,7 +319,7 @@ public class PlayerService extends Service {
         //String savedText = sPref.getString(Constants.UI.BASS_ERROR_LOG, "");
         //ed.putString(Constants.UI.BASS_ERROR_LOG, savedText + myDate + " | E:" + errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + " (" + es + ")\n");
         //ed.apply();
-        Log.d(LOG_TAG, errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + " (" + es + ")");
+        Log.i("PLAYER_BASS", errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + " (" + es + ")");
         if (sPref.getBoolean(Constants.PREFERENCES.RECONNECT, true)) {
             try {
                 Thread.sleep(300);
@@ -406,7 +397,6 @@ public class PlayerService extends Service {
                 bassError(getString(R.string.cant_play_the_stream));
             } else {
                 handler.postDelayed(timer, 50);
-                Log.d("BASS_VOLUME", BASS.BASS_GetVolume() + "");
             }
         }
     }
