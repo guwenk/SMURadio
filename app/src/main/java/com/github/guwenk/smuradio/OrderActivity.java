@@ -47,9 +47,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class OrderActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
-    SharedPreferences sPref;
-    DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-    DatabaseReference mOrderRef = mRootRef.child("Requests").child("order");
+    private SharedPreferences sPref;
+    private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+    private DatabaseReference mOrderRef = mRootRef.child("Requests").child("order");
+    private boolean caughtException = false;
     private NodeList trackNodeList;
     private List<Tracks> trackList = new ArrayList<>();
     private ArrayList<String> names = new ArrayList<>();
@@ -68,7 +69,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
         final ListView listView = (ListView) findViewById(R.id.musicBaseView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         new ParseXML().execute();
-        adapter = new ArrayAdapter<>(this, R.layout.simple_list_item_single_choice, names);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, names);
         listView.setAdapter(adapter);
 
         //<Кнопка голосования>
@@ -110,6 +111,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
             }
         });
         //<Кнопка голосования/>
+
     }
 
     @Override
@@ -172,7 +174,6 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
 
     //Парсинг XML из сети
     private class ParseXML extends AsyncTask<String, Void, Void> {
-        boolean caughtException = false;
 
         @Override
         protected void onPreExecute() {
@@ -182,7 +183,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
         @Override
         protected Void doInBackground(String... strings) {
             try {
-                URL url = new URL("https://firebasestorage.googleapis.com/v0/b/someradio-4bfa5.appspot.com/o/Base.xml?alt=media&token=4b54682f-d705-4dcf-afec-83816b4b7098");
+                URL url = new URL("https://firebasestorage.googleapis.com/v0/b/someradio-4bfa5.appspot.com/o/Base.xml?alt=media");
                 URLConnection connection = url.openConnection();
                 connection.setConnectTimeout(10000);
                 connection.setReadTimeout(10000);

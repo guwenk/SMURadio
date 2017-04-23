@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +31,6 @@ import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-
     private static long back_pressed;
     final String FBDB_RATE_VAL = "rate";
     final String FBDB_RATE_COUNT = "count";
@@ -45,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private DatabaseReference mRatingRef = mRootRef.child("Rating");
     private SharedPreferences sPref;
     private ImageView backgroundImage;
-    private TextView title;
+    private TextView titleTV;
     private TextView ratingTV;
 
     @Override
@@ -65,9 +63,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setContentView(R.layout.activity_main);
         sPref = PreferenceManager.getDefaultSharedPreferences(this);
         backgroundImage = (ImageView) findViewById(R.id.main_backgroundImage);
-        title = (TextView) findViewById(R.id.main_status1);
+        titleTV = (TextView) findViewById(R.id.main_status1);
         titleString = new TitleString();
         ratingTV = (TextView) findViewById(R.id.main_ratingTV);
+
         final Button btnToTrackOrder = (Button) findViewById(R.id.main_btnToTrackOrder);
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,16 +81,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         int seconds_left = (int) ((order_freeze - current_time) / 1000);
                         Toast.makeText(getApplicationContext(), getString(R.string.order_freeze_msg_one) + seconds_left + getString(R.string.order_freeze_msg_two), Toast.LENGTH_SHORT).show();
                     }
-
                 }
             }
         });
-        title.setOnClickListener(new View.OnClickListener() {
+        titleTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clipData = ClipData.newPlainText("", title.getText());
+                ClipData clipData = ClipData.newPlainText("", titleTV.getText());
                 clipboard.setPrimaryClip(clipData);
                 Toast.makeText(getApplicationContext(), R.string.name_copied, Toast.LENGTH_SHORT).show();
             }
@@ -132,13 +130,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             @Override
             public void onRatingChanged(final RatingBar ratingBar, float rating, boolean fromUser) {
                 if (fromUser) {
-                    char[] chars = titleString.getTitle().toCharArray();
-                    for (int i = 0; i < chars.length; i++){
-                        if (chars[i] == '.' || chars[i] == '#' || chars[i] == '$' || chars[i] == '[' || chars[i] == ']'){
-                            chars[i] = ' ';
-                        }
-                    }
-                    mRatingRef.child(String.valueOf(chars)).addListenerForSingleValueEvent(new ValueEventListener() {
+                    String song_title = del_bad_symbols(titleString.getTitle());
+                    mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             rateCount = 0;
@@ -235,14 +228,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 String player_title = sharedPreferences.getString(Constants.MESSAGE.MUSIC_TITLE, "");
                 switch (player_status) {
                     case 0: {
-                        title.setText("");
+                        titleTV.setText("");
                         titleString.setTitle("");
                         findViewById(R.id.main_status1).setVisibility(View.INVISIBLE);
                         imageButton.setImageResource(R.drawable.ic_play_arrow);
                         break;
                     }
                     case 1: {
-                        title.setText(player_title);
+                        titleTV.setText(player_title);
                         if (!titleString.getTitle().equals(player_title))
                             titleString.setTitle(player_title);
                         findViewById(R.id.main_status1).setVisibility(View.VISIBLE);
@@ -253,6 +246,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 break;
             }
         }
+    }
+
+    private String del_bad_symbols(String s) {
+        char[] chars = s.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] == '.' || chars[i] == '#' || chars[i] == '$' || chars[i] == '[' || chars[i] == ']') {
+                chars[i] = ' ';
+            }
+        }
+        return String.valueOf(chars);
     }
 
     private class TitleString {
@@ -272,31 +275,28 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             ratingBar.setRating((float) 0);
             if (!titleString.getTitle().equals("") && !titleString.getTitle().equals(getString(R.string.connecting)) && !titleString.getTitle().equals(getString(R.string.default_status))) {
-                char[] chars = titleString.getTitle().toCharArray();
-                for (int i = 0; i < chars.length; i++){
-                    if (chars[i] == '.' || chars[i] == '#' || chars[i] == '$' || chars[i] == '[' || chars[i] == ']'){
-                        chars[i] = ' ';
-                    }
-                }
-                mRatingRef.child(String.valueOf(chars)).addListenerForSingleValueEvent(new ValueEventListener() {
+                String song_title = del_bad_symbols(titleString.getTitle());
+                mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        rateCount = 0;
-                        rateValue = 0;
-                        try {
-                            rateCount = dataSnapshot.child(FBDB_RATE_COUNT).getValue(Long.class);
-                            rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
-                        } catch (NullPointerException ignored) {
+                        if (!titleString.getTitle().equals("") && !titleString.getTitle().equals(getString(R.string.connecting)) && !titleString.getTitle().equals(getString(R.string.default_status))) {
+                            rateCount = 0;
+                            rateValue = 0;
+                            try {
+                                rateCount = dataSnapshot.child(FBDB_RATE_COUNT).getValue(Long.class);
+                                rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
+                            } catch (NullPointerException ignored) {
+                            }
+                            String s = String.format("%.2f", rateValue / rateCount);
+                            ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
+                            ratingBar.setVisibility(View.VISIBLE);
+                            ratingTV.setVisibility(View.VISIBLE);
+                            float user_rate_from_pref = sPref.getFloat(Constants.OTHER.USER_RATE + getTitle(), 0);
+                            if (user_rate_from_pref != 0) {
+                                ratingBar.setRating(user_rate_from_pref);
+                                ratingBar.setIsIndicator(true);
+                            } else ratingBar.setIsIndicator(false);
                         }
-                        String s = String.format("%.2f", rateValue / rateCount);
-                        ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
-                        ratingBar.setVisibility(View.VISIBLE);
-                        ratingTV.setVisibility(View.VISIBLE);
-                        float user_rate_from_pref = sPref.getFloat(Constants.OTHER.USER_RATE + getTitle(), 0);
-                        if (user_rate_from_pref != 0) {
-                            ratingBar.setRating(user_rate_from_pref);
-                            ratingBar.setIsIndicator(true);
-                        } else ratingBar.setIsIndicator(false);
                     }
 
                     @Override
