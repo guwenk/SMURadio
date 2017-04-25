@@ -4,7 +4,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -12,8 +11,8 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -129,53 +128,57 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             @Override
             public void onRatingChanged(final RatingBar ratingBar, final float rating, boolean fromUser) {
                 if (fromUser) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setTitle("Подтвердите действие")
-                            .setMessage("Ваша оценка: " + rating)
-                            .setPositiveButton("ДА", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    String song_title = del_bad_symbols(titleString.getTitle());
-                                    mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            rateCount = 0;
-                                            rateValue = 0;
-                                            try {
-                                                rateCount = dataSnapshot.child(FBDB_RATE_COUNT).getValue(Long.class);
-                                                rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
-                                            } catch (NullPointerException ignored) {
-                                            }
-                                            String s = String.format("%.2f", rateValue / rateCount);
-                                            ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
-                                        }
+                    final String song_title = del_bad_symbols(titleString.getTitle());
+                    final float user_rate_from_pref = sPref.getFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), 0);
+                    if (user_rate_from_pref == 0){
+                        mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                rateCount = 0;
+                                rateValue = 0;
+                                try {
+                                    rateCount = dataSnapshot.child(FBDB_RATE_COUNT).getValue(Long.class);
+                                    rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
+                                } catch (NullPointerException ignored) {
+                                }
 
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
+                                rateValue += rating;
+                                rateCount += 1;
+                                mRatingRef.child(song_title).child(FBDB_RATE_VAL).setValue(rateValue);
+                                mRatingRef.child(song_title).child(FBDB_RATE_COUNT).setValue(rateCount);
+                                sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
 
-                                        }
-                                    });
-                                    mRatingRef.child(song_title).child(FBDB_RATE_VAL).setValue(rateValue + rating);
-                                    mRatingRef.child(song_title).child(FBDB_RATE_COUNT).setValue(rateCount + 1);
-                                    ratingBar.setIsIndicator(true);
-                                    sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
+                                String s = String.format("%.2f", rateValue / rateCount);
+                                ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    } else {
+                        mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                try {
+                                    rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
+                                } catch (NullPointerException ignored) {
                                 }
-                            })
-                            .setNegativeButton("НЕТ", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    ratingBar.setRating(0.f);
-                                }
-                            })
-                            .setCancelable(true)
-                            .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialog) {
-                                    ratingBar.setRating(0.f);
-                                }
-                            });
-                    AlertDialog alert = builder.create();
-                    alert.show();
+                                rateValue += rating - user_rate_from_pref;
+                                mRatingRef.child(song_title).child(FBDB_RATE_VAL).setValue(rateValue);
+                                sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
+
+                                String s = String.format("%.2f", rateValue / rateCount);
+                                ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
                 }
             }
         });
@@ -316,8 +319,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                             float user_rate_from_pref = sPref.getFloat(Constants.OTHER.USER_RATE + getTitle(), 0);
                             if (user_rate_from_pref != 0) {
                                 ratingBar.setRating(user_rate_from_pref);
-                                ratingBar.setIsIndicator(true);
-                            } else ratingBar.setIsIndicator(false);
+                            }
                         }
                     }
 
@@ -327,7 +329,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     }
                 });
             } else {
-                ratingBar.setIsIndicator(true);
                 ratingTV.setText("");
                 ratingTV.setVisibility(View.INVISIBLE);
                 ratingBar.setVisibility(View.INVISIBLE);
