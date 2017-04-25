@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -11,6 +12,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -115,9 +117,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ImageButton imgBtn = (ImageButton) findViewById(R.id.main_play_button);
-                findViewById(R.id.main_status1).setVisibility(View.VISIBLE);
-                imgBtn.setImageResource(R.drawable.ic_stop);
                 Intent intent = new Intent(MainActivity.this, PlayerService.class);
                 intent.setAction(Constants.ACTION.STARTFOREGROUND_ACTION);
                 startService(intent);
@@ -128,32 +127,55 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         RatingBar ratingBar = (RatingBar) findViewById(R.id.main_RatingBar);
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
-            public void onRatingChanged(final RatingBar ratingBar, float rating, boolean fromUser) {
+            public void onRatingChanged(final RatingBar ratingBar, final float rating, boolean fromUser) {
                 if (fromUser) {
-                    String song_title = del_bad_symbols(titleString.getTitle());
-                    mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            rateCount = 0;
-                            rateValue = 0;
-                            try {
-                                rateCount = dataSnapshot.child(FBDB_RATE_COUNT).getValue(Long.class);
-                                rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
-                            } catch (NullPointerException ignored) {
-                            }
-                            String s = String.format("%.2f", rateValue / rateCount);
-                            ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
-                        }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("Подтвердите действие")
+                            .setMessage("Ваша оценка: " + rating)
+                            .setPositiveButton("ДА", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String song_title = del_bad_symbols(titleString.getTitle());
+                                    mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            rateCount = 0;
+                                            rateValue = 0;
+                                            try {
+                                                rateCount = dataSnapshot.child(FBDB_RATE_COUNT).getValue(Long.class);
+                                                rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
+                                            } catch (NullPointerException ignored) {
+                                            }
+                                            String s = String.format("%.2f", rateValue / rateCount);
+                                            ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
+                                        }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
 
-                        }
-                    });
-                    mRatingRef.child(titleString.getTitle()).child(FBDB_RATE_VAL).setValue(rateValue + rating);
-                    mRatingRef.child(titleString.getTitle()).child(FBDB_RATE_COUNT).setValue(rateCount + 1);
-                    ratingBar.setIsIndicator(true);
-                    sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
+                                        }
+                                    });
+                                    mRatingRef.child(titleString.getTitle()).child(FBDB_RATE_VAL).setValue(rateValue + rating);
+                                    mRatingRef.child(titleString.getTitle()).child(FBDB_RATE_COUNT).setValue(rateCount + 1);
+                                    ratingBar.setIsIndicator(true);
+                                    sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
+                                }
+                            })
+                            .setNegativeButton("НЕТ", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    ratingBar.setRating(0.f);
+                                }
+                            })
+                            .setCancelable(true)
+                            .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    ratingBar.setRating(0.f);
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
                 }
             }
         });
