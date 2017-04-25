@@ -138,6 +138,7 @@ class Constants {
         String RESTORE_BACKGROUND = "restoreBackground";
         String BACKGROUND_PATH = "backgroundPath";
         String BACKGROUND = "background";
+        String BUG_REPORT = "bugReport";
     }
 
     interface MESSAGE {

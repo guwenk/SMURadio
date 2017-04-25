@@ -27,5 +27,9 @@
     <Preference
         android:key="restoreBackground"
         android:title="@string/restore_background" />
+    <Preference
+        android:key="bugReport"
+        android:title="@string/bug_report"
+        android:summary="email"/>
 
 </PreferenceScreen>

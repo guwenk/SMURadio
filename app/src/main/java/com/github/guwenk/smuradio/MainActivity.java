@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -11,6 +12,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -158,26 +160,48 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                             }
                         });
                     } else {
-                        mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                try {
-                                    rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
-                                } catch (NullPointerException ignored) {
-                                }
-                                rateValue += rating - user_rate_from_pref;
-                                mRatingRef.child(song_title).child(FBDB_RATE_VAL).setValue(rateValue);
-                                sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setTitle(R.string.ask_update_rating)
+                                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                try {
+                                                    rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
+                                                } catch (NullPointerException ignored) {
+                                                }
+                                                rateValue += rating - user_rate_from_pref;
+                                                mRatingRef.child(song_title).child(FBDB_RATE_VAL).setValue(rateValue);
+                                                sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
 
-                                String s = String.format("%.2f", rateValue / rateCount);
-                                ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
-                            }
+                                                String s = String.format("%.2f", rateValue / rateCount);
+                                                ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
+                                            }
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+                                            }
+                                        });
+                                    }
+                                })
+                                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        ratingBar.setRating(user_rate_from_pref);
+                                    }
+                                })
+                                .setCancelable(true)
+                                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                    @Override
+                                    public void onCancel(DialogInterface dialog) {
+                                        ratingBar.setRating(user_rate_from_pref);
+                                    }
+                                });
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
 
-                            }
-                        });
                     }
                 }
             }

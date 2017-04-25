@@ -48,4 +48,10 @@
     <string name="order_freeze_msg_two">" sec until next order"</string>
     <string name="zero" translatable="false">0,00</string>
     <string name="radio_image">Radio image</string>
+    <string name="send_email">Send email…</string>
+    <string name="no_email_client_installed">There are no email clients installed.</string>
+    <string name="bug_report">Bug report (email)</string>
+    <string name="ask_update_rating">Do you want to update the rating?</string>
+    <string name="yes">YES</string>
+    <string name="no">NO</string>
 </resources>

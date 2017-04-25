@@ -9,6 +9,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -38,6 +39,22 @@ public class SettingsActivity extends PreferenceActivity {
                 SharedPreferences.Editor ed = sp.edit();
                 ed.putString(Constants.PREFERENCES.BACKGROUND_PATH, "");
                 ed.apply();
+                return true;
+            }
+        });
+        Preference btnBugReport = findPreference(Constants.PREFERENCES.BUG_REPORT);
+        btnBugReport.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("message/rfc822");
+                i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"denis180799@gmail.com"});
+                i.putExtra(Intent.EXTRA_SUBJECT, "SomeRadio bug");
+                try {
+                    startActivity(Intent.createChooser(i, getString(R.string.send_email)));
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(SettingsActivity.this, R.string.no_email_client_installed, Toast.LENGTH_SHORT).show();
+                }
                 return true;
             }
         });
