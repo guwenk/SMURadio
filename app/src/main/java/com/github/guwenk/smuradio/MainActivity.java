@@ -155,8 +155,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
                                         }
                                     });
-                                    mRatingRef.child(titleString.getTitle()).child(FBDB_RATE_VAL).setValue(rateValue + rating);
-                                    mRatingRef.child(titleString.getTitle()).child(FBDB_RATE_COUNT).setValue(rateCount + 1);
+                                    mRatingRef.child(song_title).child(FBDB_RATE_VAL).setValue(rateValue + rating);
+                                    mRatingRef.child(song_title).child(FBDB_RATE_COUNT).setValue(rateCount + 1);
                                     ratingBar.setIsIndicator(true);
                                     sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
                                 }
