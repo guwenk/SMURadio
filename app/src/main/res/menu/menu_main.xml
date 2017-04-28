@@ -5,17 +5,26 @@
     tools:context=".MainActivity">
     <item
         android:id="@+id/action_toAdminActivity"
-        android:orderInCategory="0"
+        android:orderInCategory="1"
         android:title="@string/admin_menu"
+
         app:showAsAction="never"/>
     <item
         android:id="@+id/action_copy"
-        android:orderInCategory="1"
+        android:orderInCategory="2"
         android:title="@string/copy_link_to_clipboard"
+        android:icon="@drawable/ic_content_copy_24dp"
         app:showAsAction="never"/>
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="0"
         android:title="@string/action_settings"
+        android:icon="@drawable/ic_settings_24dp"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_info"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_info_24dp"
+        android:title="@string/info"
+        app:showAsAction="never" />
 </menu>

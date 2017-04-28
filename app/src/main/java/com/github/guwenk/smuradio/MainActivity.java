@@ -1,5 +1,6 @@
 package com.github.guwenk.smuradio;
 
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private ImageView backgroundImage;
     private TextView titleTV;
     private TextView ratingTV;
+    private Dialog infoDialog;
 
     @Override
     protected void onPause() {
@@ -68,6 +70,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         titleTV = (TextView) findViewById(R.id.main_status1);
         titleString = new TitleString();
         ratingTV = (TextView) findViewById(R.id.main_ratingTV);
+
+        infoDialog = new Dialog(MainActivity.this);
+        infoDialog.setContentView(R.layout.info_layout);
+        TextView infoTV = (TextView) infoDialog.findViewById(R.id.info_TextView);
+        infoTV.setText("SomeRadio\nAuthor: Guwenk\nVersion: 0.9.1");
 
         final Button btnToTrackOrder = (Button) findViewById(R.id.main_btnToTrackOrder);
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
@@ -158,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
                             }
                         });
-                    } else {
+                    } else if (rating != 0){
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                         builder.setTitle(R.string.ask_update_rating)
                                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
@@ -200,8 +207,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                                 });
                         AlertDialog alertDialog = builder.create();
                         alertDialog.show();
-
-                    }
+                    } else ratingBar.setRating(user_rate_from_pref);
                 }
             }
         });
@@ -261,6 +267,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 clipboard.setPrimaryClip(clipData);
                 Toast.makeText(getApplicationContext(), getString(R.string.link_was_copied), Toast.LENGTH_SHORT).show();
                 return true;
+            case R.id.action_info:
+                infoDialog.show();
             default:
                 return super.onOptionsItemSelected(item);
         }

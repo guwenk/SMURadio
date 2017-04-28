@@ -39,6 +39,7 @@ public class PlayerService extends Service {
     private boolean isPlaying = false;
     private boolean reconnectCancel = false;
     private SpeakerChecker speakerChecker;
+    private String temp_title = "";
 
     private int req, chan;
     private Handler handler = new Handler();
@@ -289,7 +290,8 @@ public class PlayerService extends Service {
     }
 
     private void refreshTitle(String title) {
-        if (isStarted) {
+        if (isStarted && !title.equals(temp_title)) {
+            temp_title = title;
             views.setTextViewText(R.id.status_bar_track_name, title);
             startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
         }

@@ -54,4 +54,5 @@
     <string name="ask_update_rating">Do you want to update the rating?</string>
     <string name="yes">YES</string>
     <string name="no">NO</string>
+    <string name="info">Info</string>
 </resources>
