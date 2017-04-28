@@ -39,4 +39,8 @@
     <string name="ask_update_rating">Обновить оценку?</string>
     <string name="no">НЕТ</string>
     <string name="yes">ДА</string>
+    <string name="version_title">"Версия: "</string>
+    <string name="author">"Автор: "</string>
+    <string name="background_changed">Фон изменён</string>
+    <string name="background_restored">Фон восстановлен</string>
 </resources>

@@ -139,6 +139,8 @@ class Constants {
         String BACKGROUND_PATH = "backgroundPath";
         String BACKGROUND = "background";
         String BUG_REPORT = "bugReport";
+        String INFO = "info";
+        String COPY_LINK_TO_CLIPBOARD = "copy_link_to_clipboard";
     }
 
     interface MESSAGE {

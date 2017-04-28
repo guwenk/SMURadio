@@ -28,7 +28,6 @@ public class AdminActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin);
         backgroundImage = (ImageView) findViewById(R.id.aa_backgroundImage);
         final EditText etPass = (EditText) findViewById(R.id.etPass);
-
         final Button btnNext = (Button) findViewById(R.id.btnNext);
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,6 +59,7 @@ public class AdminActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Запрос отправлен (prev)", Toast.LENGTH_SHORT).show();
             }
         });
+        Toast.makeText(getApplicationContext(), "Admin Menu", Toast.LENGTH_SHORT).show();
     }
 
     @Override

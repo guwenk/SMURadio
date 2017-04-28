@@ -1,6 +1,5 @@
 package com.github.guwenk.smuradio;
 
-import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private ImageView backgroundImage;
     private TextView titleTV;
     private TextView ratingTV;
-    private Dialog infoDialog;
+
 
     @Override
     protected void onPause() {
@@ -65,16 +64,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         sPref = PreferenceManager.getDefaultSharedPreferences(this);
         backgroundImage = (ImageView) findViewById(R.id.main_backgroundImage);
         titleTV = (TextView) findViewById(R.id.main_status1);
         titleString = new TitleString();
         ratingTV = (TextView) findViewById(R.id.main_ratingTV);
 
-        infoDialog = new Dialog(MainActivity.this);
-        infoDialog.setContentView(R.layout.info_layout);
-        TextView infoTV = (TextView) infoDialog.findViewById(R.id.info_TextView);
-        infoTV.setText("SomeRadio\nAuthor: Guwenk\nVersion: 0.9.1");
 
         final Button btnToTrackOrder = (Button) findViewById(R.id.main_btnToTrackOrder);
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
@@ -136,9 +132,22 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             @Override
             public void onRatingChanged(final RatingBar ratingBar, final float rating, boolean fromUser) {
                 if (fromUser) {
+                    final Thread pauseRate = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ratingBar.setIsIndicator(true);
+                            try {
+                                Thread.sleep(1500);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            ratingBar.setIsIndicator(false);
+                        }
+                    });
                     final String song_title = del_bad_symbols(titleString.getTitle());
                     final float user_rate_from_pref = sPref.getFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), 0);
                     if (user_rate_from_pref == 0) {
+                        pauseRate.start();
                         mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -165,12 +174,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
                             }
                         });
-                    } else if (rating != 0){
+                    } else if (rating != 0) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                         builder.setTitle(R.string.ask_update_rating)
                                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
+                                        pauseRate.start();
                                         mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -257,18 +267,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.action_toAdminActivity:
-                intent = new Intent(MainActivity.this, AdminActivity.class);
-                startActivity(intent);
-                return true;
-            case R.id.action_copy:
-                ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clipData = ClipData.newPlainText("", sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)));
-                clipboard.setPrimaryClip(clipData);
-                Toast.makeText(getApplicationContext(), getString(R.string.link_was_copied), Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.action_info:
-                infoDialog.show();
             default:
                 return super.onOptionsItemSelected(item);
         }

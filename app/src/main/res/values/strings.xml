@@ -35,14 +35,12 @@
     <string name="auto_reconnect">Auto-reconnect</string>
     <string name="set_background">Set Background</string>
     <string name="restore_background">Restore Background</string>
-    <string name="autoreconnect_summary">Unstable</string>
     <string name="hint_search">Search</string>
     <string name="on_back_pressed">Press once again to exit!</string>
     <string name="settings_lang_summary" translatable="false">Restart the application to accept the changes.</string>
     <string name="lang_title" translatable="false">Language</string>
     <string name="waiting_for_internet">Waiting for internet connection…</string>
     <string name="check_internet_connection">Check your Internet connection</string>
-    <string name="dont_use_big_images">Don\'t use big images</string>
     <string name="name_copied">Title copied</string>
     <string name="order_freeze_msg_one">"Wait "</string>
     <string name="order_freeze_msg_two">" sec until next order"</string>
@@ -54,5 +52,9 @@
     <string name="ask_update_rating">Do you want to update the rating?</string>
     <string name="yes">YES</string>
     <string name="no">NO</string>
-    <string name="info">Info</string>
+    <string name="author">"Author: "</string>
+    <string name="version_title">"Version: "</string>
+    <string name="background_restored">Background restored</string>
+    <string name="background_changed">Background changed</string>
+
 </resources>

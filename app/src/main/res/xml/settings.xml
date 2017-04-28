@@ -1,35 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
-        android:key="lang"
-        android:title="@string/lang_title"
-        android:summary="@string/settings_lang_summary"
         android:defaultValue="@string/default_lang"
+        android:dialogTitle="Choose language"
         android:entries="@array/lang_names"
         android:entryValues="@array/lang_values"
-        android:dialogTitle="Choose language"/>
+        android:key="lang"
+        android:summary="@string/settings_lang_summary"
+        android:title="@string/lang_title" />
     <ListPreference
-        android:key="stream_link"
-        android:title="@string/bitrate"
         android:defaultValue="@string/link_128"
+        android:dialogTitle="@string/bitrate_choose"
         android:entries="@array/bitrate_names"
         android:entryValues="@array/bitrate_values"
-        android:dialogTitle="@string/bitrate_choose"/>
+        android:key="stream_link"
+        android:title="@string/bitrate" />
     <SwitchPreference
+        android:defaultValue="true"
         android:key="reconnect"
-        android:title="@string/auto_reconnect"
-        android:summary="@string/autoreconnect_summary"
-        android:defaultValue="true"/>
+        android:title="@string/auto_reconnect" />
     <Preference
         android:key="setBackground"
-        android:title="@string/set_background"
-        android:summary="@string/dont_use_big_images" />
+        android:title="@string/set_background" />
     <Preference
         android:key="restoreBackground"
         android:title="@string/restore_background" />
     <Preference
+        android:key="copy_link_to_clipboard"
+        android:title="@string/copy_link_to_clipboard" />
+    <Preference
         android:key="bugReport"
-        android:title="@string/bug_report"
-        android:summary="email"/>
+        android:summary="email"
+        android:title="@string/bug_report" />
+    <Preference
+        android:icon="@drawable/ic_info_24dp"
+        android:key="info"
+        android:title="@string/app_name" />
 
 </PreferenceScreen>
