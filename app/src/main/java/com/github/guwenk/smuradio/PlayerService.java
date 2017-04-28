@@ -110,6 +110,11 @@ public class PlayerService extends Service {
                         BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_TIMEOUT, 5000); // connection timeout
                         BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
                         BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
+
+
+                        //BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_BUFFER, buffer);
+                        //BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, prebuffer);
+
                         // load AAC and HLS add-ons (if present)
                         BASS.BASS_PluginLoad("libbass_aac.so", 0);
                         BASS.BASS_PluginLoad("libbasshls.so", 0);

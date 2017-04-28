@@ -135,13 +135,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     final Thread pauseRate = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            ratingBar.setIsIndicator(true);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ratingBar.setIsIndicator(false);
+                                }
+                            });
                             try {
                                 Thread.sleep(1500);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            ratingBar.setIsIndicator(false);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ratingBar.setIsIndicator(false);
+                                }
+                            });
+
                         }
                     });
                     final String song_title = del_bad_symbols(titleString.getTitle());
