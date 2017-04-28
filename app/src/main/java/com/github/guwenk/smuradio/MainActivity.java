@@ -14,7 +14,6 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -84,7 +83,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         int seconds_left = (int) ((order_freeze - current_time) / 1000);
                         Toast.makeText(getApplicationContext(), getString(R.string.order_freeze_msg_one) + seconds_left + getString(R.string.order_freeze_msg_two), Toast.LENGTH_SHORT).show();
                     }
-                }
+                } else
+                    Toast.makeText(getApplicationContext(), getString(R.string.check_internet_connection), Toast.LENGTH_SHORT).show();
             }
         });
         titleTV.setOnClickListener(new View.OnClickListener() {
@@ -104,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
                 playerService = ((PlayerService.MyBinder) iBinder).getService();
-                //playerService.registerClient(MainActivity.this);
             }
 
             @Override
@@ -132,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 if (fromUser) {
                     final String song_title = del_bad_symbols(titleString.getTitle());
                     final float user_rate_from_pref = sPref.getFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), 0);
-                    if (user_rate_from_pref == 0){
+                    if (user_rate_from_pref == 0) {
                         mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {

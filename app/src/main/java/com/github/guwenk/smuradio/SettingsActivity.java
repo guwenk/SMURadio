@@ -20,7 +20,6 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
-        //setContentView(R.layout.activity_settings);
         Preference btnSetBG = findPreference(Constants.PREFERENCES.SET_BACKGROUND);
         btnSetBG.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -48,7 +47,7 @@ public class SettingsActivity extends PreferenceActivity {
             public boolean onPreferenceClick(Preference preference) {
                 Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType("message/rfc822");
-                i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"denis180799@gmail.com"});
+                i.putExtra(Intent.EXTRA_EMAIL, new String[]{"guwenk@rambler.ru"});
                 i.putExtra(Intent.EXTRA_SUBJECT, "SomeRadio bug");
                 try {
                     startActivity(Intent.createChooser(i, getString(R.string.send_email)));
@@ -64,7 +63,6 @@ public class SettingsActivity extends PreferenceActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
         Bitmap bitmap = null;
-        //ImageView imageView = (ImageView) findViewById(R.id.imageView2);
 
         switch (requestCode) {
             case GALLERY_REQUEST:
@@ -76,8 +74,6 @@ public class SettingsActivity extends PreferenceActivity {
                         e.printStackTrace();
                     }
                     String path = new FileManager(getApplicationContext()).saveBitmap(bitmap, Constants.PREFERENCES.BACKGROUND, "imageDir");
-                    //bitmap = resize(path);
-                    //new FileManager(getApplicationContext()).saveBitmap(bitmap, "background", "imageDir");
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
                     SharedPreferences.Editor ed = sp.edit();
                     ed.putString(Constants.PREFERENCES.BACKGROUND_PATH, path);
@@ -85,37 +81,4 @@ public class SettingsActivity extends PreferenceActivity {
                 }
         }
     }
-/*
-    Bitmap resize(String path) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path, options);
-        options.inSampleSize = calculateInSampleSize(options);
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeFile(path, options);
-    }
-
-    int calculateInSampleSize(BitmapFactory.Options options) {
-        Display display = getWindowManager().getDefaultDisplay();
-        int displayHeight = display.getHeight();
-        int displayWidth = display.getWidth();
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > displayHeight || width > displayWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            while ((halfHeight / inSampleSize) > displayHeight
-                    && (halfWidth / inSampleSize) > displayWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
-*/
-
 }

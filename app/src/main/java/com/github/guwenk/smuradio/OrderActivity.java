@@ -103,7 +103,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
                 if (!Objects.equals(filename, "") && filename != null) {
                     mOrderRef.setValue(filename);
                     Toast.makeText(getApplicationContext(), getString(R.string.done) + choose, Toast.LENGTH_SHORT).show();
-                    sPref.edit().putLong(Constants.OTHER.ORDER_FREEZE, System.currentTimeMillis() + 300000).apply();
+                    sPref.edit().putLong(Constants.OTHER.ORDER_FREEZE, System.currentTimeMillis() + 180000).apply();
                     finish();
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.nothing_selected, Toast.LENGTH_SHORT).show();
