@@ -49,7 +49,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
 
     private SharedPreferences sPref;
     private DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-    private DatabaseReference mOrderRef = mRootRef.child("Requests").child("order");
+    private DatabaseReference mOrderRef = mRootRef.child(Constants.FIREBASE.REQUESTS).child(Constants.FIREBASE.ORDER);
     private boolean caughtException = false;
     private NodeList trackNodeList;
     private List<Tracks> trackList = new ArrayList<>();

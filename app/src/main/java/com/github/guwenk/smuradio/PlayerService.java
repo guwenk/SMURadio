@@ -28,7 +28,7 @@ public class PlayerService extends Service {
     private static final int BASS_SYNC_HLS_SEGMENT = 0x10300;
     private static final int BASS_TAG_HLS_EXTINF = 0x14000;
     private final Object lock = new Object();
-    boolean isStarted = false;
+    private boolean isStarted = false;
     private AFListener afListener;
     private String AF_LOG_TAG = "AudioFocusListener";
     private AudioManager audioManager;
@@ -105,29 +105,14 @@ public class PlayerService extends Service {
             case Constants.ACTION.STARTFOREGROUND_ACTION: {
                 if (!isStarted) {
                     showNotification();
-                    if (BASS.BASS_Init(-1, 44100, 0)) {
-                        BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_READTIMEOUT, 15000); // read timeout
-                        BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_TIMEOUT, 5000); // connection timeout
-                        BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
-                        BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
 
 
-                        //BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_BUFFER, buffer);
-                        //BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, prebuffer);
-
-                        // load AAC and HLS add-ons (if present)
-                        BASS.BASS_PluginLoad("libbass_aac.so", 0);
-                        BASS.BASS_PluginLoad("libbasshls.so", 0);
-                    }
                     startPlayer();
                     isStarted = true;
                 } else {
                     if (isPlaying)
                         stopBASS();
                     else {
-                        afListener = new AFListener();
-                        int requestResult = audioManager.requestAudioFocus(afListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-                        Log.i(AF_LOG_TAG, "Music request focus, result: " + requestResult);
                         startPlayer();
                     }
                     updateUI(Constants.UI.BUTTON, null);
@@ -138,15 +123,12 @@ public class PlayerService extends Service {
                 if (isPlaying)
                     stopBASS();
                 else {
-                    afListener = new AFListener();
-                    int requestResult = audioManager.requestAudioFocus(afListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-                    Log.i(AF_LOG_TAG, "Music request focus, result: " + requestResult);
                     startPlayer();
                 }
                 break;
             }
             case Constants.ACTION.STOPFOREGROUND_ACTION: {
-                fullStopBASS();
+                stopPlayer();
                 updateUI(Constants.UI.BUTTON, null);
                 stopForeground(true);
                 stopSelf();
@@ -158,6 +140,25 @@ public class PlayerService extends Service {
 
     private void startPlayer() {
         if (new InternetChecker().hasConnection(getApplicationContext())) {
+            if (!sPref.getBoolean(Constants.PREFERENCES.SERVER_STATUS, true))
+                showToast(getBaseContext(), getString(R.string.server_is_off), Toast.LENGTH_LONG);
+            int buffer_size = Integer.parseInt(sPref.getString(Constants.PREFERENCES.BUFFER_SIZE, "5000"));
+            if (BASS.BASS_Init(-1, 44100, 0)) {
+                BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_READTIMEOUT, 15000); // read timeout
+                BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_TIMEOUT, 5000); // connection timeout
+                BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
+                BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
+                if (buffer_size >= 1000 && buffer_size <= 60000)
+                    BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_BUFFER, buffer_size);
+
+                // load AAC and HLS add-ons (if present)
+                BASS.BASS_PluginLoad("libbass_aac.so", 0);
+                BASS.BASS_PluginLoad("libbasshls.so", 0);
+            }
+
+            afListener = new AFListener();
+            int requestResult = audioManager.requestAudioFocus(afListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            Log.i(AF_LOG_TAG, "Music request focus, result: " + requestResult);
             new Thread(new BASS_OpenURL(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)))).start();
             IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
             registerReceiver(speakerChecker, intentFilter);
@@ -256,16 +257,9 @@ public class PlayerService extends Service {
         }
     }
 
-    private void fullStopBASS() {
-        audioManager.abandonAudioFocus(afListener);
-        try {
-            unregisterReceiver(speakerChecker);
-        } catch (IllegalArgumentException ignored) {
-        }
-        BASS.BASS_StreamFree(chan);
-        BASS.BASS_Free();
-        isPlaying = false;
-        updateUI(Constants.UI.BUTTON, null);
+    private void stopPlayer() {
+        stopBASS();
+        isStarted = false;
     }
 
     private void stopBASS() {
@@ -276,6 +270,7 @@ public class PlayerService extends Service {
         }
         reconnectCancel = true;
         BASS.BASS_StreamFree(chan);
+        BASS.BASS_Free(); //fff
         isPlaying = false;
         updateUI(Constants.UI.BUTTON, null);
     }
@@ -310,7 +305,7 @@ public class PlayerService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         if (sPref.getInt(Constants.MESSAGE.PLAYER_STATUS, -1) != 1) {
-            fullStopBASS();
+            stopPlayer();
             stopSelf();
         }
         return true;
@@ -447,6 +442,20 @@ public class PlayerService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             stopBASS();
+        }
+    }
+
+    void showToast(final Context appContext, final String message, final int duration){
+        if(null !=appContext){
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run()
+                {
+                    Toast.makeText(appContext, message, duration).show();
+                }
+            });
+
         }
     }
 }

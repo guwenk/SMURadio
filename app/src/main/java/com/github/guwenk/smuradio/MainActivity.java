@@ -34,8 +34,6 @@ import com.google.firebase.database.ValueEventListener;
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static long back_pressed;
-    final String FBDB_RATE_VAL = "rate";
-    final String FBDB_RATE_COUNT = "count";
     protected PlayerService playerService;
     protected ServiceConnection serviceConnection;
     protected float rateValue;
@@ -66,11 +64,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setContentView(R.layout.activity_main);
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         sPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sPref.registerOnSharedPreferenceChangeListener(this);
         backgroundImage = (ImageView) findViewById(R.id.main_backgroundImage);
         titleTV = (TextView) findViewById(R.id.main_status1);
         titleString = new TitleString();
         ratingTV = (TextView) findViewById(R.id.main_ratingTV);
-
 
         final Button btnToTrackOrder = (Button) findViewById(R.id.main_btnToTrackOrder);
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
@@ -125,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 startService(intent);
             }
         });
-        sPref.registerOnSharedPreferenceChangeListener(this);
 
         RatingBar ratingBar = (RatingBar) findViewById(R.id.main_RatingBar);
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
@@ -165,15 +162,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                                 rateCount = 0;
                                 rateValue = 0;
                                 try {
-                                    rateCount = dataSnapshot.child(FBDB_RATE_COUNT).getValue(Long.class);
-                                    rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
+                                    rateValue = dataSnapshot.child(Constants.FIREBASE.RATE_VAL).getValue(Float.class);
+                                    rateCount = dataSnapshot.child(Constants.FIREBASE.RATE_COUNT).getValue(Long.class);
                                 } catch (NullPointerException ignored) {
                                 }
 
                                 rateValue += rating;
                                 rateCount += 1;
-                                mRatingRef.child(song_title).child(FBDB_RATE_VAL).setValue(rateValue);
-                                mRatingRef.child(song_title).child(FBDB_RATE_COUNT).setValue(rateCount);
+                                mRatingRef.child(song_title).child(Constants.FIREBASE.RATE_VAL).setValue(rateValue);
+                                mRatingRef.child(song_title).child(Constants.FIREBASE.RATE_COUNT).setValue(rateCount);
                                 sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
 
                                 String s = String.format("%.2f", rateValue / rateCount);
@@ -196,11 +193,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                                             @Override
                                             public void onDataChange(DataSnapshot dataSnapshot) {
                                                 try {
-                                                    rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
+                                                    rateValue = dataSnapshot.child(Constants.FIREBASE.RATE_VAL).getValue(Float.class);
                                                 } catch (NullPointerException ignored) {
                                                 }
                                                 rateValue += rating - user_rate_from_pref;
-                                                mRatingRef.child(song_title).child(FBDB_RATE_VAL).setValue(rateValue);
+                                                mRatingRef.child(song_title).child(Constants.FIREBASE.RATE_VAL).setValue(rateValue);
                                                 sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
 
                                                 String s = String.format("%.2f", rateValue / rateCount);
@@ -230,6 +227,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         alertDialog.show();
                     } else ratingBar.setRating(user_rate_from_pref);
                 }
+            }
+        });
+        mRootRef.child(Constants.FIREBASE.SERVER_STATUS).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                sPref.edit().putBoolean(Constants.PREFERENCES.SERVER_STATUS, dataSnapshot.getValue(Boolean.class)).apply();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
     }
@@ -348,8 +356,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                             rateCount = 0;
                             rateValue = 0;
                             try {
-                                rateCount = dataSnapshot.child(FBDB_RATE_COUNT).getValue(Long.class);
-                                rateValue = dataSnapshot.child(FBDB_RATE_VAL).getValue(Float.class);
+                                rateCount = dataSnapshot.child(Constants.FIREBASE.RATE_COUNT).getValue(Long.class);
+                                rateValue = dataSnapshot.child(Constants.FIREBASE.RATE_VAL).getValue(Float.class);
                             } catch (NullPointerException ignored) {
                             }
                             String s = String.format("%.2f", rateValue / rateCount);

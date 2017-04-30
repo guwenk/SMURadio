@@ -69,12 +69,11 @@
 
     <ImageButton
         android:id="@+id/status_bar_collapse"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_margin="1dp"
         android:background="@null"
         android:contentDescription="@string/close_notification"
         android:src="@drawable/ic_close_24dp" />

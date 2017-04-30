@@ -15,6 +15,12 @@
         android:entryValues="@array/bitrate_values"
         android:key="stream_link"
         android:title="@string/bitrate" />
+    <EditTextPreference
+        android:defaultValue="5000"
+        android:inputType="number"
+        android:key="buffer_size"
+        android:singleLine="true"
+        android:title="Buffer Size" />
     <SwitchPreference
         android:defaultValue="true"
         android:key="reconnect"

@@ -56,5 +56,9 @@
     <string name="version_title">"Version: "</string>
     <string name="background_restored">Background restored</string>
     <string name="background_changed">Background changed</string>
+    <string name="wrong_value">Wrong value</string>
+    <string name="min_buffer">Min buffer = 1000 millis</string>
+    <string name="max_buffer">Max buffer = 60000 millis</string>
+    <string name="server_is_off">SomeRadio server is off</string>
 
 </resources>

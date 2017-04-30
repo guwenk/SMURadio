@@ -141,6 +141,8 @@ class Constants {
         String BUG_REPORT = "bugReport";
         String INFO = "info";
         String COPY_LINK_TO_CLIPBOARD = "copy_link_to_clipboard";
+        String SERVER_STATUS = "server_status";
+        String BUFFER_SIZE = "buffer_size";
     }
 
     interface MESSAGE {
@@ -160,5 +162,13 @@ class Constants {
     interface OTHER {
         String USER_RATE = "rate_value";
         String ORDER_FREEZE = "order_freeze";
+    }
+
+    interface FIREBASE {
+        String RATE_VAL = "rate";
+        String RATE_COUNT = "count";
+        String REQUESTS = "Requests";
+        String ORDER = "order";
+        String SERVER_STATUS = "ServerStatus";
     }
 }

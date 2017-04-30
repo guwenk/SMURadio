@@ -8,6 +8,9 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -18,7 +21,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     static final int GALLERY_REQUEST = 1;
     private int adminCounter;
     private SharedPreferences sPref;
@@ -29,6 +32,7 @@ public class SettingsActivity extends PreferenceActivity {
         addPreferencesFromResource(R.xml.settings);
 
         sPref = PreferenceManager.getDefaultSharedPreferences(this);
+        sPref.registerOnSharedPreferenceChangeListener(this);
         adminCounter = 0;
 
         Preference btnSetBG = findPreference(Constants.PREFERENCES.SET_BACKGROUND);
@@ -94,6 +98,7 @@ public class SettingsActivity extends PreferenceActivity {
         });
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -127,21 +132,21 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
-    private Bitmap resizer(Bitmap original){
+    private Bitmap resizer(Bitmap original) {
         Display display = getWindowManager().getDefaultDisplay();
         int displayHeight = display.getHeight();
         int displayWidth = display.getWidth();
         int originalHeight = original.getHeight();
         int originalWidth = original.getWidth();
-        float scaleH = (float)originalHeight / displayHeight;
-        float scaleW = (float)originalWidth / displayWidth;
+        float scaleH = (float) originalHeight / displayHeight;
+        float scaleW = (float) originalWidth / displayWidth;
         float scale = 1;
-        if (scaleH > 1 && scaleW > 1){
+        if (scaleH > 1 && scaleW > 1) {
             if (scaleH < scaleW) scale = scaleH;
             else scale = scaleW;
         }
-        int resultHeight = (int) (originalHeight/scale);
-        int resultWidth = (int) (originalWidth/scale);
+        int resultHeight = (int) (originalHeight / scale);
+        int resultWidth = (int) (originalWidth / scale);
         Log.d("RESIZER", "\nDisplayW: " + displayWidth
                 + "\nDisplayH: " + displayHeight
                 + "\nInputBitmapW: " + originalWidth
@@ -150,5 +155,29 @@ public class SettingsActivity extends PreferenceActivity {
                 + "\nOutputBitmapW: " + resultWidth
                 + "\nOutputBitmapH: " + resultHeight);
         return Bitmap.createScaledBitmap(original, resultWidth, resultHeight, false);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(Constants.PREFERENCES.BUFFER_SIZE)) {
+            EditTextPreference et = (EditTextPreference)findPreference(key);
+            int buffer_size;
+            try {
+                buffer_size = Integer.parseInt(sPref.getString(Constants.PREFERENCES.BUFFER_SIZE, "0"));
+            } catch (NumberFormatException e){
+                buffer_size = -1;
+            }
+            if (buffer_size < 0){
+                Toast.makeText(SettingsActivity.this, R.string.wrong_value, Toast.LENGTH_SHORT).show();
+            } else if (buffer_size < 1000) {
+                Toast.makeText(SettingsActivity.this, R.string.min_buffer, Toast.LENGTH_SHORT).show();
+                sharedPreferences.edit().putString(key, "1000").apply();
+                et.setText("1000");
+            } else if (buffer_size > 60000) {
+                Toast.makeText(SettingsActivity.this, R.string.max_buffer, Toast.LENGTH_SHORT).show();
+                sharedPreferences.edit().putString(key, "60000").apply();
+                et.setText("60000");
+            }
+        }
     }
 }

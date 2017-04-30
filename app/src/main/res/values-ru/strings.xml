@@ -19,7 +19,6 @@
     <string name="background">Фон</string>
     <string name="auto_reconnect">Авто-переподключение</string>
     <string name="app_name">SomeRadio</string>
-    <string name="autoreconnect_summary">Нестабильно</string>
     <string name="restore_background">Восстановить фон</string>
     <string name="set_background">Установить фон</string>
     <string name="on_back_pressed">Нажмите еще раз, чтобы выйти!</string>
@@ -27,7 +26,6 @@
     <string name="default_status">Радио выключено</string>
     <string name="waiting_for_internet">Ожидание интернет соединения…</string>
     <string name="check_internet_connection">Проверьте подключение к Интернету</string>
-    <string name="dont_use_big_images">Не используйте большие изображения</string>
     <string name="name_copied">Название скопировано</string>
     <string name="order_freeze_msg_one">"Подождите "</string>
     <string name="order_freeze_msg_two">" сек. до следующего заказа"</string>
@@ -43,4 +41,8 @@
     <string name="author">"Автор: "</string>
     <string name="background_changed">Фон изменён</string>
     <string name="background_restored">Фон восстановлен</string>
+    <string name="max_buffer">Макс. буфер = 60000 мс</string>
+    <string name="min_buffer">Мин. буфер = 1000 мс</string>
+    <string name="server_is_off">Сервер SomeRadio выключен</string>
+    <string name="wrong_value">Неверное значение</string>
 </resources>
