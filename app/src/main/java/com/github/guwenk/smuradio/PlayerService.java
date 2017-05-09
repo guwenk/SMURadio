@@ -28,6 +28,7 @@ public class PlayerService extends Service {
     private static final int BASS_SYNC_HLS_SEGMENT = 0x10300;
     private static final int BASS_TAG_HLS_EXTINF = 0x14000;
     private final Object lock = new Object();
+    private Toast toast;
     private boolean isStarted = false;
     private AFListener afListener;
     private String AF_LOG_TAG = "AudioFocusListener";
@@ -40,7 +41,6 @@ public class PlayerService extends Service {
     private boolean reconnectCancel = false;
     private SpeakerChecker speakerChecker;
     private String temp_title = "";
-
     private int req, chan;
     private Handler handler = new Handler();
     private BASS.SYNCPROC MetaSync = new BASS.SYNCPROC() {
@@ -68,7 +68,7 @@ public class PlayerService extends Service {
                 BASS.BASS_ChannelSetSync(chan, BASS.BASS_SYNC_END, 0, EndSync, 0);
                 BASS.BASS_ChannelPlay(chan, false);
             } else {
-                updateUI(Constants.UI.STATUS, getString(R.string.buffering) + " (" + progress + "%)");
+                updateUI(getString(R.string.buffering) + " (" + progress + "%)");
                 handler.postDelayed(this, 50);
             }
         }
@@ -88,7 +88,6 @@ public class PlayerService extends Service {
             }
         }
     };
-
 
     @Override
     public void onCreate() {
@@ -115,7 +114,7 @@ public class PlayerService extends Service {
                     else {
                         startPlayer();
                     }
-                    updateUI(Constants.UI.BUTTON, null);
+                    updateUI(null);
                 }
                 break;
             }
@@ -129,7 +128,7 @@ public class PlayerService extends Service {
             }
             case Constants.ACTION.STOPFOREGROUND_ACTION: {
                 stopPlayer();
-                updateUI(Constants.UI.BUTTON, null);
+                updateUI(null);
                 stopForeground(true);
                 stopSelf();
                 break;
@@ -140,8 +139,9 @@ public class PlayerService extends Service {
 
     private void startPlayer() {
         if (new InternetChecker().hasConnection(getApplicationContext())) {
-            if (!sPref.getBoolean(Constants.PREFERENCES.SERVER_STATUS, true))
+            if (((MyApplication)getApplication()).loadServerStatus()) {
                 showToast(getBaseContext(), getString(R.string.server_is_off), Toast.LENGTH_LONG);
+            }
             int buffer_size = Integer.parseInt(sPref.getString(Constants.PREFERENCES.BUFFER_SIZE, "5000"));
             if (BASS.BASS_Init(-1, 44100, 0)) {
                 BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_READTIMEOUT, 15000); // read timeout
@@ -163,7 +163,7 @@ public class PlayerService extends Service {
             IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
             registerReceiver(speakerChecker, intentFilter);
             isPlaying = true;
-            updateUI(Constants.UI.BUTTON, null);
+            updateUI(null);
         } else {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(new Runnable() {
@@ -181,8 +181,9 @@ public class PlayerService extends Service {
             new Thread(new BASS_OpenURL(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)))).start();
         } else if (reconnectCancel) {
             reconnectCancel = false;
+            stopBASS();
         } else {
-            updateUI(Constants.UI.STATUS, getString(R.string.waiting_for_internet));
+            updateUI(getString(R.string.waiting_for_internet));
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -194,19 +195,8 @@ public class PlayerService extends Service {
 
     @Override
     public void onDestroy() {
-        updateUI(Constants.UI.BUTTON, null);
+        updateUI(null);
         super.onDestroy();
-    }
-
-    private void updateActivity(String message_type, String message) {
-        SharedPreferences.Editor ed = sPref.edit();
-        if (message_type.equals(Constants.MESSAGE.MUSIC_TITLE)) {
-            ed.putString(Constants.MESSAGE.MUSIC_TITLE, message);
-        } else if (message_type.equals(Constants.MESSAGE.PLAYER_STATUS)) {
-            if (isPlaying) ed.putInt(Constants.MESSAGE.PLAYER_STATUS, 1);
-            else ed.putInt(Constants.MESSAGE.PLAYER_STATUS, 0);
-        }
-        ed.apply();
     }
 
     private void showNotification() {
@@ -238,23 +228,24 @@ public class PlayerService extends Service {
         startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
     }
 
-    void updateUI(String element, String text) {
-        switch (element) {
-            case Constants.UI.STATUS: {
-                refreshTitle(text);
-                updateActivity(Constants.MESSAGE.MUSIC_TITLE, text);
-                break;
-            }
-            case Constants.UI.BUTTON: {
-                if (isPlaying) toStopButton();
-                else {
-                    toPlayButton();
-                    updateUI(Constants.UI.STATUS, getString(R.string.default_status));
-                }
-                updateActivity(Constants.MESSAGE.PLAYER_STATUS, null);
-                break;
-            }
+    private void updateActivity(String title) {
+        MyApplication myApplication = (MyApplication) getApplication();
+        myApplication.saveTitle(title);
+    }
+
+    void updateUI(String text) {
+        if (text != null) {
+            refreshTitle(text);
         }
+        if (isPlaying) {
+            updateActivity(text);
+            toStopButton();
+        } else {
+            refreshTitle(getString(R.string.default_status));
+            updateActivity(null);
+            toPlayButton();
+        }
+
     }
 
     private void stopPlayer() {
@@ -270,9 +261,9 @@ public class PlayerService extends Service {
         }
         reconnectCancel = true;
         BASS.BASS_StreamFree(chan);
-        BASS.BASS_Free(); //fff
+        BASS.BASS_Free();
         isPlaying = false;
-        updateUI(Constants.UI.BUTTON, null);
+        updateUI(null);
     }
 
     private void toPlayButton() {
@@ -301,16 +292,14 @@ public class PlayerService extends Service {
         return binder;
     }
 
-
     @Override
     public boolean onUnbind(Intent intent) {
-        if (sPref.getInt(Constants.MESSAGE.PLAYER_STATUS, -1) != 1) {
+        if (!isPlaying) {
             stopPlayer();
             stopSelf();
         }
         return true;
     }
-
 
     private void bassError(final String es) {
         final int errorCode = BASS.BASS_ErrorGetCode();
@@ -322,14 +311,9 @@ public class PlayerService extends Service {
         //ed.putString(Constants.UI.BASS_ERROR_LOG, savedText + myDate + " | E:" + errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + " (" + es + ")\n");
         //ed.apply();
         Log.i("PLAYER_BASS", errorCode + " " + new Constants().getBASS_ErrorFromCode(errorCode) + " (" + es + ")");
+        BASS.BASS_StreamFree(chan);
         if (sPref.getBoolean(Constants.PREFERENCES.RECONNECT, true)) {
-            try {
-                Thread.sleep(300);
-                reconnectPlayer();
-            } catch (InterruptedException e) {
-                stopBASS();
-                e.printStackTrace();
-            }
+            reconnectPlayer();
         } else
             stopBASS();
     }
@@ -340,7 +324,7 @@ public class PlayerService extends Service {
             int ti = meta.indexOf("StreamTitle='");
             if (ti >= 0) {
                 String title = meta.substring(ti + 13, meta.indexOf("';", ti + 13));
-                updateUI(Constants.UI.STATUS, title);
+                updateUI(title);
             }
         } else {
             String[] ogg = (String[]) BASS.BASS_ChannelGetTags(chan, BASS.BASS_TAG_OGG);
@@ -354,9 +338,9 @@ public class PlayerService extends Service {
                 }
                 if (title != null) {
                     if (artist != null) {
-                        updateUI(Constants.UI.STATUS, title + " - " + title);
+                        updateUI(title + " - " + title);
                     } else {
-                        updateUI(Constants.UI.STATUS, title);
+                        updateUI(title);
                     }
                 }
             } else {
@@ -364,10 +348,25 @@ public class PlayerService extends Service {
                 if (meta != null) {
                     int i = meta.indexOf(',');
                     if (i > 0) {
-                        updateUI(Constants.UI.STATUS, meta.substring(i + 1));
+                        updateUI(meta.substring(i + 1));
                     }
                 }
             }
+        }
+    }
+
+    void showToast(final Context appContext, final String message, final int duration) {
+        if (null != appContext) {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (toast != null) toast.cancel();
+                    toast = Toast.makeText(appContext, message, duration);
+                    toast.show();
+                }
+            });
+
         }
     }
 
@@ -385,7 +384,7 @@ public class PlayerService extends Service {
                 r = ++req;
             }
             BASS.BASS_StreamFree(chan);
-            updateUI(Constants.UI.STATUS, getString(R.string.connecting));
+            updateUI(getString(R.string.connecting));
 
             int connection = BASS.BASS_StreamCreateURL(url, 0, BASS.BASS_STREAM_BLOCK | BASS.BASS_STREAM_STATUS | BASS.BASS_STREAM_AUTOFREE, StatusProc, r);
             synchronized (lock) {
@@ -402,7 +401,6 @@ public class PlayerService extends Service {
             }
         }
     }
-
 
     private class AFListener implements AudioManager.OnAudioFocusChangeListener {
         @Override
@@ -442,20 +440,6 @@ public class PlayerService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             stopBASS();
-        }
-    }
-
-    void showToast(final Context appContext, final String message, final int duration){
-        if(null !=appContext){
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run()
-                {
-                    Toast.makeText(appContext, message, duration).show();
-                }
-            });
-
         }
     }
 }

@@ -20,7 +20,7 @@
         android:inputType="number"
         android:key="buffer_size"
         android:singleLine="true"
-        android:title="Buffer Size" />
+        android:title="@string/buffer_size" />
     <SwitchPreference
         android:defaultValue="true"
         android:key="reconnect"

@@ -64,7 +64,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                 Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType("message/rfc822");
                 i.putExtra(Intent.EXTRA_EMAIL, new String[]{"guwenk@rambler.ru"});
-                i.putExtra(Intent.EXTRA_SUBJECT, "SomeRadio bug");
+                i.putExtra(Intent.EXTRA_SUBJECT, "SomeRadio");
                 try {
                     startActivity(Intent.createChooser(i, getString(R.string.send_email)));
                 } catch (android.content.ActivityNotFoundException ex) {
@@ -89,7 +89,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         preferenceInfo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                if (adminCounter >= 5) {
+                if (adminCounter == 4) {
                     Intent intent = new Intent(SettingsActivity.this, AdminActivity.class);
                     startActivity(intent);
                 } else adminCounter++;

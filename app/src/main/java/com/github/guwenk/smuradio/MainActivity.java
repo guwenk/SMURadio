@@ -1,11 +1,13 @@
 package com.github.guwenk.smuradio;
 
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -31,7 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends AppCompatActivity {
 
     private static long back_pressed;
     protected PlayerService playerService;
@@ -45,7 +47,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private ImageView backgroundImage;
     private TextView titleTV;
     private TextView ratingTV;
-
+    private MyApplication myApplication;
+    private BroadcastReceiver broadcastReceiver;
+    private Toast toastInternetConnection;
+    private Toast toastOrderWait;
 
     @Override
     protected void onPause() {
@@ -55,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onDestroy() {
         unbindService(serviceConnection);
+        unregisterReceiver(broadcastReceiver);
         super.onDestroy();
     }
 
@@ -64,11 +70,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setContentView(R.layout.activity_main);
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
         sPref = PreferenceManager.getDefaultSharedPreferences(this);
-        sPref.registerOnSharedPreferenceChangeListener(this);
         backgroundImage = (ImageView) findViewById(R.id.main_backgroundImage);
         titleTV = (TextView) findViewById(R.id.main_status1);
         titleString = new TitleString();
         ratingTV = (TextView) findViewById(R.id.main_ratingTV);
+
+        myApplication = (MyApplication) getApplication();
 
         final Button btnToTrackOrder = (Button) findViewById(R.id.main_btnToTrackOrder);
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
@@ -82,10 +89,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                         startActivity(intent);
                     } else {
                         int seconds_left = (int) ((order_freeze - current_time) / 1000);
-                        Toast.makeText(getApplicationContext(), getString(R.string.order_freeze_msg_one) + seconds_left + getString(R.string.order_freeze_msg_two), Toast.LENGTH_SHORT).show();
+                        if (toastOrderWait != null) toastOrderWait.cancel();
+                        toastOrderWait = Toast.makeText(getApplicationContext(), getString(R.string.order_freeze_msg_one) + seconds_left + getString(R.string.order_freeze_msg_two), Toast.LENGTH_SHORT);
+                        toastOrderWait.show();
                     }
-                } else
-                    Toast.makeText(getApplicationContext(), getString(R.string.check_internet_connection), Toast.LENGTH_SHORT).show();
+                } else {
+                    if (toastInternetConnection != null)
+                        toastInternetConnection.cancel();
+                    toastInternetConnection = Toast.makeText(getApplicationContext(), getString(R.string.check_internet_connection), Toast.LENGTH_SHORT);
+                    toastInternetConnection.show();
+                }
+
             }
         });
         titleTV.setOnClickListener(new View.OnClickListener() {
@@ -197,11 +211,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                                                 } catch (NullPointerException ignored) {
                                                 }
                                                 rateValue += rating - user_rate_from_pref;
-                                                mRatingRef.child(song_title).child(Constants.FIREBASE.RATE_VAL).setValue(rateValue);
-                                                sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
+                                                if (rateValue > 0) {
+                                                    mRatingRef.child(song_title).child(Constants.FIREBASE.RATE_VAL).setValue(rateValue);
+                                                    sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), rating).apply();
 
-                                                String s = String.format("%.2f", rateValue / rateCount);
-                                                ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
+                                                    String s = String.format("%.2f", rateValue / rateCount);
+                                                    ratingTV.setText(!s.equals("NaN") ? s : getString(R.string.zero));
+                                                } else {
+                                                    sPref.edit().putFloat(Constants.OTHER.USER_RATE + titleString.getTitle(), 0).apply();
+                                                    ratingBar.setRating(0);
+                                                    Toast.makeText(getApplicationContext(), "Something wrong! Your rate cleared!", Toast.LENGTH_SHORT).show();
+                                                }
                                             }
 
                                             @Override
@@ -232,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mRootRef.child(Constants.FIREBASE.SERVER_STATUS).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                sPref.edit().putBoolean(Constants.PREFERENCES.SERVER_STATUS, dataSnapshot.getValue(Boolean.class)).apply();
+                myApplication.saveServerStatus(dataSnapshot.getValue(Boolean.class));
             }
 
             @Override
@@ -240,13 +260,25 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             }
         });
+
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                updateActivity();
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(Constants.ACTION.UPDATE_ACTIVITY_ACTION);
+        registerReceiver(broadcastReceiver, intentFilter);
     }
 
 
     @Override
     protected void onStart() {
         super.onStart();
-        onSharedPreferenceChanged(sPref, Constants.MESSAGE.PLAYER_STATUS);
+
+        updateActivity();
+
         String path = sPref.getString(Constants.PREFERENCES.BACKGROUND_PATH, "");
         Bitmap backgroundBitmap;
         if (path.equals("")) {
@@ -260,6 +292,22 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         bindService(intent, serviceConnection, 0);
     }
 
+    void updateActivity() {
+        ImageButton imageButton = (ImageButton) findViewById(R.id.main_play_button);
+        String songTitle = myApplication.loadTitle();
+        if (songTitle != null) {
+            titleTV.setText(songTitle);
+            if (!titleString.getTitle().equals(songTitle))
+                titleString.setTitle(songTitle);
+            titleTV.setVisibility(View.VISIBLE);
+            imageButton.setImageResource(R.drawable.ic_stop);
+        } else {
+            titleTV.setText("");
+            titleString.setTitle("");
+            titleTV.setVisibility(View.INVISIBLE);
+            imageButton.setImageResource(R.drawable.ic_play_arrow);
+        }
+    }
 
     @Override
     public void onBackPressed() {
@@ -288,36 +336,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        switch (key) {
-            case Constants.MESSAGE.MUSIC_TITLE:
-            case Constants.MESSAGE.PLAYER_STATUS: {
-                ImageButton imageButton = (ImageButton) findViewById(R.id.main_play_button);
-                int player_status = sharedPreferences.getInt(Constants.MESSAGE.PLAYER_STATUS, -1);
-                String player_title = sharedPreferences.getString(Constants.MESSAGE.MUSIC_TITLE, "");
-                switch (player_status) {
-                    case 0: {
-                        titleTV.setText("");
-                        titleString.setTitle("");
-                        findViewById(R.id.main_status1).setVisibility(View.INVISIBLE);
-                        imageButton.setImageResource(R.drawable.ic_play_arrow);
-                        break;
-                    }
-                    case 1: {
-                        titleTV.setText(player_title);
-                        if (!titleString.getTitle().equals(player_title))
-                            titleString.setTitle(player_title);
-                        findViewById(R.id.main_status1).setVisibility(View.VISIBLE);
-                        imageButton.setImageResource(R.drawable.ic_stop);
-                        break;
-                    }
-                }
-                break;
-            }
         }
     }
 
@@ -366,7 +384,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                             ratingTV.setVisibility(View.VISIBLE);
                             float user_rate_from_pref = sPref.getFloat(Constants.OTHER.USER_RATE + getTitle(), 0);
                             if (user_rate_from_pref != 0) {
-                                ratingBar.setRating(user_rate_from_pref);
+                                if (rateValue != 0 && rateCount != 0)
+                                    ratingBar.setRating(user_rate_from_pref);
+                                else {
+                                    sPref.edit().putFloat(Constants.OTHER.USER_RATE + getTitle(), 0).apply();
+                                    ratingBar.setRating(0);
+                                }
                             }
                         }
                     }

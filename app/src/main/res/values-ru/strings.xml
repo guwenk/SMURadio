@@ -45,4 +45,5 @@
     <string name="min_buffer">Мин. буфер = 1000 мс</string>
     <string name="server_is_off">Сервер SomeRadio выключен</string>
     <string name="wrong_value">Неверное значение</string>
+    <string name="buffer_size">Размер буфера</string>
 </resources>
