@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -15,6 +16,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -27,6 +29,7 @@ import java.nio.charset.Charset;
 public class PlayerService extends Service {
     private static final int BASS_SYNC_HLS_SEGMENT = 0x10300;
     private static final int BASS_TAG_HLS_EXTINF = 0x14000;
+    private static long mediaKeyPressed = 0;
     private final Object lock = new Object();
     private Toast toast;
     private boolean isStarted = false;
@@ -95,6 +98,26 @@ public class PlayerService extends Service {
         speakerChecker = new SpeakerChecker();
         sPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.registerMediaButtonEventReceiver(new ComponentName(this, RemoteControlReceiver.class));
+    }
+
+    public static class RemoteControlReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
+                KeyEvent keyEvent = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK) {
+                    if (mediaKeyPressed + 1000 > System.currentTimeMillis() && mediaKeyPressed + 100 < System.currentTimeMillis()) {
+                        Intent intentPlayBtn = new Intent(context, PlayerService.class);
+                        intentPlayBtn.setAction(Constants.ACTION.ONLY_STOP_ACTION);
+                        context.startService(intentPlayBtn);
+                        intentPlayBtn.setAction(Constants.ACTION.ONLY_PLAY_ACTION);
+                        context.startService(intentPlayBtn);
+                    }
+                    mediaKeyPressed = System.currentTimeMillis();
+                }
+            }
+        }
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -104,8 +127,6 @@ public class PlayerService extends Service {
             case Constants.ACTION.STARTFOREGROUND_ACTION: {
                 if (!isStarted) {
                     showNotification();
-
-
                     startPlayer();
                     isStarted = true;
                 } else {
@@ -131,6 +152,14 @@ public class PlayerService extends Service {
                 updateUI(null);
                 stopForeground(true);
                 stopSelf();
+                break;
+            }
+            case Constants.ACTION.ONLY_PLAY_ACTION:{
+                startPlayer();
+                break;
+            }
+            case Constants.ACTION.ONLY_STOP_ACTION:{
+                stopBASS();
                 break;
             }
         }
@@ -195,6 +224,7 @@ public class PlayerService extends Service {
 
     @Override
     public void onDestroy() {
+        audioManager.unregisterMediaButtonEventReceiver(new ComponentName(this, RemoteControlReceiver.class));
         updateUI(null);
         super.onDestroy();
     }

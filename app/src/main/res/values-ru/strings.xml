@@ -47,4 +47,6 @@
     <string name="wrong_value">Неверное значение</string>
     <string name="buffer_size">Размер буфера</string>
     <string name="build">"Сборка: "</string>
+    <string name="double_click_to_reconnect">Двойной клик для переподключения</string>
+    <string name="on_headset">На гарнитуре</string>
 </resources>

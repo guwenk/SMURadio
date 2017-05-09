@@ -62,5 +62,7 @@
     <string name="server_is_off">SomeRadio server is off</string>
     <string name="buffer_size">Buffer Size</string>
     <string name="build">"Build: "</string>
+    <string name="double_click_to_reconnect">Double click to reconnect</string>
+    <string name="on_headset">On headset</string>
 
 </resources>

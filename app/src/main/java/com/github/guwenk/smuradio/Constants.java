@@ -131,6 +131,8 @@ class Constants {
         String UPDATE_ACTIVITY_ACTION = "com.github.guwenk.smuradio.updateActivity";
         String WIDGET_BUTTON_PLAY = "com.github.guwenk.smuradio.action.widget.play";
         String WIDGET_REFRESH_UI = "com.github.guwenk.smuradio.action.widget.refresh";
+        String ONLY_PLAY_ACTION = "com.github.guwenk.smuradio.action.only.play";
+        String ONLY_STOP_ACTION = "com.github.guwenk.smuradio.action.only.stop";
     }
 
     interface PREFERENCES {

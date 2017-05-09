@@ -25,6 +25,11 @@
         android:defaultValue="true"
         android:key="reconnect"
         android:title="@string/auto_reconnect" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="double_click"
+        android:title="@string/double_click_to_reconnect"
+        android:summary="@string/on_headset"/>
     <Preference
         android:key="setBackground"
         android:title="@string/set_background" />
