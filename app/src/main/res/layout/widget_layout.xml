@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widget_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,7 +16,8 @@
         android:text="@string/app_name"
         android:textColor="#ffffff"
         android:textSize="18dp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:ignore="SpUsage" />
 
 
     <ImageButton
@@ -54,6 +56,7 @@
         android:layout_toRightOf="@+id/widget_radio_icon"
         android:maxLines="2"
         android:textColor="@color/colorStick"
-        android:textSize="16dp" />
+        android:textSize="16dp"
+        tools:ignore="SpUsage" />
 
 </RelativeLayout>
