@@ -61,5 +61,6 @@
     <string name="max_buffer">Max buffer = 60000 millis</string>
     <string name="server_is_off">SomeRadio server is off</string>
     <string name="buffer_size">Buffer Size</string>
+    <string name="build">"Build: "</string>
 
 </resources>

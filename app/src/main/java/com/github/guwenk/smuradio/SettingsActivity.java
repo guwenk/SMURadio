@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +21,11 @@ import android.view.Display;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     static final int GALLERY_REQUEST = 1;
@@ -84,8 +90,11 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                 return true;
             }
         });
+
+        SimpleDateFormat format= new SimpleDateFormat("yyMMddkkmm", Locale.getDefault());
+        String build = format.format(new Date(BuildConfig.TIMESTAMP));
         Preference preferenceInfo = findPreference(Constants.PREFERENCES.INFO);
-        preferenceInfo.setSummary(getString(R.string.author) + "Guwenk" + "\n" + getString(R.string.version_title) + getString(R.string.version));
+        preferenceInfo.setSummary(getString(R.string.author) + "Guwenk" + "\n" + getString(R.string.version_title) + getString(R.string.version) + "\n" + getString(R.string.build) + build);
         preferenceInfo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -147,7 +156,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         }
         int resultHeight = (int) (originalHeight / scale);
         int resultWidth = (int) (originalWidth / scale);
-        Log.d("RESIZER", "\nDisplayW: " + displayWidth
+        Log.i("RESIZER", "\nDisplayW: " + displayWidth
                 + "\nDisplayH: " + displayHeight
                 + "\nInputBitmapW: " + originalWidth
                 + "\nInputBitmapH: " + originalHeight
