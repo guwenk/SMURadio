@@ -129,6 +129,8 @@ class Constants {
         String STARTFOREGROUND_ACTION = "com.github.guwenk.smuradio.action.startforeground";
         String STOPFOREGROUND_ACTION = "com.github.guwenk.smuradio.action.stopforeground";
         String UPDATE_ACTIVITY_ACTION = "com.github.guwenk.smuradio.updateActivity";
+        String WIDGET_BUTTON_PLAY = "com.github.guwenk.smuradio.action.widget.play";
+        String WIDGET_REFRESH_UI = "com.github.guwenk.smuradio.action.widget.refresh";
     }
 
     interface PREFERENCES {
@@ -152,6 +154,7 @@ class Constants {
     interface OTHER {
         String USER_RATE = "rate_value";
         String ORDER_FREEZE = "order_freeze";
+        String SONG_TITLE_INTENT = "song_title";
     }
 
     interface FIREBASE {

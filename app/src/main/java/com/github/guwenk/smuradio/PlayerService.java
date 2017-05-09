@@ -139,7 +139,7 @@ public class PlayerService extends Service {
 
     private void startPlayer() {
         if (new InternetChecker().hasConnection(getApplicationContext())) {
-            if (((MyApplication)getApplication()).loadServerStatus()) {
+            if (!((MyApplication) getApplication()).getServerStatus()) {
                 showToast(getBaseContext(), getString(R.string.server_is_off), Toast.LENGTH_LONG);
             }
             int buffer_size = Integer.parseInt(sPref.getString(Constants.PREFERENCES.BUFFER_SIZE, "5000"));

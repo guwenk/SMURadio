@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background">
+
+    <TextView
+        android:id="@+id/widget_radio_head"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_toEndOf="@+id/widget_status_bar_play"
+        android:layout_toRightOf="@+id/widget_status_bar_play"
+        android:text="@string/app_name"
+        android:textColor="#ffffff"
+        android:textSize="18dp"
+        android:textStyle="bold" />
+
+
+    <ImageButton
+        android:id="@+id/widget_status_bar_play"
+        android:layout_width="64dp"
+        android:layout_height="80dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
+        android:background="@null"
+        android:contentDescription="@string/play_and_stop"
+        android:padding="8dp"
+        android:paddingEnd="0dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="0dp"
+        android:paddingStart="4dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_play_circle_outline_24px" />
+
+    <ImageView
+        android:id="@+id/widget_radio_icon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_below="@+id/widget_radio_head"
+        android:layout_marginTop="2dp"
+        android:layout_toEndOf="@+id/widget_status_bar_play"
+        android:layout_toRightOf="@+id/widget_status_bar_play"
+        android:contentDescription="@string/radio_image"
+        android:src="@drawable/ic_radio_24dp" />
+
+    <TextView
+        android:id="@+id/widget_status_bar_track_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/widget_radio_head"
+        android:layout_toEndOf="@+id/widget_radio_icon"
+        android:layout_toRightOf="@+id/widget_radio_icon"
+        android:maxLines="2"
+        android:textColor="@color/colorStick"
+        android:textSize="16dp" />
+
+</RelativeLayout>

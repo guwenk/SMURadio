@@ -249,17 +249,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        mRootRef.child(Constants.FIREBASE.SERVER_STATUS).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                myApplication.saveServerStatus(dataSnapshot.getValue(Boolean.class));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
 
         broadcastReceiver = new BroadcastReceiver() {
