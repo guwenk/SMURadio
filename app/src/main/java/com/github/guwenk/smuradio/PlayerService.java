@@ -167,6 +167,7 @@ public class PlayerService extends Service {
     }
 
     private void startPlayer() {
+        reconnectCancel = false;
         if (new InternetChecker().hasConnection(getApplicationContext())) {
             if (!((MyApplication) getApplication()).getServerStatus()) {
                 showToast(getBaseContext(), getString(R.string.server_is_off), Toast.LENGTH_LONG);
@@ -210,7 +211,6 @@ public class PlayerService extends Service {
             new Thread(new BASS_OpenURL(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)))).start();
         } else if (reconnectCancel) {
             reconnectCancel = false;
-            stopBASS();
         } else {
             updateUI(getString(R.string.waiting_for_internet));
             try {
@@ -224,7 +224,6 @@ public class PlayerService extends Service {
 
     @Override
     public void onDestroy() {
-        audioManager.unregisterMediaButtonEventReceiver(new ComponentName(this, RemoteControlReceiver.class));
         updateUI(null);
         super.onDestroy();
     }
