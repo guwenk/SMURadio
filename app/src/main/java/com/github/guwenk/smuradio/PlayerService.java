@@ -98,7 +98,6 @@ public class PlayerService extends Service {
         speakerChecker = new SpeakerChecker();
         sPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.registerMediaButtonEventReceiver(new ComponentName(this, RemoteControlReceiver.class));
     }
 
     public static class RemoteControlReceiver extends BroadcastReceiver {
@@ -168,6 +167,7 @@ public class PlayerService extends Service {
 
     private void startPlayer() {
         reconnectCancel = false;
+        audioManager.registerMediaButtonEventReceiver(new ComponentName(this, RemoteControlReceiver.class));
         if (new InternetChecker().hasConnection(getApplicationContext())) {
             if (!((MyApplication) getApplication()).getServerStatus()) {
                 showToast(getBaseContext(), getString(R.string.server_is_off), Toast.LENGTH_LONG);
