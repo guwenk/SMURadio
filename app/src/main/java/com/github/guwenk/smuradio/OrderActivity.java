@@ -61,12 +61,6 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
     private boolean isClosed = false;
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        isClosed = true;
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
@@ -177,6 +171,12 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
             }
         }).start();
         return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        isClosed = true;
+        super.onBackPressed();
     }
 
     //Парсинг XML из сети
