@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="version" translatable="false">1.0 (pre-release 1)</string>
+    <string name="version" translatable="false">1.0 (pre-release 2)</string>
     <string name="link_128" translatable="false">http://free.radioheart.ru:8000/guwenk128</string>
     <string name="default_lang" translatable="false">default</string>
     <string-array name="bitrate_values">

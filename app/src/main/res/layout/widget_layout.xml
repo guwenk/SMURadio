@@ -5,7 +5,7 @@
     android:layout_marginBottom="4dp"
     android:id="@+id/widget_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@drawable/widget_background">
 
     <TextView
@@ -24,16 +24,14 @@
 
     <ImageButton
         android:id="@+id/widget_status_bar_play"
-        android:layout_width="64dp"
+        android:layout_width="72dp"
         android:layout_height="72dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginRight="4dp"
         android:background="@null"
         android:contentDescription="@string/play_and_stop"
         android:padding="8dp"
-        android:paddingEnd="0dp"
+        android:paddingEnd="4dp"
         android:paddingLeft="4dp"
-        android:paddingRight="0dp"
+        android:paddingRight="4dp"
         android:paddingStart="4dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_play_circle_outline_24px" />

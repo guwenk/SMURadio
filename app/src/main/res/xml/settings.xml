@@ -41,7 +41,7 @@
     <Preference
         android:key="bugReport"
         android:summary="email"
-        android:title="@string/bug_report" />
+        android:title="@string/contact_the_developer" />
     <Preference
         android:icon="@drawable/ic_info_24dp"
         android:key="info"
