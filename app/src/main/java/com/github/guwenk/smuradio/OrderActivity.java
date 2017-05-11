@@ -58,6 +58,13 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
     private String choose;
     private ArrayAdapter<String> adapter;
     private ImageView backgroundImage;
+    private boolean isClosed = false;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        isClosed = true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -232,7 +239,8 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
                 findViewById(R.id.buttonOrder).setVisibility(View.VISIBLE);
                 adapter.notifyDataSetChanged();
             } else {
-                Toast.makeText(getApplicationContext(), R.string.unable_to_connect_to_server, Toast.LENGTH_LONG).show();
+                if (!isClosed)
+                    Toast.makeText(getApplicationContext(), R.string.unable_to_connect_to_server, Toast.LENGTH_LONG).show();
                 finish();
             }
         }

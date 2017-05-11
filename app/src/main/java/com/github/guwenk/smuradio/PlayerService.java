@@ -100,28 +100,6 @@ public class PlayerService extends Service {
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
     }
 
-    public static class RemoteControlReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Constants.PREFERENCES.HEADSET_BUTTON, true)) {
-                if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
-                    KeyEvent keyEvent = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-                    if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK) {
-                        if (mediaKeyPressed + 1000 > System.currentTimeMillis() && mediaKeyPressed + 100 < System.currentTimeMillis()) {
-                            Intent intentPlayBtn = new Intent(context, PlayerService.class);
-                            intentPlayBtn.setAction(Constants.ACTION.ONLY_STOP_ACTION);
-                            context.startService(intentPlayBtn);
-                            intentPlayBtn.setAction(Constants.ACTION.ONLY_PLAY_ACTION);
-                            context.startService(intentPlayBtn);
-                        }
-                        mediaKeyPressed = System.currentTimeMillis();
-                    }
-                }
-            }
-
-        }
-    }
-
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = (intent.getAction() == null ? "null" : intent.getAction());
 
@@ -156,11 +134,11 @@ public class PlayerService extends Service {
                 stopSelf();
                 break;
             }
-            case Constants.ACTION.ONLY_PLAY_ACTION:{
+            case Constants.ACTION.ONLY_PLAY_ACTION: {
                 startPlayer();
                 break;
             }
-            case Constants.ACTION.ONLY_STOP_ACTION:{
+            case Constants.ACTION.ONLY_STOP_ACTION: {
                 stopBASS();
                 break;
             }
@@ -398,6 +376,28 @@ public class PlayerService extends Service {
                     toast.show();
                 }
             });
+
+        }
+    }
+
+    public static class RemoteControlReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Constants.PREFERENCES.HEADSET_BUTTON, true)) {
+                if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
+                    KeyEvent keyEvent = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                    if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK) {
+                        if (mediaKeyPressed + 1000 > System.currentTimeMillis() && mediaKeyPressed + 100 < System.currentTimeMillis()) {
+                            Intent intentPlayBtn = new Intent(context, PlayerService.class);
+                            intentPlayBtn.setAction(Constants.ACTION.ONLY_STOP_ACTION);
+                            context.startService(intentPlayBtn);
+                            intentPlayBtn.setAction(Constants.ACTION.ONLY_PLAY_ACTION);
+                            context.startService(intentPlayBtn);
+                        }
+                        mediaKeyPressed = System.currentTimeMillis();
+                    }
+                }
+            }
 
         }
     }

@@ -5,13 +5,10 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -26,8 +23,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     static final int GALLERY_REQUEST = 1;
@@ -93,7 +88,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             }
         });
 
-        SimpleDateFormat format= new SimpleDateFormat("yyMMddkkmm", Locale.getDefault());
+        SimpleDateFormat format = new SimpleDateFormat("yyMMddkkmm", Locale.getDefault());
         String build = format.format(new Date(BuildConfig.TIMESTAMP));
         Preference preferenceInfo = findPreference(Constants.PREFERENCES.INFO);
         preferenceInfo.setSummary(getString(R.string.author) + "Guwenk" + "\n" + getString(R.string.version_title) + getString(R.string.version) + "\n" + getString(R.string.build) + build);
@@ -168,7 +163,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         return Bitmap.createScaledBitmap(original, resultWidth, resultHeight, false);
     }
 
-    void localize(){
+    void localize() {
         String lang = sPref.getString(Constants.PREFERENCES.LANGUAGE, "default");
         if (lang.equals("default")) {
             lang = sPref.getString(Constants.PREFERENCES.SYSTEM_LANGUAGE, getResources().getConfiguration().locale.getCountry());
@@ -179,7 +174,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         conf.locale = new Locale(lang.toLowerCase());
         res.updateConfiguration(conf, dm);
         finishAffinity();
-        Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage( getBaseContext().getPackageName() );
+        Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
     }
@@ -187,14 +182,14 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(Constants.PREFERENCES.BUFFER_SIZE)) {
-            EditTextPreference et = (EditTextPreference)findPreference(key);
+            EditTextPreference et = (EditTextPreference) findPreference(key);
             int buffer_size;
             try {
                 buffer_size = Integer.parseInt(sPref.getString(Constants.PREFERENCES.BUFFER_SIZE, "0"));
-            } catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
                 buffer_size = -1;
             }
-            if (buffer_size < 0){
+            if (buffer_size < 0) {
                 Toast.makeText(SettingsActivity.this, R.string.wrong_value, Toast.LENGTH_SHORT).show();
             } else if (buffer_size < 1000) {
                 Toast.makeText(SettingsActivity.this, R.string.min_buffer, Toast.LENGTH_SHORT).show();
@@ -205,7 +200,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                 sharedPreferences.edit().putString(key, "60000").apply();
                 et.setText("60000");
             }
-        } else if (key.equals(Constants.PREFERENCES.LANGUAGE)){
+        } else if (key.equals(Constants.PREFERENCES.LANGUAGE)) {
             localize();
         }
     }
