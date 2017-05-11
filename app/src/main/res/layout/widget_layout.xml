@@ -57,6 +57,7 @@
         android:layout_toEndOf="@+id/widget_radio_icon"
         android:layout_toRightOf="@+id/widget_radio_icon"
         android:maxLines="2"
+        android:text="@string/default_status"
         android:textColor="@color/colorStick"
         android:textSize="16dp"
         tools:ignore="SpUsage" />

@@ -6,7 +6,6 @@
         android:entries="@array/lang_names"
         android:entryValues="@array/lang_values"
         android:key="lang"
-        android:summary="@string/settings_lang_summary"
         android:title="@string/lang_title" />
     <ListPreference
         android:defaultValue="@string/link_128"

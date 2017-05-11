@@ -147,6 +147,8 @@ class Constants {
         String INFO = "info";
         String COPY_LINK_TO_CLIPBOARD = "copy_link_to_clipboard";
         String BUFFER_SIZE = "buffer_size";
+        String HEADSET_BUTTON = "double_click";
+        String SYSTEM_LANGUAGE = "system_lang";
     }
 
     interface NOTIFICATION_ID {

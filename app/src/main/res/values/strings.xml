@@ -37,7 +37,6 @@
     <string name="restore_background">Restore Background</string>
     <string name="hint_search">Search</string>
     <string name="on_back_pressed">Press once again to exit!</string>
-    <string name="settings_lang_summary" translatable="false">Restart the application to accept the changes.</string>
     <string name="lang_title" translatable="false">Language</string>
     <string name="waiting_for_internet">Waiting for internet connection…</string>
     <string name="check_internet_connection">Check your Internet connection</string>

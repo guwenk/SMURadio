@@ -5,8 +5,9 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -17,8 +18,6 @@ import java.util.Locale;
 
 
 public class MyApplication extends Application {
-    private Locale locale;
-    private String lang;
     private String songTitle;
     private boolean serverStatus = true;
 
@@ -26,15 +25,20 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        lang = preferences.getString(Constants.PREFERENCES.LANGUAGE, "default");
+
+        String lang = preferences.getString(Constants.PREFERENCES.LANGUAGE, "default");
+        String sys_lang = getResources().getConfiguration().locale.getCountry();
+        if (!preferences.getString(Constants.PREFERENCES.SYSTEM_LANGUAGE, "").equals(sys_lang))
+            preferences.edit().putString(Constants.PREFERENCES.SYSTEM_LANGUAGE, sys_lang).apply();
         if (lang.equals("default")) {
-            lang = getResources().getConfiguration().locale.getCountry();
+            lang = sys_lang;
         }
-        locale = new Locale(lang);
-        Locale.setDefault(locale);
-        Configuration config = new Configuration();
-        config.locale = locale;
-        getBaseContext().getResources().updateConfiguration(config, null);
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        android.content.res.Configuration conf = res.getConfiguration();
+        conf.locale = new Locale(lang.toLowerCase());
+        res.updateConfiguration(conf, dm);
+
         sendBroadcasts();
         FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE.SERVER_STATUS).addValueEventListener(new ValueEventListener() {
             @Override
@@ -47,16 +51,6 @@ public class MyApplication extends Application {
 
             }
         });
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        locale = new Locale(lang);
-        Locale.setDefault(locale);
-        Configuration config = new Configuration();
-        config.locale = locale;
-        getBaseContext().getResources().updateConfiguration(config, null);
     }
 
     void saveTitle(String songTitle) {

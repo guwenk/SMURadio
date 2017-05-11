@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.widget.Toast;
@@ -166,6 +168,22 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         return Bitmap.createScaledBitmap(original, resultWidth, resultHeight, false);
     }
 
+    void localize(){
+        String lang = sPref.getString(Constants.PREFERENCES.LANGUAGE, "default");
+        if (lang.equals("default")) {
+            lang = sPref.getString(Constants.PREFERENCES.SYSTEM_LANGUAGE, getResources().getConfiguration().locale.getCountry());
+        }
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        android.content.res.Configuration conf = res.getConfiguration();
+        conf.locale = new Locale(lang.toLowerCase());
+        res.updateConfiguration(conf, dm);
+        finishAffinity();
+        Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage( getBaseContext().getPackageName() );
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
+    }
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(Constants.PREFERENCES.BUFFER_SIZE)) {
@@ -187,6 +205,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                 sharedPreferences.edit().putString(key, "60000").apply();
                 et.setText("60000");
             }
+        } else if (key.equals(Constants.PREFERENCES.LANGUAGE)){
+            localize();
         }
     }
 }

@@ -103,19 +103,22 @@ public class PlayerService extends Service {
     public static class RemoteControlReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
-                KeyEvent keyEvent = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-                if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK) {
-                    if (mediaKeyPressed + 1000 > System.currentTimeMillis() && mediaKeyPressed + 100 < System.currentTimeMillis()) {
-                        Intent intentPlayBtn = new Intent(context, PlayerService.class);
-                        intentPlayBtn.setAction(Constants.ACTION.ONLY_STOP_ACTION);
-                        context.startService(intentPlayBtn);
-                        intentPlayBtn.setAction(Constants.ACTION.ONLY_PLAY_ACTION);
-                        context.startService(intentPlayBtn);
+            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Constants.PREFERENCES.HEADSET_BUTTON, true)) {
+                if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
+                    KeyEvent keyEvent = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                    if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK) {
+                        if (mediaKeyPressed + 1000 > System.currentTimeMillis() && mediaKeyPressed + 100 < System.currentTimeMillis()) {
+                            Intent intentPlayBtn = new Intent(context, PlayerService.class);
+                            intentPlayBtn.setAction(Constants.ACTION.ONLY_STOP_ACTION);
+                            context.startService(intentPlayBtn);
+                            intentPlayBtn.setAction(Constants.ACTION.ONLY_PLAY_ACTION);
+                            context.startService(intentPlayBtn);
+                        }
+                        mediaKeyPressed = System.currentTimeMillis();
                     }
-                    mediaKeyPressed = System.currentTimeMillis();
                 }
             }
+
         }
     }
 
