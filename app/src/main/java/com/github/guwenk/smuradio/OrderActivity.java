@@ -215,12 +215,6 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
                     names_mem.add(trackElement.getAttribute("artist") + " - " + trackElement.getAttribute("title"));
                     trackList.add(tracks);
                 }
-                Collections.sort(names_mem, new Comparator<String>() {
-                    @Override
-                    public int compare(String s1, String s2) {
-                        return s1.compareToIgnoreCase(s2);
-                    }
-                });
                 for (int i = 0; i < names_mem.size(); i++) {
                     names.add((i + 1) + ". " + names_mem.get(i));
                 }
