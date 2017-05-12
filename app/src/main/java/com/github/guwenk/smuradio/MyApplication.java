@@ -69,18 +69,31 @@ public class MyApplication extends Application {
     }
 
     private void sendBroadcasts() {
-        Intent intent = new Intent(Constants.ACTION.UPDATE_ACTIVITY_ACTION);
-        sendBroadcast(intent);
-        intent = new Intent(Constants.ACTION.WIDGET_REFRESH_UI);
-        intent.putExtra(Constants.OTHER.SONG_TITLE_INTENT, songTitle);
-        sendBroadcast(intent);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                send();
+                try {
+                    Thread.sleep(100);
+                    send();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            void send(){
+                Intent intent = new Intent(Constants.ACTION.UPDATE_ACTIVITY_ACTION);
+                sendBroadcast(intent);
+                intent = new Intent(Constants.ACTION.WIDGET_REFRESH_UI);
+                intent.putExtra(Constants.OTHER.SONG_TITLE_INTENT, songTitle);
+                sendBroadcast(intent);
 
-        intent = new Intent(this, WidgetPlayer.class);
-        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        int[] ids = AppWidgetManager.getInstance(this).getAppWidgetIds(new ComponentName(this, WidgetPlayer.class));
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-        sendBroadcast(intent);
-
+                intent = new Intent(MyApplication.this, WidgetPlayer.class);
+                intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+                int[] ids = AppWidgetManager.getInstance(MyApplication.this).getAppWidgetIds(new ComponentName(MyApplication.this, WidgetPlayer.class));
+                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+                sendBroadcast(intent);
+            }
+        }).start();
     }
 
     String loadTitle() {

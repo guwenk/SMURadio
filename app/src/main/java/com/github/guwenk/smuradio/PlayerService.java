@@ -44,6 +44,7 @@ public class PlayerService extends Service {
     private boolean reconnectCancel = false;
     private SpeakerChecker speakerChecker;
     private String temp_title = "";
+    private boolean btnStatus = true;
     private int req, chan;
     private Handler handler = new Handler();
     private BASS.SYNCPROC MetaSync = new BASS.SYNCPROC() {
@@ -277,14 +278,16 @@ public class PlayerService extends Service {
     }
 
     private void toPlayButton() {
-        if (isStarted) {
+        if (isStarted && !btnStatus) {
+            btnStatus = true;
             views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_play_circle_outline_24px);
             startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
         }
     }
 
     private void toStopButton() {
-        if (isStarted) {
+        if (isStarted && btnStatus) {
+            btnStatus = false;
             views.setImageViewResource(R.id.status_bar_play, R.drawable.ic_pause_circle_outline_24px);
             startForeground(Constants.NOTIFICATION_ID.FOREGROUND_SERVICE, status);
         }

@@ -173,7 +173,10 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         android.content.res.Configuration conf = res.getConfiguration();
         conf.locale = new Locale(lang.toLowerCase());
         res.updateConfiguration(conf, dm);
-        finishAffinity();
+        try {
+            finishAffinity();
+        } catch(NullPointerException ignored) {
+        }
         Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
