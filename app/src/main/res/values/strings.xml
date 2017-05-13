@@ -70,5 +70,6 @@
     <string name="update_old_version">You use old version\nUpdate link was copied</string>
     <string name="update_latest_version">You use latest version</string>
     <string name="check_for_updates">Check for updates</string>
+    <string name="unavailable_below_5_0">Unavailable on Android below 5.0</string>
 
 </resources>

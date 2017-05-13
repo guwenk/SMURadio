@@ -57,4 +57,5 @@
     <string name="update_latest_version">Вы используете последнюю версию</string>
     <string name="update_old_version">Вы используете старую версию\nСсылка на обновление скопирована</string>
     <string name="check_for_updates">Проверка обновлений</string>
+    <string name="unavailable_below_5_0">Недоступно на Android ниже 5.0</string>
 </resources>

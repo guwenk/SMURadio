@@ -9,11 +9,13 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
@@ -30,6 +32,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     static final int GALLERY_REQUEST = 1;
@@ -47,7 +50,16 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         sPref.registerOnSharedPreferenceChangeListener(this);
         adminCounter = 0;
 
-        SimpleDateFormat format = new SimpleDateFormat("yyMMddkkmm", Locale.getDefault());
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            SwitchPreference switchPreference = (SwitchPreference) findPreference(Constants.PREFERENCES.HEADSET_BUTTON);
+            sPref.edit().putBoolean(Constants.PREFERENCES.HEADSET_BUTTON, false).apply();
+            switchPreference.setChecked(false);
+            switchPreference.setEnabled(false);
+            switchPreference.setSummary(R.string.unavailable_below_5_0);
+        }
+
+        SimpleDateFormat format = new SimpleDateFormat("yyMMddkkmm", Locale.ENGLISH);
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
         final String build = format.format(new Date(BuildConfig.TIMESTAMP));
 
         Preference btnSetBG = findPreference(Constants.PREFERENCES.SET_BACKGROUND);
