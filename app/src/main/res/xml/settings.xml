@@ -15,17 +15,17 @@
         android:key="stream_link"
         android:title="@string/bitrate" />
     <EditTextPreference
-        android:defaultValue="5000"
+        android:defaultValue="@string/default_buffer"
         android:inputType="number"
         android:key="buffer_size"
         android:singleLine="true"
         android:title="@string/buffer_size" />
     <SwitchPreference
-        android:defaultValue="true"
+        android:defaultValue="@string/default_autoreconnect"
         android:key="reconnect"
         android:title="@string/auto_reconnect" />
     <SwitchPreference
-        android:defaultValue="true"
+        android:defaultValue="@string/default_headset_reconnect"
         android:key="double_click"
         android:title="@string/double_click_to_reconnect"
         android:summary="@string/on_headset"/>
@@ -38,6 +38,9 @@
     <Preference
         android:key="copy_link_to_clipboard"
         android:title="@string/copy_link_to_clipboard" />
+    <Preference
+        android:key="restore_settings"
+        android:title="@string/restore_settings" />
     <Preference
         android:key="bugReport"
         android:summary="email"

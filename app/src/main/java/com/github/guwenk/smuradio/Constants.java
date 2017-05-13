@@ -131,8 +131,7 @@ class Constants {
         String UPDATE_ACTIVITY_ACTION = "com.github.guwenk.smuradio.updateActivity";
         String WIDGET_BUTTON_PLAY = "com.github.guwenk.smuradio.action.widget.play";
         String WIDGET_REFRESH_UI = "com.github.guwenk.smuradio.action.widget.refresh";
-        String ONLY_PLAY_ACTION = "com.github.guwenk.smuradio.action.only.play";
-        String ONLY_STOP_ACTION = "com.github.guwenk.smuradio.action.only.stop";
+        String RECONNECT = "com.github.guwenk.smuradio.action.reconnect";
     }
 
     interface PREFERENCES {
@@ -149,6 +148,7 @@ class Constants {
         String BUFFER_SIZE = "buffer_size";
         String HEADSET_BUTTON = "double_click";
         String SYSTEM_LANGUAGE = "system_lang";
+        String RESTORE_SETTINGS = "restore_settings";
     }
 
     interface NOTIFICATION_ID {

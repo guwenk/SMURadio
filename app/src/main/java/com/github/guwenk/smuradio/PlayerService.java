@@ -4,17 +4,18 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.media.session.MediaSession;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.RemoteViews;
@@ -46,6 +47,7 @@ public class PlayerService extends Service {
     private String temp_title = "";
     private boolean btnStatus = true;
     private int req, chan;
+    private MediaSessionCompat mediaSession;
     private Handler handler = new Handler();
     private BASS.SYNCPROC MetaSync = new BASS.SYNCPROC() {
         public void SYNCPROC(int handle, int channel, int data, Object user) {
@@ -96,6 +98,29 @@ public class PlayerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        mediaSession = new MediaSessionCompat(getApplicationContext(), "PLAYER_SERVICE");
+        mediaSession.setCallback(new MediaSessionCompat.Callback() {
+            @Override
+            public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+                if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(Constants.PREFERENCES.HEADSET_BUTTON, true)) {
+                    if (mediaButtonEvent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
+                        KeyEvent keyEvent = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                        if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK) {
+                            if (mediaKeyPressed + 1000 > System.currentTimeMillis() && mediaKeyPressed + 100 < System.currentTimeMillis()) {
+                                Intent intentReconnect = new Intent(getApplicationContext(), PlayerService.class);
+                                intentReconnect.setAction(Constants.ACTION.RECONNECT);
+                                getApplicationContext().startService(intentReconnect);
+                            }
+                            mediaKeyPressed = System.currentTimeMillis();
+                        }
+                    }
+                }
+                return super.onMediaButtonEvent(mediaButtonEvent);
+            }
+        });
+        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
         speakerChecker = new SpeakerChecker();
         sPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -135,12 +160,41 @@ public class PlayerService extends Service {
                 stopSelf();
                 break;
             }
-            case Constants.ACTION.ONLY_PLAY_ACTION: {
-                startPlayer();
-                break;
-            }
-            case Constants.ACTION.ONLY_STOP_ACTION: {
-                stopBASS();
+            case Constants.ACTION.RECONNECT: {
+                if (sPref.getBoolean(Constants.PREFERENCES.HEADSET_BUTTON, true)) {
+                    if (isPlaying){
+                        BASS.BASS_StreamFree(chan);
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        reconnectPlayer();
+                    } else {
+                        int buffer_size = Integer.parseInt(sPref.getString(Constants.PREFERENCES.BUFFER_SIZE, "5000"));
+                        if (BASS.BASS_Init(-1, 44100, 0)) {
+                            BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_READTIMEOUT, 15000); // read timeout
+                            BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_TIMEOUT, 5000); // connection timeout
+                            BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PLAYLIST, 1); // enable playlist processing
+                            BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_PREBUF, 0); // minimize automatic pre-buffering, so we can do it (and display it) instead
+                            if (buffer_size >= 1000 && buffer_size <= 60000)
+                                BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_BUFFER, buffer_size);
+
+                            // load AAC and HLS add-ons (if present)
+                            BASS.BASS_PluginLoad("libbass_aac.so", 0);
+                            BASS.BASS_PluginLoad("libbasshls.so", 0);
+                        }
+
+                        afListener = new AFListener();
+                        int requestResult = audioManager.requestAudioFocus(afListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+                        Log.i(AF_LOG_TAG, "Music request focus, result: " + requestResult);
+                        new Thread(new BASS_OpenURL(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)))).start();
+                        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+                        registerReceiver(speakerChecker, intentFilter);
+                        isPlaying = true;
+                        updateUI(null);
+                    }
+                }
                 break;
             }
         }
@@ -149,7 +203,6 @@ public class PlayerService extends Service {
 
     private void startPlayer() {
         reconnectCancel = false;
-        audioManager.registerMediaButtonEventReceiver(new ComponentName(this, RemoteControlReceiver.class));
         if (new InternetChecker().hasConnection(getApplicationContext())) {
             if (!((MyApplication) getApplication()).getServerStatus()) {
                 showToast(getBaseContext(), getString(R.string.server_is_off), Toast.LENGTH_LONG);
@@ -206,11 +259,14 @@ public class PlayerService extends Service {
 
     @Override
     public void onDestroy() {
+        mediaSession.setActive(false);
         updateUI(null);
         super.onDestroy();
     }
 
     private void showNotification() {
+        mediaSession.setActive(true);
+
         views = new RemoteViews(getPackageName(), R.layout.notification_layout);
 
         Intent intentToMainActivity = new Intent(this, MainActivity.class);
@@ -379,29 +435,6 @@ public class PlayerService extends Service {
                     toast.show();
                 }
             });
-
-        }
-    }
-
-    public static class RemoteControlReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Constants.PREFERENCES.HEADSET_BUTTON, true)) {
-                if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
-                    KeyEvent keyEvent = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-                    if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_HEADSETHOOK) {
-                        if (mediaKeyPressed + 1000 > System.currentTimeMillis() && mediaKeyPressed + 100 < System.currentTimeMillis()) {
-                            Intent intentPlayBtn = new Intent(context, PlayerService.class);
-                            intentPlayBtn.setAction(Constants.ACTION.ONLY_STOP_ACTION);
-                            context.startService(intentPlayBtn);
-                            intentPlayBtn.setAction(Constants.ACTION.ONLY_PLAY_ACTION);
-                            context.startService(intentPlayBtn);
-                        }
-                        mediaKeyPressed = System.currentTimeMillis();
-                    }
-                }
-            }
-
         }
     }
 

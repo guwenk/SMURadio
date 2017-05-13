@@ -343,7 +343,7 @@ public class MainActivity extends AppCompatActivity {
             this.title = title;
 
             ratingBar.setRating((float) 0);
-            if (!titleString.getTitle().equals("") && !titleString.getTitle().equals(getString(R.string.connecting)) && !titleString.getTitle().equals(getString(R.string.default_status))) {
+            if (!titleString.getTitle().equals("") && !titleString.getTitle().equals(getString(R.string.connecting)) && !titleString.getTitle().equals(getString(R.string.default_status)) && !titleString.getTitle().contains(getString(R.string.buffering))) {
                 String song_title = del_bad_symbols(titleString.getTitle());
                 mRatingRef.child(song_title).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

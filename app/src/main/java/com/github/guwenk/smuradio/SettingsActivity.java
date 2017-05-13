@@ -3,6 +3,7 @@ package com.github.guwenk.smuradio;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -14,6 +15,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -24,10 +26,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import static android.R.attr.format;
+import static android.R.attr.key;
+
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     static final int GALLERY_REQUEST = 1;
     private int adminCounter;
     private SharedPreferences sPref;
+    private boolean isRestore = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +90,47 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                 ClipData clipData = ClipData.newPlainText("", sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)));
                 clipboard.setPrimaryClip(clipData);
                 Toast.makeText(getApplicationContext(), getString(R.string.link_was_copied), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
+        Preference btnRestoreSettings = findPreference(Constants.PREFERENCES.RESTORE_SETTINGS);
+        btnRestoreSettings.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+                builder.setTitle(R.string.warning)
+                        .setMessage(R.string.settings_will_be_restored)
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                isRestore = true;
+                                sPref.edit()
+                                        .putString(Constants.PREFERENCES.BUFFER_SIZE, getString(R.string.default_buffer))
+                                        .putBoolean(Constants.PREFERENCES.HEADSET_BUTTON, Boolean.parseBoolean(getString(R.string.default_headset_reconnect)))
+                                        .putBoolean(Constants.PREFERENCES.RECONNECT, Boolean.parseBoolean(getString(R.string.default_autoreconnect)))
+                                        .putString(Constants.PREFERENCES.BACKGROUND_PATH, "")
+                                        .putString(Constants.PREFERENCES.LINK, getString(R.string.link_128))
+                                        .putString(Constants.PREFERENCES.LANGUAGE, getString(R.string.default_lang))
+                                        .apply();
+                                try {
+                                    finishAffinity();
+                                } catch (NullPointerException ignored) {
+                                }
+                                Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
+                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(i);
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
                 return true;
             }
         });
@@ -173,37 +220,42 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         android.content.res.Configuration conf = res.getConfiguration();
         conf.locale = new Locale(lang.toLowerCase());
         res.updateConfiguration(conf, dm);
-        try {
-            finishAffinity();
-        } catch(NullPointerException ignored) {
+        if (!isRestore) {
+            try {
+                finishAffinity();
+            } catch (NullPointerException ignored) {
+            }
+            Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
         }
-        Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(i);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(Constants.PREFERENCES.BUFFER_SIZE)) {
-            EditTextPreference et = (EditTextPreference) findPreference(key);
-            int buffer_size;
-            try {
-                buffer_size = Integer.parseInt(sPref.getString(Constants.PREFERENCES.BUFFER_SIZE, "0"));
-            } catch (NumberFormatException e) {
-                buffer_size = -1;
+        if (!isRestore) {
+            if (key.equals(Constants.PREFERENCES.BUFFER_SIZE)) {
+                EditTextPreference et = (EditTextPreference) findPreference(key);
+                int buffer_size;
+                try {
+                    buffer_size = Integer.parseInt(sPref.getString(Constants.PREFERENCES.BUFFER_SIZE, "0"));
+                } catch (NumberFormatException e) {
+                    buffer_size = -1;
+                }
+                if (buffer_size < 0) {
+                    Toast.makeText(SettingsActivity.this, R.string.wrong_value, Toast.LENGTH_SHORT).show();
+                } else if (buffer_size < 1000) {
+                    Toast.makeText(SettingsActivity.this, R.string.min_buffer, Toast.LENGTH_SHORT).show();
+                    sharedPreferences.edit().putString(key, "1000").apply();
+                    et.setText("1000");
+                } else if (buffer_size > 60000) {
+                    Toast.makeText(SettingsActivity.this, R.string.max_buffer, Toast.LENGTH_SHORT).show();
+                    sharedPreferences.edit().putString(key, "60000").apply();
+                    et.setText("60000");
+                }
             }
-            if (buffer_size < 0) {
-                Toast.makeText(SettingsActivity.this, R.string.wrong_value, Toast.LENGTH_SHORT).show();
-            } else if (buffer_size < 1000) {
-                Toast.makeText(SettingsActivity.this, R.string.min_buffer, Toast.LENGTH_SHORT).show();
-                sharedPreferences.edit().putString(key, "1000").apply();
-                et.setText("1000");
-            } else if (buffer_size > 60000) {
-                Toast.makeText(SettingsActivity.this, R.string.max_buffer, Toast.LENGTH_SHORT).show();
-                sharedPreferences.edit().putString(key, "60000").apply();
-                et.setText("60000");
-            }
-        } else if (key.equals(Constants.PREFERENCES.LANGUAGE)) {
+        }
+        if (key.equals(Constants.PREFERENCES.LANGUAGE)) {
             localize();
         }
     }

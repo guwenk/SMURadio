@@ -3,11 +3,13 @@
     <string name="version" translatable="false">1.0 (pre-release 3)</string>
     <string name="link_128" translatable="false">http://free.radioheart.ru:8000/guwenk128</string>
     <string name="default_lang" translatable="false">default</string>
+    <string name="default_buffer" translatable="false">5000</string>
+    <string name="default_autoreconnect" translatable="false">true</string>
+    <string name="default_headset_reconnect" translatable="false">true</string>
     <string-array name="bitrate_values">
         <item>http://free.radioheart.ru:8000/guwenk64</item>
         <item>http://free.radioheart.ru:8000/guwenk96</item>
         <item>http://free.radioheart.ru:8000/guwenk128</item>
-        <item>http://192.168.1.69:8000/live</item>
     </string-array>
     <string-array name="lang_values">
         <item>default</item>

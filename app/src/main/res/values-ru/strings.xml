@@ -49,4 +49,9 @@
     <string name="build">"Сборка: "</string>
     <string name="double_click_to_reconnect">Двойной клик для переподключения</string>
     <string name="on_headset">На гарнитуре</string>
+    <string name="cancel">Отмена</string>
+    <string name="ok">ОК</string>
+    <string name="restore_settings">Восстановить настройки</string>
+    <string name="settings_will_be_restored">Все настройки будут восстановлены</string>
+    <string name="warning">ПРЕДУПРЕЖДЕНИЕ!</string>
 </resources>

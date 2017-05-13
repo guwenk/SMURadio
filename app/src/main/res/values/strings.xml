@@ -17,7 +17,6 @@
         <item>64 kbps</item>
         <item>96 kbps</item>
         <item>128 kbps</item>
-        <item>dev_channel</item>
     </string-array>
     <string-array name="lang_names">
         <item>Default</item>
@@ -63,5 +62,10 @@
     <string name="build">"Build: "</string>
     <string name="double_click_to_reconnect">Double click to reconnect</string>
     <string name="on_headset">On headset</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="settings_will_be_restored">All settings will be restored!</string>
+    <string name="warning">WARNING!</string>
+    <string name="restore_settings">Restore settings</string>
 
 </resources>

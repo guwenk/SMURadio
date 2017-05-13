@@ -12,8 +12,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_marginLeft="6dp"
-        android:layout_marginStart="6dp"
         android:layout_toRightOf="@+id/status_bar_play"
         android:layout_toEndOf="@+id/status_bar_play"
         android:textColor="#ffffff"
@@ -48,8 +46,6 @@
         android:layout_marginTop="2dp"
         android:layout_toRightOf="@id/status_bar_play"
         android:layout_toEndOf="@id/status_bar_play"
-        android:layout_marginLeft="6dp"
-        android:layout_marginStart="6dp"
         android:layout_below="@id/radio_head"
         android:src="@drawable/ic_radio_24dp"
         android:contentDescription="@string/radio_image" />
@@ -62,7 +58,7 @@
         android:layout_height="62dp"
         android:scaleType="centerCrop"
         android:layout_margin="1dp"
-        android:padding="8dp"
+        android:padding="4dp"
         android:background="@null"
         android:contentDescription="@string/play_and_stop" />
 
