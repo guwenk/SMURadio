@@ -149,6 +149,7 @@ class Constants {
         String HEADSET_BUTTON = "double_click";
         String SYSTEM_LANGUAGE = "system_lang";
         String RESTORE_SETTINGS = "restore_settings";
+        String CHECK_FOR_UPDATES = "check_for_updates";
     }
 
     interface NOTIFICATION_ID {
@@ -167,5 +168,8 @@ class Constants {
         String REQUESTS = "Requests";
         String ORDER = "order";
         String SERVER_STATUS = "ServerStatus";
+        String UPDATES = "Updates";
+        String LATEST_BUILD = "LatestBuild";
+        String UPDATE_LINK = "UpdateLink";
     }
 }

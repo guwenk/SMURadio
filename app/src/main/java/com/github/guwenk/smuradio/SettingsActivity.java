@@ -21,19 +21,22 @@ import android.util.Log;
 import android.view.Display;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import static android.R.attr.format;
-import static android.R.attr.key;
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     static final int GALLERY_REQUEST = 1;
     private int adminCounter;
     private SharedPreferences sPref;
     private boolean isRestore = false;
+    private boolean isVersionRequested = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,9 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         sPref = PreferenceManager.getDefaultSharedPreferences(this);
         sPref.registerOnSharedPreferenceChangeListener(this);
         adminCounter = 0;
+
+        SimpleDateFormat format = new SimpleDateFormat("yyMMddkkmm", Locale.getDefault());
+        final String build = format.format(new Date(BuildConfig.TIMESTAMP));
 
         Preference btnSetBG = findPreference(Constants.PREFERENCES.SET_BACKGROUND);
         btnSetBG.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -94,6 +100,38 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             }
         });
 
+        Preference btnCheckForUpdates = findPreference(Constants.PREFERENCES.CHECK_FOR_UPDATES);
+        btnCheckForUpdates.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                if (!isVersionRequested) {
+                    isVersionRequested = true;
+                    FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE.UPDATES).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            long latestBuild = dataSnapshot.child(Constants.FIREBASE.LATEST_BUILD).getValue(Long.class);
+                            long currentBuild = Integer.parseInt(build);
+                            if (currentBuild >= latestBuild) {
+                                Toast.makeText(getApplicationContext(), R.string.update_latest_version, Toast.LENGTH_SHORT).show();
+                            } else {
+                                ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                                ClipData clipData = ClipData.newPlainText("", dataSnapshot.child(Constants.FIREBASE.UPDATE_LINK).getValue(String.class));
+                                clipboard.setPrimaryClip(clipData);
+                                Toast.makeText(getApplicationContext(), R.string.update_old_version, Toast.LENGTH_LONG).show();
+                            }
+                            isVersionRequested = false;
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+                return true;
+            }
+        });
+
         Preference btnRestoreSettings = findPreference(Constants.PREFERENCES.RESTORE_SETTINGS);
         btnRestoreSettings.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -135,8 +173,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             }
         });
 
-        SimpleDateFormat format = new SimpleDateFormat("yyMMddkkmm", Locale.getDefault());
-        String build = format.format(new Date(BuildConfig.TIMESTAMP));
         Preference preferenceInfo = findPreference(Constants.PREFERENCES.INFO);
         preferenceInfo.setSummary(getString(R.string.author) + "Guwenk" + "\n" + getString(R.string.version_title) + getString(R.string.version) + "\n" + getString(R.string.build) + build);
         preferenceInfo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

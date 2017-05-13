@@ -46,6 +46,9 @@
         android:summary="email"
         android:title="@string/contact_the_developer" />
     <Preference
+        android:key="check_for_updates"
+        android:title="@string/check_for_updates" />
+    <Preference
         android:icon="@drawable/ic_info_24dp"
         android:key="info"
         android:title="@string/app_name" />

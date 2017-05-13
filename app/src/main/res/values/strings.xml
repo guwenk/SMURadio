@@ -67,5 +67,8 @@
     <string name="settings_will_be_restored">All settings will be restored!</string>
     <string name="warning">WARNING!</string>
     <string name="restore_settings">Restore settings</string>
+    <string name="update_old_version">You use old version\nUpdate link was copied</string>
+    <string name="update_latest_version">You use latest version</string>
+    <string name="check_for_updates">Check for updates</string>
 
 </resources>

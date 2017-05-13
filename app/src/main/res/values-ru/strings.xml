@@ -54,4 +54,7 @@
     <string name="restore_settings">Восстановить настройки</string>
     <string name="settings_will_be_restored">Все настройки будут восстановлены</string>
     <string name="warning">ПРЕДУПРЕЖДЕНИЕ!</string>
+    <string name="update_latest_version">Вы используете последнюю версию</string>
+    <string name="update_old_version">Вы используете старую версию\nСсылка на обновление скопирована</string>
+    <string name="check_for_updates">Проверка обновлений</string>
 </resources>
