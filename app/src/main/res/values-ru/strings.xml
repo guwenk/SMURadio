@@ -37,7 +37,6 @@
     <string name="ask_update_rating">Обновить оценку?</string>
     <string name="no">НЕТ</string>
     <string name="yes">ДА</string>
-    <string name="version_title">"Версия: "</string>
     <string name="author">"Автор: "</string>
     <string name="background_changed">Фон изменён</string>
     <string name="background_restored">Фон восстановлен</string>
@@ -46,7 +45,6 @@
     <string name="server_is_off">Сервер SomeRadio выключен</string>
     <string name="wrong_value">Неверное значение</string>
     <string name="buffer_size">Размер буфера</string>
-    <string name="build">"Сборка: "</string>
     <string name="double_click_to_reconnect">Двойной клик для переподключения</string>
     <string name="on_headset">На гарнитуре</string>
     <string name="cancel">Отмена</string>
@@ -58,4 +56,9 @@
     <string name="update_old_version">Вы используете старую версию\nСсылка на обновление скопирована</string>
     <string name="check_for_updates">Проверка обновлений</string>
     <string name="unavailable_below_5_0">Недоступно на Android ниже 5.0</string>
+    <string name="about">О приложении</string>
+    <string name="main_settings">Основные настройки</string>
+    <string name="special_thanks">Особая благодарность:</string>
+    <string name="lang_title">Язык</string>
+    <string name="choose_language">Выберите язык</string>
 </resources>

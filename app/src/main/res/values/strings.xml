@@ -36,7 +36,7 @@
     <string name="restore_background">Restore Background</string>
     <string name="hint_search">Search</string>
     <string name="on_back_pressed">Press once again to exit!</string>
-    <string name="lang_title" translatable="false">Language</string>
+    <string name="lang_title">Language</string>
     <string name="waiting_for_internet">Waiting for internet connection…</string>
     <string name="check_internet_connection">Check your Internet connection</string>
     <string name="name_copied">Title copied</string>
@@ -51,7 +51,6 @@
     <string name="yes">YES</string>
     <string name="no">NO</string>
     <string name="author">"Author: "</string>
-    <string name="version_title">"Version: "</string>
     <string name="background_restored">Background restored</string>
     <string name="background_changed">Background changed</string>
     <string name="wrong_value">Wrong value</string>
@@ -59,7 +58,6 @@
     <string name="max_buffer">Max buffer = 60000 millis</string>
     <string name="server_is_off">SomeRadio server is off</string>
     <string name="buffer_size">Buffer Size</string>
-    <string name="build">"Build: "</string>
     <string name="double_click_to_reconnect">Double click to reconnect</string>
     <string name="on_headset">On headset</string>
     <string name="cancel">Cancel</string>
@@ -71,5 +69,9 @@
     <string name="update_latest_version">You use latest version</string>
     <string name="check_for_updates">Check for updates</string>
     <string name="unavailable_below_5_0">Unavailable on Android below 5.0</string>
+    <string name="about">About</string>
+    <string name="special_thanks">Special thanks:</string>
+    <string name="main_settings">Main Settings</string>
+    <string name="choose_language">Choose language</string>
 
 </resources>

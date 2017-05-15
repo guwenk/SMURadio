@@ -18,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -186,14 +187,21 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         });
 
         Preference preferenceInfo = findPreference(Constants.PREFERENCES.INFO);
-        preferenceInfo.setSummary(getString(R.string.author) + "Guwenk" + "\n" + getString(R.string.version_title) + getString(R.string.version) + "\n" + getString(R.string.build) + build);
         preferenceInfo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
+                /*
                 if (adminCounter == 4) {
                     Intent intent = new Intent(SettingsActivity.this, AdminActivity.class);
                     startActivity(intent);
                 } else adminCounter++;
+                 */
+                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+                builder.setTitle(Html.fromHtml("<u>" + getString(R.string.about) + "</u>"))
+                        .setMessage(Html.fromHtml("<i><b><u>"+getString(R.string.version)+", Build " + build+"</u></b></i>"+ "<br>" + getString(R.string.author) + "Guwenk" +"<br><br>" + getString(R.string.special_thanks)+"<br>  • Stronger197<br>  • Aliksmen"))
+                        .setCancelable(true);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
                 return false;
             }
         });

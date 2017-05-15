@@ -190,7 +190,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
         @Override
         protected Void doInBackground(String... strings) {
             try {
-                URL url = new URL("https://firebasestorage.googleapis.com/v0/b/someradio-4bfa5.appspot.com/o/Base.xml?alt=media");
+                URL url = new URL(getString(R.string.music_base_link));
                 URLConnection connection = url.openConnection();
                 connection.setConnectTimeout(10000);
                 connection.setReadTimeout(10000);
