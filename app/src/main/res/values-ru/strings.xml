@@ -61,4 +61,6 @@
     <string name="special_thanks">Особая благодарность:</string>
     <string name="lang_title">Язык</string>
     <string name="choose_language">Выберите язык</string>
+    <string name="download_update">Вы хотите загрузить обновление?</string>
+    <string name="update_available">Доступно обновление!</string>
 </resources>

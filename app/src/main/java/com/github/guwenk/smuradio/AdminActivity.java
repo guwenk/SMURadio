@@ -59,7 +59,6 @@ public class AdminActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Запрос отправлен (prev)", Toast.LENGTH_SHORT).show();
             }
         });
-        Toast.makeText(getApplicationContext(), "Admin Menu", Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -1,8 +1,5 @@
 package com.github.guwenk.smuradio;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,6 +19,7 @@ import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.Menu;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -37,7 +35,6 @@ import java.util.TimeZone;
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     static final int GALLERY_REQUEST = 1;
-    private int adminCounter;
     private SharedPreferences sPref;
     private boolean isRestore = false;
     private boolean isVersionRequested = false;
@@ -49,7 +46,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
         sPref = PreferenceManager.getDefaultSharedPreferences(this);
         sPref.registerOnSharedPreferenceChangeListener(this);
-        adminCounter = 0;
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             SwitchPreference switchPreference = (SwitchPreference) findPreference(Constants.PREFERENCES.HEADSET_BUTTON);
@@ -101,17 +97,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                 return true;
             }
         });
-        Preference btnCopyLink = findPreference(Constants.PREFERENCES.COPY_LINK_TO_CLIPBOARD);
-        btnCopyLink.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clipData = ClipData.newPlainText("", sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)));
-                clipboard.setPrimaryClip(clipData);
-                Toast.makeText(getApplicationContext(), getString(R.string.link_was_copied), Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
 
         Preference btnCheckForUpdates = findPreference(Constants.PREFERENCES.CHECK_FOR_UPDATES);
         btnCheckForUpdates.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -121,16 +106,31 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                     isVersionRequested = true;
                     FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE.UPDATES).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                        public void onDataChange(final DataSnapshot dataSnapshot) {
                             long latestBuild = dataSnapshot.child(Constants.FIREBASE.LATEST_BUILD).getValue(Long.class);
                             long currentBuild = Integer.parseInt(build);
                             if (currentBuild >= latestBuild) {
                                 Toast.makeText(getApplicationContext(), R.string.update_latest_version, Toast.LENGTH_SHORT).show();
                             } else {
-                                ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                                ClipData clipData = ClipData.newPlainText("", dataSnapshot.child(Constants.FIREBASE.UPDATE_LINK).getValue(String.class));
-                                clipboard.setPrimaryClip(clipData);
-                                Toast.makeText(getApplicationContext(), R.string.update_old_version, Toast.LENGTH_LONG).show();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+                                builder.setTitle(R.string.update_available)
+                                        .setMessage(R.string.download_update)
+                                        .setCancelable(true)
+                                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(dataSnapshot.child(Constants.FIREBASE.UPDATE_LINK).getValue(String.class)));
+                                                startActivity(i);
+                                            }
+                                        })
+                                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                            }
+                                        });
+                                AlertDialog alertDialog = builder.create();
+                                alertDialog.show();
                             }
                             isVersionRequested = false;
                         }
@@ -190,12 +190,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         preferenceInfo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                /*
-                if (adminCounter == 4) {
-                    Intent intent = new Intent(SettingsActivity.this, AdminActivity.class);
-                    startActivity(intent);
-                } else adminCounter++;
-                 */
                 AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
                 builder.setTitle(Html.fromHtml("<u>" + getString(R.string.about) + "</u>"))
                         .setMessage(Html.fromHtml("<i><b><u>"+getString(R.string.version)+", Build " + build+"</u></b></i>"+ "<br>" + getString(R.string.author) + "Guwenk" +"<br><br>" + getString(R.string.special_thanks)+"<br>  • Stronger197<br>  • Aliksmen"))
@@ -207,11 +201,14 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
 
     @Override
     protected void onStart() {
         super.onStart();
-        adminCounter = 0;
     }
 
     @Override

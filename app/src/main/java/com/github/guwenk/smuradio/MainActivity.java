@@ -11,11 +11,14 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,7 +38,6 @@ import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static long back_pressed;
     protected PlayerService playerService;
     protected ServiceConnection serviceConnection;
     protected float rateValue;
@@ -250,7 +252,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -299,7 +300,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        try {
+            if (!getString(R.string.dev_id).equals(Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID)))
+                getMenuInflater().inflate(R.menu.menu_main, menu);
+            else {
+                getMenuInflater().inflate(R.menu.menu_main_dev, menu);
+            }
+        } catch (NullPointerException ignored) {
+            getMenuInflater().inflate(R.menu.menu_main, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -310,6 +319,20 @@ public class MainActivity extends AppCompatActivity {
         switch (id) {
             case R.id.action_settings:
                 intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.telegram_bot:
+                intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://t.me/SomeRadio_bot"));
+                startActivity(intent);
+                return true;
+            case R.id.copy_link_to_clipboard:
+                ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clipData = ClipData.newPlainText("", sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)));
+                clipboard.setPrimaryClip(clipData);
+                Toast.makeText(getApplicationContext(), getString(R.string.link_was_copied), Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.admin_menu:
+                intent = new Intent(MainActivity.this, AdminActivity.class);
                 startActivity(intent);
                 return true;
             default:

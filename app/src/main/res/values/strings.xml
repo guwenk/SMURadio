@@ -73,5 +73,8 @@
     <string name="special_thanks">Special thanks:</string>
     <string name="main_settings">Main Settings</string>
     <string name="choose_language">Choose language</string>
+    <string name="download_update">Do you want to download the update?</string>
+    <string name="update_available">Update available!</string>
+    <string name="telegram_bot" translatable="false">Telegram Bot</string>
 
 </resources>

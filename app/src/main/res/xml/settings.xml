@@ -41,9 +41,6 @@
             android:title="@string/restore_settings" />
     </PreferenceScreen>
     <Preference
-        android:key="copy_link_to_clipboard"
-        android:title="@string/copy_link_to_clipboard" />
-    <Preference
         android:key="bugReport"
         android:summary="email"
         android:title="@string/contact_the_developer" />
