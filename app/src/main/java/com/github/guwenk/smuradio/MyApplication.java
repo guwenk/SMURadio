@@ -3,11 +3,9 @@ package com.github.guwenk.smuradio;
 import android.app.Application;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.media.AudioManager;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -18,8 +16,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Locale;
-
-import static java.lang.Thread.interrupted;
 
 
 public class MyApplication extends Application {
@@ -74,31 +70,17 @@ public class MyApplication extends Application {
     }
 
     private void sendBroadcasts() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                send();
-                try {
-                    Thread.sleep(100);
-                    send();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            void send(){
-                Intent intent = new Intent(Constants.ACTION.UPDATE_ACTIVITY_ACTION);
-                sendBroadcast(intent);
-                intent = new Intent(Constants.ACTION.WIDGET_REFRESH_UI);
-                intent.putExtra(Constants.OTHER.SONG_TITLE_INTENT, songTitle);
-                sendBroadcast(intent);
+        Intent intent = new Intent(Constants.ACTION.UPDATE_ACTIVITY_ACTION);
+        sendBroadcast(intent);
+        intent = new Intent(Constants.ACTION.WIDGET_REFRESH_UI);
+        intent.putExtra(Constants.OTHER.SONG_TITLE_INTENT, songTitle);
+        sendBroadcast(intent);
 
-                intent = new Intent(MyApplication.this, WidgetPlayer.class);
-                intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                int[] ids = AppWidgetManager.getInstance(MyApplication.this).getAppWidgetIds(new ComponentName(MyApplication.this, WidgetPlayer.class));
-                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                sendBroadcast(intent);
-            }
-        }).start();
+        intent = new Intent(MyApplication.this, WidgetPlayer.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int[] ids = AppWidgetManager.getInstance(MyApplication.this).getAppWidgetIds(new ComponentName(MyApplication.this, WidgetPlayer.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        sendBroadcast(intent);
     }
 
     String loadTitle() {

@@ -144,7 +144,6 @@ public class PlayerService extends Service {
                     else {
                         startPlayer();
                     }
-                    updateUI(null);
                 }
                 break;
             }
@@ -227,11 +226,10 @@ public class PlayerService extends Service {
             afListener = new AFListener();
             int requestResult = audioManager.requestAudioFocus(afListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             Log.i(AF_LOG_TAG, "Music request focus, result: " + requestResult);
+            isPlaying = true;
             new Thread(new BASS_OpenURL(sPref.getString(Constants.PREFERENCES.LINK, getString(R.string.link_128)))).start();
             IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
             registerReceiver(speakerChecker, intentFilter);
-            isPlaying = true;
-            updateUI(null);
         } else {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(new Runnable() {
@@ -308,6 +306,7 @@ public class PlayerService extends Service {
     }
 
     void updateUI(String text) {
+        Log.d("PLAYER_UI", text+"");
         if (text != null) {
             refreshTitle(text);
         }
