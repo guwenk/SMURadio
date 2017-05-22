@@ -144,12 +144,13 @@ class Constants {
         String BACKGROUND = "background";
         String BUG_REPORT = "bugReport";
         String INFO = "info";
-        String COPY_LINK_TO_CLIPBOARD = "copy_link_to_clipboard";
         String BUFFER_SIZE = "buffer_size";
         String HEADSET_BUTTON = "double_click";
         String SYSTEM_LANGUAGE = "system_lang";
         String RESTORE_SETTINGS = "restore_settings";
         String CHECK_FOR_UPDATES = "check_for_updates";
+        String BUILD_NUM = "build_num";
+        String CHECK_UPDATES_AT_STARTUP = "check_updates_at_startup";
     }
 
     interface NOTIFICATION_ID {
@@ -171,5 +172,6 @@ class Constants {
         String UPDATES = "Updates";
         String LATEST_BUILD = "LatestBuild";
         String UPDATE_LINK = "UpdateLink";
+        String LATEST_VERSION = "LatestVersion";
     }
 }

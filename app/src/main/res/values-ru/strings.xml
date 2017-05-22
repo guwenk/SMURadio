@@ -63,4 +63,7 @@
     <string name="choose_language">Выберите язык</string>
     <string name="download_update">Вы хотите загрузить обновление?</string>
     <string name="update_available">Доступно обновление!</string>
+    <string name="check_for_updates_at_startup">Проверка обновлений при запуске</string>
+    <string name="later">Позже</string>
+    <string name="please_wait">Пожалуйста, подождите…</string>
 </resources>

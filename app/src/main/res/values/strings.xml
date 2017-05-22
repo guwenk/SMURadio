@@ -76,5 +76,8 @@
     <string name="download_update">Do you want to download the update?</string>
     <string name="update_available">Update available!</string>
     <string name="telegram_bot" translatable="false">Telegram Bot</string>
+    <string name="check_for_updates_at_startup">Check for updates at startup</string>
+    <string name="later">Later</string>
+    <string name="please_wait">Please, wait…</string>
 
 </resources>

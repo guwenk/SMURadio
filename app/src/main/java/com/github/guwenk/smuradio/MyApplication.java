@@ -15,7 +15,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 
 public class MyApplication extends Application {
@@ -39,6 +42,11 @@ public class MyApplication extends Application {
         android.content.res.Configuration conf = res.getConfiguration();
         conf.locale = new Locale(lang.toLowerCase());
         res.updateConfiguration(conf, dm);
+
+        SimpleDateFormat format = new SimpleDateFormat("yyMMddkkmm", Locale.ENGLISH);
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+        final String build = format.format(new Date(BuildConfig.TIMESTAMP));
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putLong(Constants.PREFERENCES.BUILD_NUM, Long.parseLong(build)).apply();
 
         sendBroadcasts();
         FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE.SERVER_STATUS).addValueEventListener(new ValueEventListener() {

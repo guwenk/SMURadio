@@ -306,7 +306,6 @@ public class PlayerService extends Service {
     }
 
     void updateUI(String text) {
-        Log.d("PLAYER_UI", text+"");
         if (text != null) {
             refreshTitle(text);
         }

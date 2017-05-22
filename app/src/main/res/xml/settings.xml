@@ -39,6 +39,10 @@
         <Preference
             android:key="restore_settings"
             android:title="@string/restore_settings" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="check_updates_at_startup"
+            android:title="@string/check_for_updates_at_startup" />
     </PreferenceScreen>
     <Preference
         android:key="bugReport"

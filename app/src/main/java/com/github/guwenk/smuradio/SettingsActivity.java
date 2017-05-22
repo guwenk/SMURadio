@@ -28,10 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     static final int GALLERY_REQUEST = 1;
@@ -55,9 +52,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             switchPreference.setSummary(R.string.unavailable_below_5_0);
         }
 
-        SimpleDateFormat format = new SimpleDateFormat("yyMMddkkmm", Locale.ENGLISH);
-        format.setTimeZone(TimeZone.getTimeZone("GMT"));
-        final String build = format.format(new Date(BuildConfig.TIMESTAMP));
+        final long build = sPref.getLong(Constants.PREFERENCES.BUILD_NUM, 0);
 
         Preference btnSetBG = findPreference(Constants.PREFERENCES.SET_BACKGROUND);
         btnSetBG.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -103,18 +98,19 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 if (!isVersionRequested) {
+                    Toast.makeText(SettingsActivity.this, R.string.please_wait, Toast.LENGTH_SHORT).show();
                     isVersionRequested = true;
                     FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE.UPDATES).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(final DataSnapshot dataSnapshot) {
                             long latestBuild = dataSnapshot.child(Constants.FIREBASE.LATEST_BUILD).getValue(Long.class);
-                            long currentBuild = Integer.parseInt(build);
-                            if (currentBuild >= latestBuild) {
-                                Toast.makeText(getApplicationContext(), R.string.update_latest_version, Toast.LENGTH_SHORT).show();
+                            String version = dataSnapshot.child(Constants.FIREBASE.LATEST_VERSION).getValue(String.class);
+                            if (build >= latestBuild) {
+                                Toast.makeText(SettingsActivity.this, R.string.update_latest_version, Toast.LENGTH_SHORT).show();
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
                                 builder.setTitle(R.string.update_available)
-                                        .setMessage(R.string.download_update)
+                                        .setMessage(Html.fromHtml(getString(R.string.download_update) + "<br><i><b><u>" + version + "</u></b></i>"))
                                         .setCancelable(true)
                                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                                             @Override
@@ -192,7 +188,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             public boolean onPreferenceClick(Preference preference) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
                 builder.setTitle(Html.fromHtml("<u>" + getString(R.string.about) + "</u>"))
-                        .setMessage(Html.fromHtml("<i><b><u>"+getString(R.string.version)+", Build " + build+"</u></b></i>"+ "<br>" + getString(R.string.author) + "Guwenk" +"<br><br>" + getString(R.string.special_thanks)+"<br>  • Stronger197<br>  • Aliksmen"))
+                        .setMessage(Html.fromHtml("<i><b><u>" + getString(R.string.version) + ", Build " + build + "</u></b></i>" + "<br>" + getString(R.string.author) + "Guwenk" + "<br><br>" + getString(R.string.special_thanks) + "<br>  • Stronger197<br>  • Aliksmen"))
                         .setCancelable(true);
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
