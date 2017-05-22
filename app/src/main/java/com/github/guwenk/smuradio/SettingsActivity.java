@@ -98,11 +98,13 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 if (!isVersionRequested) {
-                    Toast.makeText(SettingsActivity.this, R.string.please_wait, Toast.LENGTH_SHORT).show();
+                    final Toast toast = Toast.makeText(SettingsActivity.this, R.string.please_wait, Toast.LENGTH_SHORT);
+                    toast.show();
                     isVersionRequested = true;
                     FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE.UPDATES).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(final DataSnapshot dataSnapshot) {
+                            toast.cancel();
                             long latestBuild = dataSnapshot.child(Constants.FIREBASE.LATEST_BUILD).getValue(Long.class);
                             String version = dataSnapshot.child(Constants.FIREBASE.LATEST_VERSION).getValue(String.class);
                             if (build >= latestBuild) {
