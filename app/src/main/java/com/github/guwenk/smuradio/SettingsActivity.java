@@ -28,6 +28,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -51,8 +53,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             switchPreference.setEnabled(false);
             switchPreference.setSummary(R.string.unavailable_below_5_0);
         }
-
-        final long build = sPref.getLong(Constants.PREFERENCES.BUILD_NUM, 0);
 
         Preference btnSetBG = findPreference(Constants.PREFERENCES.SET_BACKGROUND);
         btnSetBG.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -107,7 +107,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                             toast.cancel();
                             long latestBuild = dataSnapshot.child(Constants.FIREBASE.LATEST_BUILD).getValue(Long.class);
                             String version = dataSnapshot.child(Constants.FIREBASE.LATEST_VERSION).getValue(String.class);
-                            if (build >= latestBuild) {
+                            if (BuildConfig.VERSION_CODE >= latestBuild) {
                                 Toast.makeText(SettingsActivity.this, R.string.update_latest_version, Toast.LENGTH_SHORT).show();
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
@@ -188,9 +188,11 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         preferenceInfo.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
+                SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
+                String build_time = format.format(new Date(BuildConfig.TIMESTAMP));
                 AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
                 builder.setTitle(Html.fromHtml("<u>" + getString(R.string.about) + "</u>"))
-                        .setMessage(Html.fromHtml("<i><b><u>" + getString(R.string.version) + ", Build " + build + "</u></b></i>" + "<br>" + getString(R.string.author) + "Guwenk" + "<br><br>" + getString(R.string.special_thanks) + "<br>  • Stronger197<br>  • Aliksmen"))
+                        .setMessage(Html.fromHtml("<i><b><u>v" + BuildConfig.VERSION_NAME + ", Build " + BuildConfig.VERSION_CODE + " (" + build_time + ")</u></b></i><br>" + getString(R.string.programming) + "<b>Guwenk</b>" + "<br>" + getString(R.string.design) + "<b>Stronger197</b>" + "<br><br>" + getString(R.string.special_thanks) + "<br>&emsp;• Aliksmen"))
                         .setCancelable(true);
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();

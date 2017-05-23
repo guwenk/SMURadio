@@ -181,12 +181,6 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
 
     //Парсинг XML из сети
     private class ParseXML extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
         @Override
         protected Void doInBackground(String... strings) {
             try {
@@ -224,7 +218,6 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
             if (!caughtException && names.size() > 0) {
                 ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar_orderMenu);
                 pb.setVisibility(View.INVISIBLE);

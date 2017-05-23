@@ -85,8 +85,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onDataChange(final DataSnapshot dataSnapshot) {
                     final long latestBuild = dataSnapshot.child(Constants.FIREBASE.LATEST_BUILD).getValue(Long.class);
                     String version = dataSnapshot.child(Constants.FIREBASE.LATEST_VERSION).getValue(String.class);
-                    long currentBuild = sPref.getLong(Constants.PREFERENCES.BUILD_NUM, 0);
-                    if (currentBuild < latestBuild) {
+                    if (BuildConfig.VERSION_CODE < latestBuild) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                         builder.setTitle(R.string.update_available)
                                 .setMessage(Html.fromHtml(getString(R.string.download_update) + "<br><i><b><u>" + version + "</u></b></i>"))
@@ -140,14 +139,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        titleTV.setOnClickListener(new View.OnClickListener() {
+        titleTV.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-
+            public boolean onLongClick(View v) {
                 ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clipData = ClipData.newPlainText("", titleTV.getText());
                 clipboard.setPrimaryClip(clipData);
                 Toast.makeText(getApplicationContext(), R.string.name_copied, Toast.LENGTH_SHORT).show();
+                return true;
             }
         });
 

@@ -39,11 +39,13 @@
         <TextView
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/main_status1"
-            android:visibility="invisible"
+            android:visibility="visible"
             android:background="@drawable/rectangle_gray"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="24sp"
+            android:paddingTop="2sp"
+            android:paddingBottom="2sp"
             android:elevation="8dp"
 
             android:singleLine="true"

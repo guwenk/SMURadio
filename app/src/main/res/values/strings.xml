@@ -13,12 +13,12 @@
     <string name="link_was_copied">Stream link was copied</string>
     <string name="unable_to_connect_to_server">Unable to connect to server</string>
     <string name="action_settings">Settings</string>
-    <string-array name="bitrate_names">
+    <string-array name="bitrate_names" translatable="false">
         <item>64 kbps</item>
         <item>96 kbps</item>
         <item>128 kbps</item>
     </string-array>
-    <string-array name="lang_names">
+    <string-array name="lang_names" translatable="false">
         <item>Default</item>
         <item>English</item>
         <item>Русский</item>
@@ -50,7 +50,6 @@
     <string name="ask_update_rating">Do you want to update the rating?</string>
     <string name="yes">YES</string>
     <string name="no">NO</string>
-    <string name="author">"Author: "</string>
     <string name="background_restored">Background restored</string>
     <string name="background_changed">Background changed</string>
     <string name="wrong_value">Wrong value</string>
@@ -70,7 +69,7 @@
     <string name="check_for_updates">Check for updates</string>
     <string name="unavailable_below_5_0">Unavailable on Android below 5.0</string>
     <string name="about">About</string>
-    <string name="special_thanks">Special thanks:</string>
+    <string name="special_thanks" translatable="false">Special thanks:</string>
     <string name="main_settings">Main Settings</string>
     <string name="choose_language">Choose language</string>
     <string name="download_update">Do you want to download the update?</string>
@@ -79,5 +78,7 @@
     <string name="check_for_updates_at_startup">Check for updates at startup</string>
     <string name="later">Later</string>
     <string name="please_wait">Please, wait…</string>
+    <string name="programming" translatable="false">"Programming: "</string>
+    <string name="design" translatable="false">"Design: "</string>
 
 </resources>

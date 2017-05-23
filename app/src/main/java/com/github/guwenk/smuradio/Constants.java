@@ -149,7 +149,6 @@ class Constants {
         String SYSTEM_LANGUAGE = "system_lang";
         String RESTORE_SETTINGS = "restore_settings";
         String CHECK_FOR_UPDATES = "check_for_updates";
-        String BUILD_NUM = "build_num";
         String CHECK_UPDATES_AT_STARTUP = "check_updates_at_startup";
     }
 
@@ -170,7 +169,7 @@ class Constants {
         String ORDER = "order";
         String SERVER_STATUS = "ServerStatus";
         String UPDATES = "Updates";
-        String LATEST_BUILD = "LatestBuild";
+        String LATEST_BUILD = "LatestVersionCode";
         String UPDATE_LINK = "UpdateLink";
         String LATEST_VERSION = "LatestVersion";
     }

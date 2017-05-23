@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="version" translatable="false">v1.2</string>
     <string name="link_128" translatable="false">http://free.radioheart.ru:8000/guwenk128</string>
     <string name="default_lang" translatable="false">default</string>
     <string name="default_buffer" translatable="false">5000</string>
@@ -8,12 +7,12 @@
     <string name="default_headset_reconnect" translatable="false">true</string>
     <string name="music_base_link" translatable="false">https://firebasestorage.googleapis.com/v0/b/someradio-4bfa5.appspot.com/o/Base.xml?alt=media</string>
     <string name="dev_id" translatable="false">c769c80e3a541bf3</string>
-    <string-array name="bitrate_values">
+    <string-array name="bitrate_values" translatable="false">
         <item>http://free.radioheart.ru:8000/guwenk64</item>
         <item>http://free.radioheart.ru:8000/guwenk96</item>
         <item>http://free.radioheart.ru:8000/guwenk128</item>
     </string-array>
-    <string-array name="lang_values">
+    <string-array name="lang_values" translatable="false">
         <item>default</item>
         <item>en</item>
         <item>ru</item>
