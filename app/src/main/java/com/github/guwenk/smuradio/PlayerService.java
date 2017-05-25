@@ -27,6 +27,8 @@ import com.un4seen.bass.BASS;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
+import static android.R.attr.action;
+
 
 public class PlayerService extends Service {
     private static final int BASS_SYNC_HLS_SEGMENT = 0x10300;
@@ -130,7 +132,12 @@ public class PlayerService extends Service {
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String action = (intent.getAction() == null ? "null" : intent.getAction());
+        String action;
+        try {
+            action = intent.getAction();
+        }catch (NullPointerException e){
+            action = "null";
+        }
 
         switch (action) {
             case Constants.ACTION.STARTFOREGROUND_ACTION: {
