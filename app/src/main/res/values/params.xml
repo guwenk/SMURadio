@@ -5,6 +5,7 @@
     <string name="default_buffer" translatable="false">5000</string>
     <string name="default_autoreconnect" translatable="false">true</string>
     <string name="default_headset_reconnect" translatable="false">true</string>
+    <string name="default_check_updates_at_startup" translatable="false">true</string>
     <string name="music_base_link" translatable="false">https://firebasestorage.googleapis.com/v0/b/someradio-4bfa5.appspot.com/o/Base.xml?alt=media</string>
     <string name="dev_id" translatable="false">c769c80e3a541bf3</string>
     <string-array name="bitrate_values" translatable="false">

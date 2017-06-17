@@ -18,8 +18,6 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -79,41 +77,6 @@ public class MainActivity extends AppCompatActivity {
         ratingTV = (TextView) findViewById(R.id.main_ratingTV);
 
         myApplication = (MyApplication) getApplication();
-
-        if (sPref.getBoolean(Constants.PREFERENCES.CHECK_UPDATES_AT_STARTUP, true))
-            mRootRef.child(Constants.FIREBASE.UPDATES).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(final DataSnapshot dataSnapshot) {
-                    final long latestBuild = dataSnapshot.child(Constants.FIREBASE.LATEST_BUILD).getValue(Long.class);
-                    String version = dataSnapshot.child(Constants.FIREBASE.LATEST_VERSION).getValue(String.class);
-                    if (BuildConfig.VERSION_CODE < latestBuild) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                        builder.setTitle(R.string.update_available)
-                                .setMessage(Html.fromHtml(getString(R.string.download_update) + "<br><i><b><u>" + version + "</u></b></i>"))
-                                .setCancelable(true)
-                                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(dataSnapshot.child(Constants.FIREBASE.UPDATE_LINK).getValue(String.class)));
-                                        startActivity(i);
-                                    }
-                                })
-                                .setNegativeButton(R.string.later, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                    }
-                                });
-                        AlertDialog alertDialog = builder.create();
-                        alertDialog.show();
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
 
         final Button btnToTrackOrder = (Button) findViewById(R.id.main_btnToTrackOrder);
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
@@ -323,8 +286,8 @@ public class MainActivity extends AppCompatActivity {
         if (songTitle != null) {
             titleTV.setText(songTitle);
             if (!titleString.getTitle().equals(songTitle))
-                titleString.setTitle(songTitle);
-            titleTV.setVisibility(View.VISIBLE);
+                //titleString.setTitle(songTitle);
+                titleTV.setVisibility(View.VISIBLE);
             imageButton.setImageResource(R.drawable.ic_stop);
         } else {
             titleTV.setText("");

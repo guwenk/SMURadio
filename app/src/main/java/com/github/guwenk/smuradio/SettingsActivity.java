@@ -22,11 +22,6 @@ import android.view.Display;
 import android.view.Menu;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,7 +31,6 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     static final int GALLERY_REQUEST = 1;
     private SharedPreferences sPref;
     private boolean isRestore = false;
-    private boolean isVersionRequested = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,51 +87,15 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             }
         });
 
-        Preference btnCheckForUpdates = findPreference(Constants.PREFERENCES.CHECK_FOR_UPDATES);
-        btnCheckForUpdates.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        Preference btnToPlayMarket = findPreference(Constants.PREFERENCES.CHECK_FOR_UPDATES);
+        btnToPlayMarket.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                if (!isVersionRequested) {
-                    final Toast toast = Toast.makeText(SettingsActivity.this, R.string.please_wait, Toast.LENGTH_SHORT);
-                    toast.show();
-                    isVersionRequested = true;
-                    FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE.UPDATES).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(final DataSnapshot dataSnapshot) {
-                            toast.cancel();
-                            long latestBuild = dataSnapshot.child(Constants.FIREBASE.LATEST_BUILD).getValue(Long.class);
-                            String version = dataSnapshot.child(Constants.FIREBASE.LATEST_VERSION).getValue(String.class);
-                            if (BuildConfig.VERSION_CODE >= latestBuild) {
-                                Toast.makeText(SettingsActivity.this, R.string.update_latest_version, Toast.LENGTH_SHORT).show();
-                            } else {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
-                                builder.setTitle(R.string.update_available)
-                                        .setMessage(Html.fromHtml(getString(R.string.download_update) + "<br><i><b><u>" + version + "</u></b></i>"))
-                                        .setCancelable(true)
-                                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(dataSnapshot.child(Constants.FIREBASE.UPDATE_LINK).getValue(String.class)));
-                                                startActivity(i);
-                                            }
-                                        })
-                                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-
-                                            }
-                                        });
-                                AlertDialog alertDialog = builder.create();
-                                alertDialog.show();
-                            }
-                            isVersionRequested = false;
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+                final String appPackageName = getPackageName();
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
                 }
                 return true;
             }
@@ -159,6 +117,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                                         .putString(Constants.PREFERENCES.BUFFER_SIZE, getString(R.string.default_buffer))
                                         .putBoolean(Constants.PREFERENCES.HEADSET_BUTTON, Boolean.parseBoolean(getString(R.string.default_headset_reconnect)))
                                         .putBoolean(Constants.PREFERENCES.RECONNECT, Boolean.parseBoolean(getString(R.string.default_autoreconnect)))
+                                        .putBoolean(Constants.PREFERENCES.CHECK_UPDATES_AT_STARTUP, Boolean.parseBoolean(getString(R.string.default_check_updates_at_startup)))
                                         .putString(Constants.PREFERENCES.BACKGROUND_PATH, "")
                                         .putString(Constants.PREFERENCES.LINK, getString(R.string.link_128))
                                         .putString(Constants.PREFERENCES.LANGUAGE, getString(R.string.default_lang))

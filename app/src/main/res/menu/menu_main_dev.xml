@@ -9,11 +9,13 @@
         android:title="@string/action_settings"
         android:icon="@drawable/ic_settings_24dp"
         app:showAsAction="ifRoom"/>
+    <!--
     <item
         android:id="@+id/copy_link_to_clipboard"
         android:orderInCategory="1"
         android:title="@string/copy_link_to_clipboard"
         app:showAsAction="never" />
+    -->
     <item
         android:id="@+id/telegram_bot"
         android:orderInCategory="2"
