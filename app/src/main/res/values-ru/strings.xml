@@ -51,17 +51,11 @@
     <string name="restore_settings">Восстановить настройки</string>
     <string name="settings_will_be_restored">Все настройки будут восстановлены</string>
     <string name="warning">ПРЕДУПРЕЖДЕНИЕ!</string>
-    <string name="update_latest_version">Вы используете последнюю версию</string>
-    <string name="update_old_version">Вы используете старую версию\nСсылка на обновление скопирована</string>
-    <string name="check_for_updates">Проверка обновлений</string>
     <string name="unavailable_below_5_0">Недоступно на Android ниже 5.0</string>
     <string name="about">О приложении</string>
     <string name="main_settings">Основные настройки</string>
     <string name="lang_title">Язык</string>
     <string name="choose_language">Выберите язык</string>
-    <string name="download_update">Вы хотите загрузить обновление?</string>
-    <string name="update_available">Доступно обновление!</string>
-    <string name="check_for_updates_at_startup">Проверка обновлений при запуске</string>
     <string name="later">Позже</string>
     <string name="please_wait">Пожалуйста, подождите…</string>
 </resources>

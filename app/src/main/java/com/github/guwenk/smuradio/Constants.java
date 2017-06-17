@@ -168,9 +168,5 @@ class Constants {
         String REQUESTS = "Requests";
         String ORDER = "order";
         String SERVER_STATUS = "ServerStatus";
-        String UPDATES = "Updates";
-        String LATEST_BUILD = "LatestVersionCode";
-        String UPDATE_LINK = "UpdateLink";
-        String LATEST_VERSION = "LatestVersion";
     }
 }

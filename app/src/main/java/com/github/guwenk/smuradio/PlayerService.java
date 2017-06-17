@@ -22,12 +22,14 @@ import android.view.KeyEvent;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.un4seen.bass.BASS;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-
-import static android.R.attr.action;
 
 
 public class PlayerService extends Service {
@@ -132,12 +134,7 @@ public class PlayerService extends Service {
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String action;
-        try {
-            action = intent.getAction();
-        }catch (NullPointerException e){
-            action = "null";
-        }
+        String action = String.valueOf(intent.getAction());
 
         switch (action) {
             case Constants.ACTION.STARTFOREGROUND_ACTION: {
@@ -213,9 +210,21 @@ public class PlayerService extends Service {
     private void startPlayer() {
         reconnectCancel = false;
         if (new InternetChecker().hasConnection(getApplicationContext())) {
-            if (!((MyApplication) getApplication()).getServerStatus()) {
-                showToast(getBaseContext(), getString(R.string.server_is_off), Toast.LENGTH_LONG);
-            }
+
+            FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE.SERVER_STATUS).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.getValue(Boolean.class)) {
+                        showToast(getBaseContext(), getString(R.string.server_is_off), Toast.LENGTH_LONG);
+                        stopBASS();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
             int buffer_size = Integer.parseInt(sPref.getString(Constants.PREFERENCES.BUFFER_SIZE, "5000"));
             if (BASS.BASS_Init(-1, 44100, 0)) {
                 BASS.BASS_SetConfig(BASS.BASS_CONFIG_NET_READTIMEOUT, 15000); // read timeout

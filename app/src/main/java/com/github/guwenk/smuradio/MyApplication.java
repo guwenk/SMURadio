@@ -9,17 +9,11 @@ import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.Locale;
 
 
 public class MyApplication extends Application {
     private String songTitle;
-    private boolean serverStatus = true;
 
     @Override
     public void onCreate() {
@@ -40,17 +34,7 @@ public class MyApplication extends Application {
         res.updateConfiguration(conf, dm);
 
         sendBroadcasts();
-        FirebaseDatabase.getInstance().getReference().child(Constants.FIREBASE.SERVER_STATUS).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                serverStatus = dataSnapshot.getValue(Boolean.class);
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
     void saveTitle(String songTitle) {
@@ -84,9 +68,5 @@ public class MyApplication extends Application {
 
     String loadTitle() {
         return songTitle;
-    }
-
-    boolean getServerStatus() {
-        return serverStatus;
     }
 }

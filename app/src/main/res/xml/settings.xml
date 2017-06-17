@@ -39,18 +39,14 @@
         <Preference
             android:key="restore_settings"
             android:title="@string/restore_settings" />
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="check_updates_at_startup"
-            android:title="@string/check_for_updates_at_startup" />
     </PreferenceScreen>
     <Preference
         android:key="bugReport"
         android:summary="email"
         android:title="@string/contact_the_developer" />
     <Preference
-        android:key="check_for_updates"
-        android:title="@string/check_for_updates" />
+        android:key="toPlayMarket"
+        android:title="@string/openGP" />
     <Preference
         android:icon="@drawable/ic_info_24dp"
         android:key="info"
