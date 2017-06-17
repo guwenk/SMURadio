@@ -148,7 +148,7 @@ class Constants {
         String HEADSET_BUTTON = "double_click";
         String SYSTEM_LANGUAGE = "system_lang";
         String RESTORE_SETTINGS = "restore_settings";
-        String CHECK_FOR_UPDATES = "check_for_updates";
+        String CHECK_FOR_UPDATES = "toPlayMarket";
         String CHECK_UPDATES_AT_STARTUP = "check_updates_at_startup";
     }
 
