@@ -91,7 +91,12 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         btnToPlayMarket.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Toast.makeText(SettingsActivity.this, "Coming soon...", Toast.LENGTH_SHORT).show();
+                final String appPackageName = getPackageName();
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                }
                 return true;
             }
         });
