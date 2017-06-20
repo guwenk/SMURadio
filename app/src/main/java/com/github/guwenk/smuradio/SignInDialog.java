@@ -59,6 +59,7 @@ public class SignInDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
         builder = new AlertDialog.Builder(getActivity());
         View signInDialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_sign_in, null);
         builder.setView(signInDialogView);
@@ -179,7 +180,11 @@ public class SignInDialog extends DialogFragment {
         if(check1 && check2 && check3) {
             alertDialogButton.setEnabled(true);
         } else {
-            alertDialogButton.setEnabled(false);
+            try {
+                alertDialogButton.setEnabled(false); // ПЕРЕДЕЛАТЬ!
+            } catch (Exception e) {
+                Log.d(AuthTag, "Button status error");
+            }
         }
     }
 
@@ -210,4 +215,5 @@ public class SignInDialog extends DialogFragment {
                     }
                 });
     }
+
 }
