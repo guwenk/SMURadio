@@ -187,7 +187,12 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 Log.d(AuthTag, "onMenuItemClick");
-                signIn();
+
+
+                SignInDialog signInDialog = new SignInDialog();
+                signInDialog.show(getFragmentManager(), "Sing in dialog");
+
+               // signIn();
 
 
 

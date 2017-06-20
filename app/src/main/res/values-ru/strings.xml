@@ -58,4 +58,10 @@
     <string name="choose_language">Выберите язык</string>
     <string name="later">Позже</string>
     <string name="please_wait">Пожалуйста, подождите…</string>
+    <string name="you_accepting_license_agreement">Вы принимаете\nпользовательское соглашение</string>
+
+
+    
+    
+    
 </resources>
