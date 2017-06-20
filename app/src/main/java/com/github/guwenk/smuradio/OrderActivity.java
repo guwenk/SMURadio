@@ -1,5 +1,6 @@
 package com.github.guwenk.smuradio;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -71,13 +73,11 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
     private ImageView backgroundImage;
     private boolean isClosed = false;
 
-    // Auth
-    private static final int RC_SIGN_IN = 9001;
-    GoogleApiClient mGoogleApiClient;
-    private FirebaseAuth mAuth;
-    // /Auth
-
+    //AUTH
     private final String AuthTag = "Auth debug: ";
+    private static GoogleApiClient mGoogleApiClient;
+    private static final int RC_SIGN_IN = 9001;
+    // /AUTH
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,26 +92,7 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, names);
         listView.setAdapter(adapter);
 
-
-
-
-        // Auth
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("525276358555-jrq2c9t7lbjeup1golt9596aa79v9g8d.apps.googleusercontent.com")
-                .requestEmail()
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Log.d(AuthTag, "OnConnectionFailed");
-                    }
-                }).addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        mAuth = FirebaseAuth.getInstance();
-        // /Auth
+        Auth();
 
         //<Кнопка голосования>
         Button btnVote = (Button) findViewById(R.id.buttonOrder);
@@ -166,12 +147,6 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
             backgroundBitmap = new FileManager(getApplicationContext()).loadBitmap(path, Constants.PREFERENCES.BACKGROUND);
             backgroundImage.setImageBitmap(backgroundBitmap);
         }
-
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null)
-            Log.d(AuthTag, "currentUser not null");
-        else
-            Log.d(AuthTag, "currentUser is null");
     }
 
     @Override
@@ -192,10 +167,6 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
                 SignInDialog signInDialog = new SignInDialog();
                 signInDialog.show(getFragmentManager(), "Sing in dialog");
 
-               // signIn();
-
-
-
                 return true;
             }
         });
@@ -203,33 +174,6 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
         return true;
     }
 
-    private void signIn() {
-        Log.d(AuthTag, "signIn");
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    // [START onactivityresult]
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                Log.d(AuthTag, "result is success");
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = result.getSignInAccount();
-                // firebaseAuthWithGoogle(account);
-            } else {
-                Log.d(AuthTag, "result is not success");
-                Log.d(AuthTag, result.getStatus().toString());
-
-            }
-        }
-    }
-    // [END onactivityresult]
 
     @Override
     public boolean onQueryTextSubmit(String filter) {
@@ -324,4 +268,27 @@ public class OrderActivity extends AppCompatActivity implements SearchView.OnQue
             }
         }
     }
+
+    // Auth
+    public void Auth(){
+        // Auth
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("525276358555-jrq2c9t7lbjeup1golt9596aa79v9g8d.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Log.d(AuthTag, "OnConnectionFailed");
+                    }
+                }).addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+    }
+
+    public static GoogleApiClient getmGoogleApiClient() {
+        return mGoogleApiClient;
+    }
+
 }
