@@ -1,5 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/add_song"
+        android:title="Add song"
+        android:icon="@drawable/ic_add_48dp"
+        app:showAsAction="always" />
     <item android:id="@+id/search"
         android:title="@string/hint_search"
         android:icon="@drawable/ic_search_24dp"
