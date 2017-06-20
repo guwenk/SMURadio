@@ -1,46 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/signInGridLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:columnCount="2"
-    android:paddingTop="16dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    >
+    android:paddingTop="16dp">
+
+    <Button
+        android:id="@+id/selectFileButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_columnSpan="2"
+        android:layout_gravity="fill_horizontal"
+        android:backgroundTint="@color/white"
+        android:drawableLeft="@drawable/ic_file_upload_24dp"
+        android:gravity="center"
+        android:text="@string/select_file"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimary"
+        android:lines="1"/>
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_columnSpan="2"
         android:layout_gravity="fill_horizontal"
-        android:layout_columnSpan="2"/>
+        android:paddingTop="8dp"/>
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_columnSpan="2">
+        android:layout_height="wrap_content"
+        android:layout_columnSpan="2"
+        android:orientation="horizontal">
 
-    <CheckBox
-        android:id="@+id/checkBox2"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_row="1"
-        android:layout_column="0"
-        android:layout_marginLeft="-8dp"
-        android:button="@null"
-        android:layout_gravity="center_vertical"
-        android:background="?android:attr/listChoiceIndicatorMultiple"
-        />
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkBox2"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="center_vertical"
+            android:background="?android:attr/listChoiceIndicatorMultiple"
+            android:button="@null"
+            app:theme="@style/checkBoxStyle"/>
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_column="1"
             android:layout_gravity="center_vertical|fill_horizontal"
-            android:layout_row="1"
-            android:text="TextView" />
+             />
     </LinearLayout>
 </GridLayout>
