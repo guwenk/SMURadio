@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -45,6 +44,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -63,14 +63,16 @@ public class SignInDialog extends DialogFragment {
     boolean check1; // SIGN IN
     boolean check2; // LICENSE
     boolean check3; // FILE
+    GoogleSignInAccount account;
+    FirebaseUser user;
     private String songTitle;
     private Uri filepath;
     private SignInButton signInButton;
     private AlertDialog.Builder builder;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mAuth;
-    // /AUTH
 
+    // /AUTH
     // STORAGE
     private StorageReference mStorageRef;
     // /STORAGE
@@ -84,6 +86,13 @@ public class SignInDialog extends DialogFragment {
         builder.setMessage(R.string.upload_your_song);
 
         checkBox = (CheckBox) signInDialogView.findViewById(R.id.checkBox2);
+
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        } else {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+        }
 
 
         check1 = false;
@@ -174,7 +183,7 @@ public class SignInDialog extends DialogFragment {
             if (result.isSuccess()) {
                 Log.d(AuthTag, "Result is success");
                 // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = result.getSignInAccount();
+                account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
             } else {
                 Log.d(AuthTag, "Result is not success");
@@ -255,7 +264,7 @@ public class SignInDialog extends DialogFragment {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            user = mAuth.getCurrentUser();
                             signInButton.setEnabled(false);
                             check1 = true;
                             //Log.d(AuthTag, "onComplete " + check1 + " " + check2 + " " + check3);
@@ -292,8 +301,7 @@ public class SignInDialog extends DialogFragment {
             int currentOrientation = getResources().getConfiguration().orientation;
             if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
                 getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-            }
-            else {
+            } else {
                 getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
             }
 
@@ -303,7 +311,11 @@ public class SignInDialog extends DialogFragment {
 
             Log.d(AuthTag, "UPLOAD FILE storage referense: " + musicRef);
 
-            musicRef.putFile(filepath)
+            StorageMetadata metadata = new StorageMetadata.Builder()
+                    .setCustomMetadata("By", user.getUid())
+                    .build();
+
+            musicRef.putFile(filepath, metadata)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -333,7 +345,7 @@ public class SignInDialog extends DialogFragment {
                             try {
                                 progressDialog.setMessage((int) progress + getString(R.string.uploaded_procents));
                                 Log.d(AuthTag, "UPLOAD FILE progress update: " + progress);
-                            }catch (Exception e) {
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
@@ -341,6 +353,12 @@ public class SignInDialog extends DialogFragment {
         } else {
             Toast.makeText(getActivity(), R.string.wrong_file, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
     }
 
     private class customButtonClickListener implements View.OnClickListener {
@@ -356,5 +374,6 @@ public class SignInDialog extends DialogFragment {
             }
         }
     }
+
 
 }
