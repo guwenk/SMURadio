@@ -102,6 +102,8 @@ public class SignInDialog extends DialogFragment {
             @Override
             public void onClick(View textView) {
                 Log.d(AuthTag, "click");
+                LicenseDialog licenseDialog = new LicenseDialog();
+                licenseDialog.show(getFragmentManager(), "Sing in dialog");
             }
             @Override
             public void updateDrawState(TextPaint ds) {
