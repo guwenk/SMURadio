@@ -16,4 +16,8 @@
         <item name="colorControlActivated">@color/colorAccent</item>
     </style>
 
+    <style name="checkBoxStyle" parent="Base.Theme.AppCompat">
+        <item name="colorAccent">#3cba54</item>
+    </style>
+
 </resources>
