@@ -59,9 +59,20 @@
     <string name="later">Позже</string>
     <string name="please_wait">Пожалуйста, подождите…</string>
     <string name="you_accepting_license_agreement">Вы принимаете\nпользовательское соглашение</string>
+    <string name="auth_failed">Авторизация не удалась</string>
+    <string name="close">закрыть</string>
+    <string name="file_uploaded">Файл загружен!</string>
+    <string name="next">Далее</string>
+    <string name="select_file">Выбрать файл</string>
+    <string name="select_music">Выбрать музыку</string>
+    <string name="upload_your_song">Загрузить ваш трек</string>
+    <string name="uploaded_procents">% загружено…</string>
+    <string name="uploading">Загрузка…</string>
+    <string name="uploading_error">Ошибка загрузки файла:</string>
+    <string name="toast_decline_lic_agreement">Необходимо принять соглашение</string>
+    <string name="wrong_file">Неверный файл. Пожалуйста, выберете другой</string>
+    <string name="decline">Отказ</string>
+    <string name="accept">Принять</string>
 
 
-    
-    
-    
 </resources>

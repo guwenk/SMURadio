@@ -150,6 +150,7 @@ class Constants {
         String RESTORE_SETTINGS = "restore_settings";
         String CHECK_FOR_UPDATES = "toPlayMarket";
         String CHECK_UPDATES_AT_STARTUP = "check_updates_at_startup";
+        String LIC_AGREEMENT = "lic_agreement";
     }
 
     interface NOTIFICATION_ID {

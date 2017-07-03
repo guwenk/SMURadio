@@ -76,7 +76,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             public boolean onPreferenceClick(Preference preference) {
                 Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType("message/rfc822");
-                i.putExtra(Intent.EXTRA_EMAIL, new String[]{"guwenk@rambler.ru"});
+                i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.email)});
                 i.putExtra(Intent.EXTRA_SUBJECT, "SomeRadio");
                 try {
                     startActivity(Intent.createChooser(i, getString(R.string.send_email)));

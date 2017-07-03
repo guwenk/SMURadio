@@ -78,6 +78,28 @@ public class MainActivity extends AppCompatActivity {
 
         myApplication = (MyApplication) getApplication();
 
+        if (!sPref.getBoolean(Constants.PREFERENCES.LIC_AGREEMENT, false)){
+            AlertDialog.Builder licBuilder = new AlertDialog.Builder(this);
+            licBuilder.setView(R.layout.dialog_license)
+                    .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            sPref.edit().putBoolean(Constants.PREFERENCES.LIC_AGREEMENT, true).apply();
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.decline, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(MainActivity.this, getString(R.string.toast_decline_lic_agreement), Toast.LENGTH_SHORT).show();
+                            finishAffinity();
+                        }
+                    })
+                    .setCancelable(false);
+            AlertDialog licDialog = licBuilder.create();
+            licDialog.show();
+        }
+
         final Button btnToTrackOrder = (Button) findViewById(R.id.main_btnToTrackOrder);
         btnToTrackOrder.setOnClickListener(new View.OnClickListener() {
             @Override

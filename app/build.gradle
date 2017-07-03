@@ -5,7 +5,7 @@ android {
         config {
             keyAlias 'AndroidDebugKey'
             keyPassword 'android'
-            storeFile file('C:/Users/Stron/.android/debug.keystore')
+            storeFile file('C:/Users/denis/.android/debug.keystore')
             storePassword 'android'
         }
     }
@@ -15,8 +15,8 @@ android {
         applicationId "com.github.guwenk.smuradio"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 5
-        versionName "1.4"
+        versionCode 6
+        versionName "1.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
     }
