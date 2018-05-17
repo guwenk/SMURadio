@@ -9,14 +9,19 @@ android {
             storePassword 'android'
         }
     }
-    compileSdkVersion 25
+    lintOptions {
+
+        checkReleaseBuilds false
+
+    }
+    compileSdkVersion 27
     buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "com.github.guwenk.smuradio"
         minSdkVersion 16
-        targetSdkVersion 25
-        versionCode 6
-        versionName "1.5"
+        targetSdkVersion 27
+        versionCode 7
+        versionName "1.5.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         buildConfigField "long", "TIMESTAMP", System.currentTimeMillis() + "L"
     }

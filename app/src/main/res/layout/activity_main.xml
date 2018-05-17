@@ -85,15 +85,6 @@
                 android:textSize="24sp"
                 android:visibility="invisible" />
 
-            <RatingBar
-                android:theme="@style/RatingBar"
-                android:id="@+id/main_RatingBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:numStars="5"
-                android:visibility="invisible" />
-
-
         </GridLayout>
 
         <ImageButton

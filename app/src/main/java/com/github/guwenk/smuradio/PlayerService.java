@@ -484,6 +484,7 @@ public class PlayerService extends Service {
                 chan = connection;
             }
             if (chan == 0) {
+                Log.e("ERRORRRRRRR", url);
                 bassError(getString(R.string.cant_play_the_stream));
             } else {
                 handler.postDelayed(timer, 50);

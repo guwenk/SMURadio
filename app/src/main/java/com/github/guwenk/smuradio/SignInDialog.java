@@ -311,6 +311,10 @@ public class SignInDialog extends DialogFragment {
 
             Log.d(AuthTag, "UPLOAD FILE storage referense: " + musicRef);
 
+            try {
+                user = mAuth.getCurrentUser();
+            } catch (Exception ignored){}
+
             StorageMetadata metadata = new StorageMetadata.Builder()
                     .setCustomMetadata("By", user.getUid())
                     .build();
